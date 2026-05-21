@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data IKM — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .filter-bar { background:white; border-radius:var(--radius-lg); padding:1rem 1.2rem; margin-bottom:1.2rem; box-shadow:var(--shadow); display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .search-input { flex:1; min-width:200px; border:1.5px solid rgba(61,31,13,0.15); border-radius:var(--radius); padding:9px 14px; font-size:14px; font-family:'Plus Jakarta Sans',sans-serif; background:var(--cream); outline:none; }
+    .search-input:focus { border-color:var(--gold); }
+    .ikm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; }
+    .ikm-card { background:white; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow); border:1px solid rgba(61,31,13,0.07); transition:transform 0.2s,box-shadow 0.2s; }
+    .ikm-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+    .ikm-foto { height:140px; background:linear-gradient(135deg,var(--brown),var(--gold)); display:flex; align-items:center; justify-content:center; font-size:48px; overflow:hidden; }
+    .ikm-foto img { width:100%; height:100%; object-fit:cover; }
+    .ikm-body { padding:1rem; }
+    .ikm-nama { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--brown); margin-bottom:4px; }
+    .ikm-pemilik { font-size:12px; color:var(--text2); margin-bottom:8px; }
+    .ikm-meta { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .ikm-lokasi { font-size:12px; color:var(--text2); }
+    .empty-state { text-align:center; padding:4rem 2rem; color:var(--text2); }
+    .empty-state div { font-size:48px; margin-bottom:1rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="data-ikm.html" class="active">Data IKM</a>
+      <a href="peta.html">Peta Industri</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;">
+      <h2 style="margin:0;">📊 Data IKM Manggarai Barat</h2>
+      <a href="form-ikm.html" class="btn btn-primary">➕ Tambah IKM</a>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="🔍 Cari nama usaha, pemilik, atau desa...">
+      <select class="form-select" id="filterKategori" style="width:auto;min-width:160px;margin-bottom:0;">
+        <option value="">Semua Kategori</option>
+        <option value="Anyaman">Anyaman</option>
+        <option value="Tenun">Tenun</option>
+        <option value="Makanan & Minuman">Makanan & Minuman</option>
+        <option value="Kerajinan">Kerajinan</option>
+        <option value="Industri Logam">Industri Logam</option>
+      </select>
+      <select class="form-select" id="filterKecamatan" style="width:auto;min-width:160px;margin-bottom:0;">
+        <option value="">Semua Kecamatan</option>
+        <option value="Komodo">Komodo</option>
+        <option value="Sano Nggoang">Sano Nggoang</option>
+        <option value="Lembor">Lembor</option>
+        <option value="Lembor Selatan">Lembor Selatan</option>
+        <option value="Welak">Welak</option>
+        <option value="Boleng">Boleng</option>
+        <option value="Mbeliling">Mbeliling</option>
+      </select>
+    </div>
+
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">
+      Menampilkan <strong id="jumlahTampil">0</strong> IKM
+    </p>
+
+    <div class="ikm-grid" id="ikmGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:3rem;">
+        <div class="spinner"></div>
+        <p style="color:var(--text2);margin-top:1rem;">Memuat data IKM...</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/ikm.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    const ikonKategori = {
+      'Anyaman': '🧺', 'Tenun': '🧵', 'Makanan & Minuman': '☕',
+      'Kerajinan': '🏺', 'Industri Logam': '⚒️', 'Lainnya': '🏭'
+    };
+
+    let semuaIKM = [];
+
+    function renderIKM(list) {
+      const grid = document.getElementById('ikmGrid');
+      document.getElementById('jumlahTampil').textContent = list.length;
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+          <div>🏭</div>
+          <p>Tidak ada IKM yang ditemukan.</p>
+          <a href="form-ikm.html" class="btn btn-primary" style="margin-top:1rem;">Tambah IKM Pertama</a>
+        </div>`;
+        return;
+      }
+      grid.innerHTML = list.map(ikm => `
+        <div class="ikm-card">
+          <div class="ikm-foto">
+            ${ikm.foto_url
+              ? `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">`
+              : `<span>${ikonKategori[ikm.kategori] || '🏭'}</span>`}
+          </div>
+          <div class="ikm-body">
+            <div class="ikm-nama">${ikm.nama_usaha}</div>
+            <div class="ikm-pemilik">👤 ${ikm.pemilik}</div>
+            <div class="ikm-meta">
+              <span class="badge badge-kategori">${ikm.kategori}</span>
+              <span class="badge badge-${ikm.status === 'aktif' ? 'aktif' : ikm.status === 'menunggu' ? 'menunggu' : 'nonaktif'}">${ikm.status}</span>
+            </div>
+            <div class="ikm-lokasi">📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}</div>
+            ${ikm.no_telp ? `<div class="ikm-lokasi" style="margin-top:4px;">📞 ${ikm.no_telp}</div>` : ''}
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <a href="detail-ikm.html?id=${ikm.id}" class="btn btn-secondary" style="flex:1;font-size:12px;padding:7px;">Lihat Detail</a>
+              <a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold" style="font-size:12px;padding:7px 12px;">Edit</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filter() {
+      const cari = document.getElementById('searchInput').value.toLowerCase();
+      const kat  = document.getElementById('filterKategori').value;
+      const kec  = document.getElementById('filterKecamatan').value;
+      const hasil = semuaIKM.filter(ikm => {
+        const cocokCari = !cari ||
+          ikm.nama_usaha?.toLowerCase().includes(cari) ||
+          ikm.pemilik?.toLowerCase().includes(cari) ||
+          ikm.desa?.toLowerCase().includes(cari);
+        const cocokKat = !kat || ikm.kategori === kat;
+        const cocokKec = !kec || ikm.kecamatan === kec;
+        return cocokCari && cocokKat && cocokKec;
+      });
+      renderIKM(hasil);
+    }
+
+    async function init() {
+      try {
+        const { data, error } = await db.from('ikm').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        semuaIKM = data || [];
+        renderIKM(semuaIKM);
+      } catch(e) {
+        document.getElementById('ikmGrid').innerHTML =
+          `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--red);">Gagal memuat data: ${e.message}</div>`;
+      }
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filter);
+    document.getElementById('filterKategori').addEventListener('change', filter);
+    document.getElementById('filterKecamatan').addEventListener('change', filter);
+
+    init();
+  </script>
+</body>
+</html>

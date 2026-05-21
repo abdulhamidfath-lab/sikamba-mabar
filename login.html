@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="batik-strip"></div>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div style="font-size:48px;margin-bottom:8px;">🏛️</div>
+        <h2>SIKAMBA MABAR</h2>
+        <p>Masuk ke akun Anda</p>
+      </div>
+
+      <div id="alertBox"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="email" class="form-input" placeholder="Masukkan email Anda">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="password" class="form-input" placeholder="Masukkan password">
+      </div>
+      <div style="text-align:right;margin-bottom:1.2rem;">
+        <a href="lupa-password.html" style="font-size:13px;">Lupa password?</a>
+      </div>
+
+      <button class="btn btn-primary btn-full btn-lg" id="btnLogin" onclick="doLogin()">
+        Masuk
+      </button>
+
+      <p style="text-align:center;margin-top:1.2rem;font-size:13px;color:var(--text2);">
+        Belum punya akun? <a href="daftar.html"><strong>Daftar di sini</strong></a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Jika sudah login, langsung ke dashboard
+    redirectIfLoggedIn();
+
+    function showAlert(pesan, tipe = 'error') {
+      document.getElementById('alertBox').innerHTML =
+        `<div class="alert alert-${tipe}">${pesan}</div>`;
+    }
+
+    async function doLogin() {
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('btnLogin');
+
+      if (!email || !password) {
+        showAlert('Email dan password wajib diisi.');
+        return;
+      }
+
+      btn.textContent = 'Memproses...';
+      btn.disabled = true;
+
+      try {
+        await login(email, password);
+        showAlert('Login berhasil! Mengalihkan...', 'success');
+        setTimeout(() => window.location.href = 'pages/dashboard.html', 1000);
+      } catch(e) {
+        showAlert('Email atau password salah. Coba lagi.');
+        btn.textContent = 'Masuk';
+        btn.disabled = false;
+      }
+    }
+
+    // Bisa tekan Enter untuk login
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+  </script>
+</body>
+</html>

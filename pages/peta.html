@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peta Industri — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- Leaflet.js — peta gratis -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    #map { height: calc(100vh - 200px); min-height: 500px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
+    .map-controls { background: white; border-radius: var(--radius-lg); padding: 1rem 1.2rem; margin-bottom: 1rem; box-shadow: var(--shadow); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .legend { background: white; border-radius: var(--radius-lg); padding: 1rem 1.2rem; margin-top: 1rem; box-shadow: var(--shadow); }
+    .legend-grid { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.8rem; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); }
+    .legend-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+    .map-stat { background: white; border-radius: var(--radius); padding: 8px 14px; text-align: center; flex: 1; min-width: 100px; box-shadow: var(--shadow); }
+    .map-stat .num { font-size: 1.4rem; font-weight: 700; color: var(--brown); }
+    .map-stat .lbl { font-size: 11px; color: var(--text2); }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="peta.html" class="active">Peta Industri</a>
+      <a href="marketplace.html">Marketplace</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="container" style="padding-top:1.5rem;padding-bottom:2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:10px;">
+      <h2 style="margin:0;">🗺️ Peta Industri Manggarai Barat</h2>
+    </div>
+
+    <!-- Kontrol filter -->
+    <div class="map-controls">
+      <select class="form-select" id="filterKat" style="width:auto;min-width:160px;margin-bottom:0;" onchange="filterPeta()">
+        <option value="">Semua Kategori</option>
+        <option value="Anyaman">Anyaman</option>
+        <option value="Tenun">Tenun</option>
+        <option value="Makanan & Minuman">Makanan & Minuman</option>
+        <option value="Kerajinan">Kerajinan</option>
+        <option value="Industri Logam">Industri Logam</option>
+      </select>
+      <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap;">
+        <div class="map-stat"><div class="num" id="statTotal">–</div><div class="lbl">Total IKM</div></div>
+        <div class="map-stat"><div class="num" id="statDiPeta">–</div><div class="lbl">Tampil di Peta</div></div>
+      </div>
+      <button class="btn btn-secondary" onclick="resetView()">🎯 Pusatkan Peta</button>
+    </div>
+
+    <!-- Peta -->
+    <div id="map"></div>
+
+    <!-- Legenda -->
+    <div class="legend">
+      <strong style="font-size:13px;">Legenda Kategori</strong>
+      <div class="legend-grid">
+        <div class="legend-item"><div class="legend-dot" style="background:#9B59B6;"></div>Anyaman</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2ECC71;"></div>Tenun</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E67E22;"></div>Makanan & Minuman</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3498DB;"></div>Kerajinan</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E74C3C;"></div>Industri Logam</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#95A5A6;"></div>Lainnya</div>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin-top:8px;">💡 Klik pin di peta untuk melihat detail IKM. Hanya IKM yang memiliki koordinat GPS yang ditampilkan.</p>
+    </div>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/ikm.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    // Warna per kategori
+    const warna = {
+      'Anyaman': '#9B59B6',
+      'Tenun': '#2ECC71',
+      'Makanan & Minuman': '#E67E22',
+      'Kerajinan': '#3498DB',
+      'Industri Logam': '#E74C3C',
+      'Lainnya': '#95A5A6'
+    };
+
+    // Inisialisasi peta — terpusat di Manggarai Barat
+    const map = L.map('map').setView([-8.5, 120.0], 9);
+
+    // Tile OpenStreetMap — GRATIS
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+      maxZoom: 18
+    }).addTo(map);
+
+    let markers = L.layerGroup().addTo(map);
+    let semuaIKM = [];
+
+    function buatIkon(kategori) {
+      const c = warna[kategori] || '#95A5A6';
+      return L.divIcon({
+        className: '',
+        html: `<div style="
+          width:36px;height:36px;
+          background:${c};
+          border:3px solid white;
+          border-radius:50% 50% 50% 0;
+          transform:rotate(-45deg);
+          box-shadow:0 2px 8px rgba(0,0,0,0.3);
+        "></div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -36]
+      });
+    }
+
+    function renderMarker(list) {
+      markers.clearLayers();
+      let tampil = 0;
+      list.forEach(ikm => {
+        if (!ikm.latitude || !ikm.longitude) return;
+        tampil++;
+        const marker = L.marker([ikm.latitude, ikm.longitude], { icon: buatIkon(ikm.kategori) });
+        marker.bindPopup(`
+          <div style="min-width:200px;font-family:'Plus Jakarta Sans',sans-serif;">
+            <div style="font-weight:700;font-size:14px;color:#3D1F0D;margin-bottom:4px;">${ikm.nama_usaha}</div>
+            <div style="font-size:12px;color:#6B4C2A;margin-bottom:6px;">👤 ${ikm.pemilik}</div>
+            <div style="margin-bottom:6px;">
+              <span style="background:#F2E8D5;color:#6B3A1F;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${ikm.kategori}</span>
+            </div>
+            <div style="font-size:12px;color:#6B4C2A;">📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}</div>
+            ${ikm.no_telp ? `<div style="font-size:12px;color:#6B4C2A;margin-top:2px;">📞 ${ikm.no_telp}</div>` : ''}
+            <a href="detail-ikm.html?id=${ikm.id}"
+               style="display:block;margin-top:10px;background:#3D1F0D;color:white;padding:7px;text-align:center;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">
+              Lihat Detail IKM
+            </a>
+          </div>
+        `);
+        markers.addLayer(marker);
+      });
+      document.getElementById('statDiPeta').textContent = tampil;
+    }
+
+    function filterPeta() {
+      const kat = document.getElementById('filterKat').value;
+      const hasil = kat ? semuaIKM.filter(i => i.kategori === kat) : semuaIKM;
+      renderMarker(hasil);
+    }
+
+    function resetView() {
+      map.setView([-8.5, 120.0], 9);
+    }
+
+    async function init() {
+      try {
+        const { data, error } = await db.from('ikm').select('*').eq('status', 'aktif');
+        if (error) throw error;
+        semuaIKM = data || [];
+        document.getElementById('statTotal').textContent = semuaIKM.length;
+        renderMarker(semuaIKM);
+
+        // Kalau ada data, sesuaikan tampilan peta
+        const dgGPS = semuaIKM.filter(i => i.latitude && i.longitude);
+        if (dgGPS.length > 0) {
+          const bounds = L.latLngBounds(dgGPS.map(i => [i.latitude, i.longitude]));
+          map.fitBounds(bounds, { padding: [40, 40] });
+        }
+      } catch(e) {
+        console.error('Gagal load data peta:', e.message);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

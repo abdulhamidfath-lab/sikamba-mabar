@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="peta.html">Peta Industri</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div style="background:var(--brown);padding:2.5rem 0;">
+    <div class="container" style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--gold-light);display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid rgba(255,255,255,0.3);">👤</div>
+      <div>
+        <h2 style="color:white;margin-bottom:4px;" id="namaUser">Memuat...</h2>
+        <p style="color:rgba(255,255,255,0.7);font-size:13px;" id="emailUser"></p>
+        <span class="badge badge-aktif" style="margin-top:6px;display:inline-block;" id="peranUser"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <div id="alertBox"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+      <div class="card">
+        <h3 style="margin-bottom:1.2rem;">✏️ Edit Profil</h3>
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap</label>
+          <input type="text" id="editNama" class="form-input">
+        </div>
+        <button class="btn btn-primary" onclick="simpanProfil()">Simpan Perubahan</button>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:1.2rem;">🔒 Ubah Password</h3>
+        <div class="form-group">
+          <label class="form-label">Password Baru</label>
+          <input type="password" id="passBar" class="form-input" placeholder="Min. 6 karakter">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Konfirmasi Password</label>
+          <input type="password" id="passKonfirmasi" class="form-input" placeholder="Ulangi password baru">
+        </div>
+        <button class="btn btn-secondary" onclick="ubahPassword()">Ubah Password</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h3>🚪 Keluar dari Akun</h3>
+          <p style="font-size:13px;color:var(--text2);margin-top:4px;">Anda akan keluar dari sesi ini.</p>
+        </div>
+        <button class="btn btn-danger" onclick="logout()">Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    function showAlert(pesan, tipe = 'success') {
+      document.getElementById('alertBox').innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
+    }
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      document.getElementById('namaUser').textContent = profil?.nama_lengkap || user.email;
+      document.getElementById('emailUser').textContent = user.email;
+      document.getElementById('peranUser').textContent = (profil?.peran || 'konsumen').toUpperCase();
+      document.getElementById('editNama').value = profil?.nama_lengkap || '';
+    }
+
+    async function simpanProfil() {
+      const user = await getUser();
+      const nama = document.getElementById('editNama').value.trim();
+      if (!nama) { showAlert('Nama tidak boleh kosong.', 'error'); return; }
+      const { error } = await db.from('profiles').update({ nama_lengkap: nama }).eq('id', user.id);
+      if (error) { showAlert('Gagal menyimpan: ' + error.message, 'error'); return; }
+      showAlert('✅ Profil berhasil diperbarui!');
+      document.getElementById('namaUser').textContent = nama;
+    }
+
+    async function ubahPassword() {
+      const pass = document.getElementById('passBar').value;
+      const konfirmasi = document.getElementById('passKonfirmasi').value;
+      if (pass.length < 6) { showAlert('Password minimal 6 karakter.', 'error'); return; }
+      if (pass !== konfirmasi) { showAlert('Konfirmasi password tidak cocok.', 'error'); return; }
+      const { error } = await db.auth.updateUser({ password: pass });
+      if (error) { showAlert('Gagal ubah password: ' + error.message, 'error'); return; }
+      showAlert('✅ Password berhasil diubah!');
+      document.getElementById('passBar').value = '';
+      document.getElementById('passKonfirmasi').value = '';
+    }
+
+    init();
+  </script>
+</body>
+</html>

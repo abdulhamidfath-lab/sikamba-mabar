@@ -1,1 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIKAMBA MABAR — Sistem Industri Kreatif Manggarai Barat</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, var(--brown) 0%, var(--brown-mid) 60%, var(--brown-light) 100%);
+      color: white;
+      padding: 5rem 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-content { position: relative; text-align: center; }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      color: var(--gold-light);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .hero h1 { color: white; font-size: 2.8rem; margin-bottom: 1rem; }
+    .hero h1 span { color: var(--gold-light); }
+    .hero p { font-size: 1.05rem; color: rgba(255,255,255,0.82); max-width: 560px; margin: 0 auto 2rem; }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
+    /* FITUR */
+    .features { padding: 4rem 0; }
+    .section-header { text-align: center; margin-bottom: 2.5rem; }
+    .section-header p { color: var(--text2); max-width: 500px; margin: 0.5rem auto 0; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; }
+    .feature-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 1.8rem 1.4rem;
+      text-align: center;
+      border: 1px solid rgba(61,31,13,0.07);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .feature-icon {
+      width: 60px; height: 60px;
+      border-radius: 16px;
+      background: var(--cream2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 1rem;
+    }
+    .feature-card h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 13px; color: var(--text2); }
+
+    /* STATISTIK */
+    .stats-section {
+      background: var(--brown);
+      padding: 3rem 0;
+      color: white;
+    }
+    .stats-inner { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; text-align: center; }
+    .stat-item-big .num { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 700; color: var(--gold-light); }
+    .stat-item-big .lbl { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+    /* CTA */
+    .cta-section { background: var(--cream2); padding: 4rem 0; text-align: center; }
+    .cta-section h2 { margin-bottom: 0.8rem; }
+    .cta-section p { color: var(--text2); margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      🏛️ <span>SIKAMBA MABAR</span>
+    </div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="index.html" class="active">Beranda</a>
+      <a href="pages/data-ikm.html">Data IKM</a>
+      <a href="pages/peta.html">Peta Industri</a>
+      <a href="pages/marketplace.html">Marketplace</a>
+      <a href="login.html" class="btn btn-gold" style="padding:7px 16px;">Masuk</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">🌿 Dinas Perdagangan & Perindustrian Kabupaten Manggarai Barat</div>
+        <h1>Sistem Industri Kreatif<br><span>Manggarai Barat</span></h1>
+        <p>Platform digital untuk pendataan, pengembangan, dan pemasaran produk industri kecil menengah (IKM) Kabupaten Manggarai Barat.</p>
+        <div class="hero-btns">
+          <a href="pages/data-ikm.html" class="btn btn-gold btn-lg">Lihat Data IKM</a>
+          <a href="pages/peta.html" class="btn btn-secondary btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">🗺️ Peta Industri</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATISTIK -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-inner" id="statsGrid">
+        <div class="stat-item-big"><div class="num" id="statIKM">–</div><div class="lbl">IKM Terdaftar</div></div>
+        <div class="stat-item-big"><div class="num" id="statProduk">–</div><div class="lbl">Produk Lokal</div></div>
+        <div class="stat-item-big"><div class="num">5</div><div class="lbl">Kecamatan</div></div>
+        <div class="stat-item-big"><div class="num">4</div><div class="lbl">Kategori Industri</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FITUR -->
+  <section class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Fitur Utama Platform</h2>
+        <p>Semua yang dibutuhkan untuk mengelola dan mengembangkan industri lokal Manggarai Barat</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Data IKM Terintegrasi</h3>
+          <p>Pendataan lengkap seluruh IKM — profil, produksi, tenaga kerja, dan perkembangan usaha.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗺️</div>
+          <h3>Peta Industri</h3>
+          <p>Visualisasi persebaran IKM per kecamatan dan kategori industri secara realtime.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛍️</div>
+          <h3>Pasar Digital</h3>
+          <p>Platform pemasaran produk lokal Mabar — anyaman, tenun, kopi, kerajinan, dan kuliner.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>QR Produk Asli</h3>
+          <p>Setiap produk mendapat QR code sebagai bukti keaslian produk Manggarai Barat.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Pelaku IKM? Daftarkan Usaha Anda</h2>
+      <p>Bergabung dengan ratusan pelaku IKM Manggarai Barat dan jangkau pasar yang lebih luas.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="daftar.html" class="btn btn-primary btn-lg">Daftar Sekarang</a>
+        <a href="login.html" class="btn btn-secondary btn-lg">Sudah punya akun? Masuk</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Sistem Industri Kreatif, Anyaman, Makanan, dan Bina Usaha Manggarai Barat<br>
+    <span style="font-size:12px;margin-top:4px;display:block;">Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024</span>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/ikm.js"></script>
+  <script>
+    function toggleMenu() {
+      document.getElementById('navMenu').classList.toggle('open');
+    }
+
+    // Load statistik dari database
+    async function loadStats() {
+      try {
+        const stats = await getStatistik();
+        document.getElementById('statIKM').textContent = stats.totalIKM;
+        document.getElementById('statProduk').textContent = stats.totalProduk;
+      } catch(e) {
+        console.log('Stats tidak tersedia:', e.message);
+      }
+    }
+    loadStats();
+  </script>
+</body>
+</html>

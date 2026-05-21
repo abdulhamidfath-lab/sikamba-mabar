@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Akun — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="batik-strip"></div>
+  <div class="auth-page">
+    <div class="auth-card" style="max-width:480px;">
+      <div class="auth-logo">
+        <div style="font-size:48px;margin-bottom:8px;">🏛️</div>
+        <h2>Daftar Akun</h2>
+        <p>Bergabung dengan SIKAMBA MABAR</p>
+      </div>
+
+      <div id="alertBox"></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap</label>
+          <input type="text" id="nama" class="form-input" placeholder="Nama lengkap Anda">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Peran</label>
+          <select id="peran" class="form-select">
+            <option value="">-- Pilih Peran --</option>
+            <option value="ikm">Pelaku IKM</option>
+            <option value="konsumen">Konsumen / Pembeli</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="email" class="form-input" placeholder="Masukkan email aktif">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="Min. 6 karakter">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Konfirmasi Password</label>
+          <input type="password" id="konfirmasi" class="form-input" placeholder="Ulangi password">
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full btn-lg" id="btnDaftar" onclick="doDaftar()">
+        Buat Akun
+      </button>
+
+      <p style="text-align:center;margin-top:1.2rem;font-size:13px;color:var(--text2);">
+        Sudah punya akun? <a href="login.html"><strong>Masuk di sini</strong></a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    function showAlert(pesan, tipe = 'error') {
+      document.getElementById('alertBox').innerHTML =
+        `<div class="alert alert-${tipe}">${pesan}</div>`;
+    }
+
+    async function doDaftar() {
+      const nama      = document.getElementById('nama').value.trim();
+      const peran     = document.getElementById('peran').value;
+      const email     = document.getElementById('email').value.trim();
+      const password  = document.getElementById('password').value;
+      const konfirmasi = document.getElementById('konfirmasi').value;
+      const btn       = document.getElementById('btnDaftar');
+
+      if (!nama || !peran || !email || !password) {
+        showAlert('Semua kolom wajib diisi.'); return;
+      }
+      if (password.length < 6) {
+        showAlert('Password minimal 6 karakter.'); return;
+      }
+      if (password !== konfirmasi) {
+        showAlert('Konfirmasi password tidak cocok.'); return;
+      }
+
+      btn.textContent = 'Memproses...';
+      btn.disabled = true;
+
+      try {
+        await daftar(email, password, nama, peran);
+        showAlert('Akun berhasil dibuat! Silakan cek email untuk verifikasi.', 'success');
+        setTimeout(() => window.location.href = 'login.html', 3000);
+      } catch(e) {
+        showAlert('Gagal membuat akun: ' + e.message);
+        btn.textContent = 'Buat Akun';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

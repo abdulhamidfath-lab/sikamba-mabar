@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="peta.html">Peta Industri</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
 
+  <div style="background:var(--brown);padding:2rem 0 2.5rem;">
+    <div class="container">
+      <p style="color:rgba(255,255,255,0.7);font-size:13px;margin-bottom:4px;">Selamat datang,</p>
+      <h2 style="color:white;font-family:'Playfair Display',serif;" id="namaUser">Memuat...</h2>
+      <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-top:4px;" id="peranUser"></p>
+    </div>
+  </div>
+
+  <div class="container" style="margin-top:-1rem;padding-bottom:3rem;">
+
+    <!-- Statistik -->
+    <div class="stat-grid" style="margin-bottom:1.5rem;">
+      <div class="stat-card blue">
+        <div class="stat-label">IKM Terdaftar</div>
+        <div class="stat-num" id="statIKM">–</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Produk Lokal</div>
+        <div class="stat-num" id="statProduk">–</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">Kecamatan</div>
+        <div class="stat-num">5</div>
+      </div>
+      <div class="stat-card cream">
+        <div class="stat-label">Kategori IKM</div>
+        <div class="stat-num">4</div>
+      </div>
+    </div>
+
+    <!-- Menu cepat -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <h3 style="margin-bottom:1.2rem;">Menu Cepat</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
+        <a href="data-ikm.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
+          <span style="font-size:24px;">📊</span>Data IKM
+        </a>
+        <a href="form-ikm.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
+          <span style="font-size:24px;">➕</span>Tambah IKM
+        </a>
+        <a href="peta.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
+          <span style="font-size:24px;">🗺️</span>Peta Industri
+        </a>
+        <a href="marketplace.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
+          <span style="font-size:24px;">🛍️</span>Marketplace
+        </a>
+        <a href="profil.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
+          <span style="font-size:24px;">👤</span>Profil Saya
+        </a>
+      </div>
+    </div>
+
+    <!-- IKM terbaru -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h3>IKM Terbaru Terdaftar</h3>
+        <a href="data-ikm.html" style="font-size:13px;font-weight:600;">Lihat Semua →</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Usaha</th>
+              <th>Kategori</th>
+              <th>Kecamatan</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tabelIKM">
+            <tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text2);">
+              <div class="spinner"></div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/ikm.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    const badgeProfil = { admin: 'badge-aktif', ikm: 'badge-kategori', konsumen: 'badge-menunggu' };
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+
+      document.getElementById('namaUser').textContent = profil?.nama_lengkap || user.email;
+      const peran = profil?.peran || 'konsumen';
+      document.getElementById('peranUser').innerHTML =
+        `<span class="badge ${badgeProfil[peran] || 'badge-kategori'}" style="font-size:12px;">${peran.toUpperCase()}</span>`;
+
+      // Load statistik
+      try {
+        const stats = await getStatistik();
+        document.getElementById('statIKM').textContent = stats.totalIKM;
+        document.getElementById('statProduk').textContent = stats.totalProduk;
+      } catch(e) {}
+
+      // Load IKM terbaru
+      try {
+        const { data } = await db.from('ikm').select('*').order('created_at', { ascending: false }).limit(5);
+        const tbody = document.getElementById('tabelIKM');
+        if (!data || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:2rem;">Belum ada data IKM. <a href="form-ikm.html">Tambah sekarang</a></td></tr>';
+        } else {
+          tbody.innerHTML = data.map(ikm => `
+            <tr>
+              <td><a href="detail-ikm.html?id=${ikm.id}" style="font-weight:600;">${ikm.nama_usaha}</a><br>
+                <small style="color:var(--text2)">${ikm.pemilik}</small></td>
+              <td><span class="badge badge-kategori">${ikm.kategori}</span></td>
+              <td>${ikm.kecamatan || '-'}</td>
+              <td><span class="badge badge-${ikm.status === 'aktif' ? 'aktif' : ikm.status === 'menunggu' ? 'menunggu' : 'nonaktif'}">${ikm.status}</span></td>
+            </tr>
+          `).join('');
+        }
+      } catch(e) {
+        document.getElementById('tabelIKM').innerHTML =
+          '<tr><td colspan="4" style="text-align:center;color:var(--text2);">Gagal memuat data.</td></tr>';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
