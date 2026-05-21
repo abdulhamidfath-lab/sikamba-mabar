@@ -24,98 +24,60 @@
     <div class="container">
       <p style="color:rgba(255,255,255,0.7);font-size:13px;margin-bottom:4px;">Selamat datang,</p>
       <h2 style="color:white;font-family:'Playfair Display',serif;" id="namaUser">Memuat...</h2>
-      <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-top:4px;" id="peranUser"></p>
+      <div id="peranUser" style="margin-top:6px;"></div>
     </div>
   </div>
 
-  <div class="container" style="margin-top:-1rem;padding-bottom:3rem;">
+  <div class="container" style="margin-top:1.5rem;padding-bottom:3rem;">
 
-    <!-- Statistik -->
     <div class="stat-grid" style="margin-bottom:1.5rem;">
-      <div class="stat-card blue">
-        <div class="stat-label">IKM Terdaftar</div>
-        <div class="stat-num" id="statIKM">–</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-label">Produk Lokal</div>
-        <div class="stat-num" id="statProduk">–</div>
-      </div>
-      <div class="stat-card orange">
-        <div class="stat-label">Kecamatan</div>
-        <div class="stat-num">5</div>
-      </div>
-      <div class="stat-card cream">
-        <div class="stat-label">Kategori IKM</div>
-        <div class="stat-num">4</div>
-      </div>
+      <div class="stat-card blue"><div class="stat-label">IKM Terdaftar</div><div class="stat-num" id="statIKM">–</div></div>
+      <div class="stat-card green"><div class="stat-label">Produk Lokal</div><div class="stat-num" id="statProduk">–</div></div>
+      <div class="stat-card orange"><div class="stat-label">Kecamatan</div><div class="stat-num">10</div></div>
+      <div class="stat-card cream"><div class="stat-label">Kategori IKM</div><div class="stat-num">4</div></div>
     </div>
 
-    <!-- Menu cepat -->
-    <div class="card" style="margin-bottom:1.5rem;">
-      <h3 style="margin-bottom:1.2rem;">Menu Cepat</h3>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
-        <a href="data-ikm.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
-          <span style="font-size:24px;">📊</span>Data IKM
-        </a>
-        <a href="form-ikm.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
-          <span style="font-size:24px;">➕</span>Tambah IKM
-        </a>
-        <a href="peta.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
-          <span style="font-size:24px;">🗺️</span>Peta Industri
-        </a>
-        <a href="marketplace.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
-          <span style="font-size:24px;">🛍️</span>Marketplace
-        </a>
-        <a href="profil.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;">
-          <span style="font-size:24px;">👤</span>Profil Saya
-        </a>
-      </div>
-    </div>
-<!-- Panel verifikasi IKM — hanya muncul untuk admin -->
-<div class="card" id="panelVerifikasi" style="display:none;margin-bottom:1.5rem;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-    <h3>⏳ IKM Menunggu Verifikasi</h3>
-    <span class="badge badge-menunggu" id="jumlahMenunggu">0 IKM</span>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Nama Usaha</th>
-          <th>Pemilik</th>
-          <th>Kategori</th>
-          <th>Kecamatan</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="tabelMenunggu">
-        <tr><td colspan="5" style="text-align:center;color:var(--text2);padding:1.5rem;">
-          Tidak ada IKM yang menunggu verifikasi
-        </td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-    <!-- IKM terbaru -->
-    <div class="card">
+    <!-- PANEL VERIFIKASI ADMIN -->
+    <div class="card" id="panelVerifikasi" style="display:none;margin-bottom:1.5rem;border:2px solid var(--gold);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-        <h3>IKM Terbaru Terdaftar</h3>
-        <a href="data-ikm.html" style="font-size:13px;font-weight:600;">Lihat Semua →</a>
+        <h3 style="margin:0;">⏳ IKM Menunggu Verifikasi</h3>
+        <span class="badge badge-menunggu" id="jumlahMenunggu" style="font-size:13px;padding:5px 12px;">0 IKM</span>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr>
-              <th>Nama Usaha</th>
-              <th>Kategori</th>
-              <th>Kecamatan</th>
-              <th>Status</th>
-            </tr>
+            <tr><th>Nama Usaha</th><th>Kategori</th><th>Kecamatan</th><th>Tgl Daftar</th><th>Aksi</th></tr>
           </thead>
+          <tbody id="tabelMenunggu">
+            <tr><td colspan="5" style="text-align:center;padding:2rem;"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MENU CEPAT -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <h3 style="margin-bottom:1.2rem;">Menu Cepat</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
+        <a href="data-ikm.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;"><span style="font-size:24px;">📊</span>Data IKM</a>
+        <a href="form-ikm.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;"><span style="font-size:24px;">➕</span>Tambah IKM</a>
+        <a href="peta.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;"><span style="font-size:24px;">🗺️</span>Peta Industri</a>
+        <a href="marketplace.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;"><span style="font-size:24px;">🛍️</span>Marketplace</a>
+        <a href="profil.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;"><span style="font-size:24px;">👤</span>Profil Saya</a>
+      </div>
+    </div>
+
+    <!-- IKM TERBARU -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h3 style="margin:0;">IKM Terbaru Terdaftar</h3>
+        <a href="data-ikm.html" style="font-size:13px;font-weight:600;">Lihat Semua →</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nama Usaha</th><th>Kategori</th><th>Kecamatan</th><th>Status</th></tr></thead>
           <tbody id="tabelIKM">
-            <tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text2);">
-              <div class="spinner"></div>
-            </td></tr>
+            <tr><td colspan="4" style="text-align:center;padding:2rem;"><div class="spinner"></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -132,97 +94,112 @@
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
   <script>
-    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function toggleMenu() {
+      document.getElementById('navMenu').classList.toggle('open');
+    }
 
-    const badgeProfil = { admin: 'badge-aktif', ikm: 'badge-kategori', konsumen: 'badge-menunggu' };
+    async function loadMenunggu() {
+      document.getElementById('panelVerifikasi').style.display = 'block';
+      try {
+        const { data, error } = await db.from('ikm').select('*').eq('status', 'menunggu').order('created_at', { ascending: false });
+        if (error) throw error;
+        const jumlah = data?.length || 0;
+        document.getElementById('jumlahMenunggu').textContent = jumlah + ' IKM';
+        const tbody = document.getElementById('tabelMenunggu');
+        if (jumlah === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:2rem;">✅ Tidak ada IKM yang menunggu verifikasi</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.map(ikm => {
+          const tgl = new Date(ikm.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+          return `<tr id="row-${ikm.id}">
+            <td><strong style="color:var(--brown);">${ikm.nama_usaha}</strong><br>
+              <small style="color:var(--text2);">👤 ${ikm.pemilik}</small>
+              ${ikm.no_telp ? `<br><small style="color:var(--text2);">📞 ${ikm.no_telp}</small>` : ''}
+            </td>
+            <td><span class="badge badge-kategori">${ikm.kategori}</span></td>
+            <td>${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}</td>
+            <td style="font-size:12px;color:var(--text2);">${tgl}</td>
+            <td>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-primary" style="padding:5px 12px;font-size:12px;" onclick="verifikasi('${ikm.id}','aktif')">✅ Approve</button>
+                <button class="btn btn-danger" style="padding:5px 12px;font-size:12px;" onclick="verifikasi('${ikm.id}','nonaktif')">❌ Tolak</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('');
+      } catch(e) {
+        document.getElementById('tabelMenunggu').innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:1rem;">Gagal memuat: ${e.message}</td></tr>`;
+      }
+    }
 
-    async function init() {
-      const user = await requireLogin();
-      const profil = await getProfil(user.id);
+    async function verifikasi(ikmId, statusBaru) {
+      const konfirmasi = confirm(statusBaru === 'aktif'
+        ? '✅ Approve IKM ini? Data akan tampil di peta dan marketplace.'
+        : '❌ Tolak IKM ini? Status akan menjadi nonaktif.');
+      if (!konfirmasi) return;
+      const { error } = await db.from('ikm').update({ status: statusBaru }).eq('id', ikmId);
+      if (error) { alert('Gagal: ' + error.message); return; }
+      document.getElementById('row-' + ikmId)?.remove();
+      const sisa = document.querySelectorAll('#tabelMenunggu tr[id]').length;
+      document.getElementById('jumlahMenunggu').textContent = sisa + ' IKM';
+      if (sisa === 0) {
+        document.getElementById('tabelMenunggu').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:2rem;">✅ Tidak ada IKM yang menunggu verifikasi</td></tr>';
+      }
+      loadStatistik();
+      loadTabelIKM();
+      alert(statusBaru === 'aktif' ? '✅ IKM berhasil di-approve! Sekarang tampil di peta.' : '❌ IKM ditolak.');
+    }
 
-      document.getElementById('namaUser').textContent = profil?.nama_lengkap || user.email;
-      const peran = profil?.peran || 'konsumen';
-      document.getElementById('peranUser').innerHTML =
-        `loadMenunggu(peran);<span class="badge ${badgeProfil[peran] || 'badge-kategori'}" style="font-size:12px;">${peran.toUpperCase()}</span>`;
-
-      // Load statistik
+    async function loadStatistik() {
       try {
         const stats = await getStatistik();
         document.getElementById('statIKM').textContent = stats.totalIKM;
         document.getElementById('statProduk').textContent = stats.totalProduk;
       } catch(e) {}
+    }
 
-      // Load IKM terbaru
+    async function loadTabelIKM() {
       try {
-        const { data } = await db.from('ikm').select('*').order('created_at', { ascending: false }).limit(5);
+        const { data, error } = await db.from('ikm').select('*').order('created_at', { ascending: false }).limit(5);
+        if (error) throw error;
         const tbody = document.getElementById('tabelIKM');
         if (!data || data.length === 0) {
           tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:2rem;">Belum ada data IKM. <a href="form-ikm.html">Tambah sekarang</a></td></tr>';
-        } else {
-          tbody.innerHTML = data.map(ikm => `
-            <tr>
-              <td><a href="detail-ikm.html?id=${ikm.id}" style="font-weight:600;">${ikm.nama_usaha}</a><br>
-                <small style="color:var(--text2)">${ikm.pemilik}</small></td>
-              <td><span class="badge badge-kategori">${ikm.kategori}</span></td>
-              <td>${ikm.kecamatan || '-'}</td>
-              <td><span class="badge badge-${ikm.status === 'aktif' ? 'aktif' : ikm.status === 'menunggu' ? 'menunggu' : 'nonaktif'}">${ikm.status}</span></td>
-            </tr>
-          `).join('');
+          return;
         }
+        tbody.innerHTML = data.map(ikm => `
+          <tr>
+            <td><a href="detail-ikm.html?id=${ikm.id}" style="font-weight:600;color:var(--brown);">${ikm.nama_usaha}</a><br>
+              <small style="color:var(--text2);">${ikm.pemilik}</small></td>
+            <td><span class="badge badge-kategori">${ikm.kategori}</span></td>
+            <td>${ikm.kecamatan || '-'}</td>
+            <td><span class="badge badge-${ikm.status === 'aktif' ? 'aktif' : ikm.status === 'menunggu' ? 'menunggu' : 'nonaktif'}">${ikm.status}</span></td>
+          </tr>`).join('');
       } catch(e) {
-        document.getElementById('tabelIKM').innerHTML =
-          '<tr><td colspan="4" style="text-align:center;color:var(--text2);">Gagal memuat data.</td></tr>';
+        document.getElementById('tabelIKM').innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--red);">Gagal memuat data.</td></tr>';
       }
     }
-async function loadMenunggu(peran) {
-  if (peran !== 'admin') return;
-  
-  document.getElementById('panelVerifikasi').style.display = 'block';
-  
-  const { data } = await db.from('ikm')
-    .select('*')
-    .eq('status', 'menunggu')
-    .order('created_at', { ascending: false });
-  
-  const jumlah = data?.length || 0;
-  document.getElementById('jumlahMenunggu').textContent = jumlah + ' IKM';
-  
-  if (jumlah === 0) return;
-  
-  document.getElementById('tabelMenunggu').innerHTML = data.map(ikm => `
-    <tr id="row-${ikm.id}">
-      <td><strong>${ikm.nama_usaha}</strong><br>
-        <small style="color:var(--text2)">${ikm.pemilik}</small></td>
-      <td>${ikm.pemilik}</td>
-      <td><span class="badge badge-kategori">${ikm.kategori}</span></td>
-      <td>${ikm.kecamatan || '-'}</td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-primary" style="padding:5px 12px;font-size:12px;"
-            onclick="verifikasi('${ikm.id}', 'aktif')">✅ Approve</button>
-          <button class="btn btn-danger" style="padding:5px 12px;font-size:12px;"
-            onclick="verifikasi('${ikm.id}', 'nonaktif')">❌ Tolak</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
 
-async function verifikasi(ikmId, statusBaru) {
-  const { error } = await db.from('ikm')
-    .update({ status: statusBaru })
-    .eq('id', ikmId);
-  
-  if (error) { alert('Gagal: ' + error.message); return; }
-  
-  // Hapus baris dari tabel langsung tanpa reload
-  document.getElementById('row-' + ikmId)?.remove();
-  
-  const sisa = document.querySelectorAll('#tabelMenunggu tr').length;
-  document.getElementById('jumlahMenunggu').textContent = sisa + ' IKM';
-  
-  alert(statusBaru === 'aktif' ? '✅ IKM berhasil diapprove!' : '❌ IKM ditolak.');
-}
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      const peran = profil?.peran || 'konsumen';
+
+      document.getElementById('namaUser').textContent = profil?.nama_lengkap || user.email;
+
+      const warnaBadge = { admin: 'badge-aktif', ikm: 'badge-kategori', konsumen: 'badge-menunggu' };
+      document.getElementById('peranUser').innerHTML =
+        `<span class="badge ${warnaBadge[peran] || 'badge-kategori'}" style="font-size:12px;">${peran.toUpperCase()}</span>`;
+
+      loadStatistik();
+      loadTabelIKM();
+
+      if (peran === 'admin') {
+        loadMenunggu();
+      }
+    }
+
     init();
   </script>
 </body>
