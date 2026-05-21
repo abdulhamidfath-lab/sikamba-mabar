@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail IKM — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .detail-hero { height: 260px; background: linear-gradient(135deg, var(--brown), var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 80px; position: relative; overflow: hidden; }
+    .detail-hero img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-body { max-width: 800px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--cream2); font-size: 14px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { color: var(--text2); font-weight: 500; flex-shrink: 0; width: 180px; }
+    .info-val { color: var(--text); font-weight: 600; text-align: right; }
+    .produk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .produk-card { background: var(--cream2); border-radius: var(--radius); padding: 1rem; text-align: center; }
+    .produk-card .nama { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .produk-card .harga { font-size: 14px; font-weight: 700; color: var(--brown); }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="peta.html">Peta Industri</a>
+      <a href="marketplace.html">Marketplace</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <!-- HERO FOTO -->
+  <div class="detail-hero" id="heroSection">
+    <span id="heroIcon">🏭</span>
+  </div>
+
+  <div class="detail-body">
+
+    <!-- BREADCRUMB -->
+    <div style="display:flex;align-items:center;gap:8px;margin:1.2rem 0;font-size:13px;color:var(--text2);">
+      <a href="data-ikm.html">← Data IKM</a>
+      <span>/</span>
+      <span id="breadNama">Detail IKM</span>
+    </div>
+
+    <!-- HEADER IKM -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem;">
+      <div>
+        <h1 style="font-size:1.8rem;margin-bottom:6px;" id="namaUsaha">Memuat...</h1>
+        <p style="color:var(--text2);font-size:14px;" id="subHeader"></p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="tombolAksi">
+        <!-- tombol edit muncul jika admin/pemilik -->
+      </div>
+    </div>
+
+    <!-- INFO UTAMA -->
+    <div class="card" style="margin-bottom:1.2rem;">
+      <h3 style="margin-bottom:1rem;">📋 Informasi Usaha</h3>
+      <div id="infoUsaha">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- LOKASI -->
+    <div class="card" style="margin-bottom:1.2rem;">
+      <h3 style="margin-bottom:1rem;">📍 Lokasi Usaha</h3>
+      <div id="infoLokasi"></div>
+      <div id="mapKecil" style="height:200px;border-radius:var(--radius);margin-top:1rem;background:var(--cream2);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:13px;">
+        Koordinat GPS belum diisi
+      </div>
+    </div>
+
+    <!-- DESKRIPSI -->
+    <div class="card" id="cardDeskripsi" style="margin-bottom:1.2rem;display:none;">
+      <h3 style="margin-bottom:0.8rem;">📝 Deskripsi Usaha</h3>
+      <p id="deskripsiUsaha" style="font-size:14px;color:var(--text2);line-height:1.8;"></p>
+    </div>
+
+    <!-- KONTAK -->
+    <div class="card" style="margin-bottom:1.2rem;">
+      <h3 style="margin-bottom:1rem;">📞 Kontak</h3>
+      <div id="infoKontak"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/ikm.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    const ikonKategori = {
+      'Anyaman': '🧺', 'Tenun': '🧵', 'Makanan & Minuman': '☕',
+      'Kerajinan': '🏺', 'Industri Logam': '⚒️', 'Lainnya': '🏭'
+    };
+
+    function rupiah(angka) {
+      return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    }
+
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) { window.location.href = 'data-ikm.html'; return; }
+
+      try {
+        const { data: ikm, error } = await db.from('ikm').select('*').eq('id', id).single();
+        if (error || !ikm) throw new Error('IKM tidak ditemukan');
+
+        // Hero
+        const ikon = ikonKategori[ikm.kategori] || '🏭';
+        document.getElementById('heroIcon').textContent = ikon;
+        if (ikm.foto_url) {
+          document.getElementById('heroSection').innerHTML = `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">`;
+        }
+
+        // Judul
+        document.title = ikm.nama_usaha + ' — SIKAMBA MABAR';
+        document.getElementById('namaUsaha').textContent = ikm.nama_usaha;
+        document.getElementById('breadNama').textContent = ikm.nama_usaha;
+        document.getElementById('subHeader').innerHTML = `
+          👤 ${ikm.pemilik} &nbsp;|&nbsp;
+          <span class="badge badge-${ikm.status === 'aktif' ? 'aktif' : ikm.status === 'menunggu' ? 'menunggu' : 'nonaktif'}">${ikm.status}</span>
+          &nbsp;<span class="badge badge-kategori">${ikm.kategori}</span>
+        `;
+
+        // Tombol aksi (admin bisa edit)
+        const user = await getUser();
+        if (user) {
+          const profil = await getProfil(user.id);
+          if (profil?.peran === 'admin' || profil?.ikm_id === ikm.id) {
+            document.getElementById('tombolAksi').innerHTML = `
+              <a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold">✏️ Edit IKM</a>
+            `;
+          }
+        }
+
+        // Info usaha
+        document.getElementById('infoUsaha').innerHTML = `
+          <div class="info-row"><span class="info-key">Nama Usaha</span><span class="info-val">${ikm.nama_usaha}</span></div>
+          <div class="info-row"><span class="info-key">Nama Pemilik</span><span class="info-val">${ikm.pemilik}</span></div>
+          <div class="info-row"><span class="info-key">Kategori</span><span class="info-val"><span class="badge badge-kategori">${ikm.kategori}</span></span></div>
+          <div class="info-row"><span class="info-key">Tahun Berdiri</span><span class="info-val">${ikm.tahun_berdiri || '-'}</span></div>
+          <div class="info-row"><span class="info-key">Jumlah Tenaga Kerja</span><span class="info-val">${ikm.jumlah_tenaga_kerja ? ikm.jumlah_tenaga_kerja + ' orang' : '-'}</span></div>
+          <div class="info-row"><span class="info-key">Status</span><span class="info-val"><span class="badge badge-${ikm.status === 'aktif' ? 'aktif' : 'menunggu'}">${ikm.status}</span></span></div>
+        `;
+
+        // Lokasi
+        document.getElementById('infoLokasi').innerHTML = `
+          <div class="info-row"><span class="info-key">Alamat</span><span class="info-val">${ikm.alamat || '-'}</span></div>
+          <div class="info-row"><span class="info-key">Desa/Kelurahan</span><span class="info-val">${ikm.desa || '-'}</span></div>
+          <div class="info-row"><span class="info-key">Kecamatan</span><span class="info-val">${ikm.kecamatan || '-'}</span></div>
+          <div class="info-row"><span class="info-key">Koordinat GPS</span><span class="info-val">${ikm.latitude && ikm.longitude ? ikm.latitude + ', ' + ikm.longitude : 'Belum diisi'}</span></div>
+        `;
+
+        // Mini map jika ada GPS
+        if (ikm.latitude && ikm.longitude) {
+          document.getElementById('mapKecil').innerHTML = '';
+          const miniMap = L.map('mapKecil').setView([ikm.latitude, ikm.longitude], 14);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap);
+          L.marker([ikm.latitude, ikm.longitude])
+            .addTo(miniMap)
+            .bindPopup(`<strong>${ikm.nama_usaha}</strong><br>${ikm.kecamatan}`)
+            .openPopup();
+        }
+
+        // Deskripsi
+        if (ikm.deskripsi) {
+          document.getElementById('cardDeskripsi').style.display = 'block';
+          document.getElementById('deskripsiUsaha').textContent = ikm.deskripsi;
+        }
+
+        // Kontak
+        document.getElementById('infoKontak').innerHTML = `
+          <div class="info-row"><span class="info-key">No. Telepon/WA</span><span class="info-val">
+            ${ikm.no_telp
+              ? `<a href="https://wa.me/62${ikm.no_telp.replace(/^0/, '')}" target="_blank" style="color:var(--green);">💬 ${ikm.no_telp}</a>`
+              : '-'}
+          </span></div>
+          <div class="info-row"><span class="info-key">Email</span><span class="info-val">${ikm.email || '-'}</span></div>
+        `;
+
+      } catch(e) {
+        document.getElementById('namaUsaha').textContent = 'IKM tidak ditemukan';
+        document.getElementById('infoUsaha').innerHTML = `<p style="color:var(--red);">Error: ${e.message}</p>`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
