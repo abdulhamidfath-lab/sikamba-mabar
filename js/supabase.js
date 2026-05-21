@@ -4,8 +4,8 @@
 // dengan nilai dari project Supabase Anda
 // ============================================
 
-const SUPABASE_URL = 'https://GANTI_DENGAN_URL_ANDA.supabase.co';
-const SUPABASE_ANON_KEY = 'GANTI_DENGAN_ANON_KEY_ANDA';
+const SUPABASE_URL = 'https://bmseepdxszauqzdiygnb.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Ue4jnv_wM8p4zPtNzVX8Gw_B6iWhlAo';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
