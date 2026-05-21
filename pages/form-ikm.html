@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tambah Data IKM — SIKAMBA MABAR</title>
+  <title>Form IKM — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
@@ -58,7 +58,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Tahun Berdiri</label>
-          <input type="number" id="tahun_berdiri" class="form-input" placeholder="Contoh: 2015" min="1900" max="2024">
+          <input type="number" id="tahun_berdiri" class="form-input" placeholder="Contoh: 2015" min="1900" max="2025">
         </div>
       </div>
 
@@ -102,8 +102,7 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">
-            Latitude (GPS)
-            <span class="form-hint" style="display:inline;">— <a href="#" onclick="getGPS()">📍 Ambil dari GPS</a></span>
+            Latitude (GPS) — <a href="#" onclick="getGPS(); return false;" style="font-size:12px;">📍 Ambil dari GPS</a>
           </label>
           <input type="number" id="latitude" class="form-input" placeholder="-8.5000" step="0.000001">
         </div>
@@ -112,7 +111,7 @@
           <input type="number" id="longitude" class="form-input" placeholder="119.8000" step="0.000001">
         </div>
       </div>
-      <p class="form-hint" style="margin-bottom:1rem;">💡 Klik "Ambil dari GPS" untuk mengisi koordinat otomatis dari lokasi HP Anda, atau lihat di Google Maps.</p>
+      <p class="form-hint" style="margin-bottom:1rem;">💡 Klik "Ambil dari GPS" untuk mengisi otomatis, atau buka Google Maps → tahan lokasi → salin koordinatnya.</p>
 
       <h3 style="margin:1.5rem 0 1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--cream2);">
         📞 Kontak & Data Usaha
@@ -129,19 +128,28 @@
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Jumlah Tenaga Kerja</label>
-          <input type="number" id="jumlah_tenaga_kerja" class="form-input" placeholder="Contoh: 5" min="1">
-        </div>
-        <!-- Status diatur otomatis, tersembunyi dari pengguna -->
-<input type="hidden" id="status" value="menunggu">
+      <div class="form-group">
+        <label class="form-label">Jumlah Tenaga Kerja</label>
+        <input type="number" id="jumlah_tenaga_kerja" class="form-input" placeholder="Contoh: 5" min="1">
       </div>
+
+      <!-- Status hanya muncul untuk admin -->
+      <div class="form-group" id="groupStatus" style="display:none;">
+        <label class="form-label">Status IKM</label>
+        <select id="status" class="form-select">
+          <option value="menunggu">Menunggu Verifikasi</option>
+          <option value="aktif">Aktif</option>
+          <option value="nonaktif">Nonaktif</option>
+        </select>
+      </div>
+      <!-- Status tersembunyi untuk non-admin -->
+      <input type="hidden" id="statusHidden" value="menunggu">
 
       <div class="form-group">
         <label class="form-label">Foto Usaha</label>
         <input type="file" id="foto" class="form-input" accept="image/*" style="padding:8px;">
         <p class="form-hint">Format: JPG, PNG. Ukuran maksimal 5MB.</p>
+        <div id="previewFoto" style="margin-top:8px;"></div>
       </div>
 
       <div style="display:flex;gap:12px;margin-top:1.5rem;flex-wrap:wrap;">
@@ -164,30 +172,72 @@
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
+    let editId = null;   // kalau ada ID = mode edit
+    let isAdmin = false;
+
     function showAlert(pesan, tipe = 'error') {
       const el = document.getElementById('alertBox');
       el.innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // Ambil koordinat GPS dari browser
     function getGPS() {
-      if (!navigator.geolocation) {
-        showAlert('Browser tidak mendukung GPS.'); return;
-      }
+      if (!navigator.geolocation) { showAlert('Browser tidak mendukung GPS.'); return; }
       navigator.geolocation.getCurrentPosition(
         pos => {
           document.getElementById('latitude').value = pos.coords.latitude.toFixed(6);
           document.getElementById('longitude').value = pos.coords.longitude.toFixed(6);
           showAlert('✅ Koordinat GPS berhasil diambil!', 'success');
         },
-        () => showAlert('Gagal mengambil lokasi GPS. Pastikan izin lokasi diaktifkan.')
+        () => showAlert('Gagal mengambil lokasi. Pastikan izin lokasi diaktifkan.')
       );
+    }
+
+    // Preview foto sebelum upload
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('foto').addEventListener('change', function() {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById('previewFoto').innerHTML =
+            `<img src="${e.target.result}" style="max-width:200px;max-height:150px;border-radius:8px;border:2px solid var(--cream2);">`;
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    function isiForm(ikm) {
+      document.getElementById('nama_usaha').value        = ikm.nama_usaha || '';
+      document.getElementById('pemilik').value           = ikm.pemilik || '';
+      document.getElementById('kategori').value          = ikm.kategori || '';
+      document.getElementById('tahun_berdiri').value     = ikm.tahun_berdiri || '';
+      document.getElementById('deskripsi').value         = ikm.deskripsi || '';
+      document.getElementById('kecamatan').value         = ikm.kecamatan || '';
+      document.getElementById('desa').value              = ikm.desa || '';
+      document.getElementById('alamat').value            = ikm.alamat || '';
+      document.getElementById('latitude').value          = ikm.latitude || '';
+      document.getElementById('longitude').value         = ikm.longitude || '';
+      document.getElementById('no_telp').value           = ikm.no_telp || '';
+      document.getElementById('email_usaha').value       = ikm.email || '';
+      document.getElementById('jumlah_tenaga_kerja').value = ikm.jumlah_tenaga_kerja || '';
+      if (isAdmin) {
+        document.getElementById('status').value = ikm.status || 'menunggu';
+      }
+      if (ikm.foto_url) {
+        document.getElementById('previewFoto').innerHTML =
+          `<img src="${ikm.foto_url}" style="max-width:200px;max-height:150px;border-radius:8px;border:2px solid var(--cream2);">
+           <p class="form-hint">Foto saat ini. Upload baru untuk mengganti.</p>`;
+      }
     }
 
     async function simpan() {
       const user = await requireLogin();
       const btn = document.getElementById('btnSimpan');
+
+      const statusVal = isAdmin
+        ? document.getElementById('status').value
+        : 'menunggu';
 
       const data = {
         nama_usaha:          document.getElementById('nama_usaha').value.trim(),
@@ -203,7 +253,7 @@
         no_telp:             document.getElementById('no_telp').value.trim(),
         email:               document.getElementById('email_usaha').value.trim(),
         jumlah_tenaga_kerja: parseInt(document.getElementById('jumlah_tenaga_kerja').value) || null,
-        status:              document.getElementById('status').value,
+        status:              statusVal,
       };
 
       if (!data.nama_usaha || !data.pemilik || !data.kategori) {
@@ -214,17 +264,27 @@
       btn.disabled = true;
 
       try {
-        const ikm = await simpanIKM(data);
+        let ikmId = editId;
 
-        // Upload foto jika ada
-        const fotoFile = document.getElementById('foto').files[0];
-        if (fotoFile && ikm.id) {
-          const fotoUrl = await uploadFotoIKM(fotoFile, ikm.id);
-          await updateIKM(ikm.id, { foto_url: fotoUrl });
+        if (editId) {
+          // MODE EDIT — update data yang ada
+          await updateIKM(editId, data);
+        } else {
+          // MODE TAMBAH — buat data baru
+          const ikm = await simpanIKM(data);
+          ikmId = ikm.id;
         }
 
-        showAlert('✅ Data IKM berhasil disimpan!', 'success');
-        setTimeout(() => window.location.href = 'data-ikm.html', 1500);
+        // Upload foto baru jika ada
+        const fotoFile = document.getElementById('foto').files[0];
+        if (fotoFile && ikmId) {
+          const fotoUrl = await uploadFotoIKM(fotoFile, ikmId);
+          await updateIKM(ikmId, { foto_url: fotoUrl });
+        }
+
+        showAlert(editId ? '✅ Data IKM berhasil diperbarui!' : '✅ Data IKM berhasil disimpan! Menunggu verifikasi admin.', 'success');
+        setTimeout(() => window.location.href = editId ? `detail-ikm.html?id=${editId}` : 'data-ikm.html', 1800);
+
       } catch(e) {
         showAlert('Gagal menyimpan: ' + e.message);
         btn.textContent = '💾 Simpan Data IKM';
@@ -232,7 +292,38 @@
       }
     }
 
-    requireLogin();
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      isAdmin = profil?.peran === 'admin';
+
+      // Tampilkan pilihan status hanya untuk admin
+      if (isAdmin) {
+        document.getElementById('groupStatus').style.display = 'block';
+      }
+
+      // Cek apakah mode edit (ada ?id= di URL)
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+
+      if (id) {
+        // MODE EDIT
+        editId = id;
+        document.getElementById('pageTitle').textContent = 'Edit Data IKM';
+        document.getElementById('btnSimpan').textContent = '💾 Simpan Perubahan';
+
+        try {
+          const { data: ikm, error } = await db.from('ikm').select('*').eq('id', id).single();
+          if (error) throw error;
+          isiForm(ikm);
+        } catch(e) {
+          showAlert('Gagal memuat data IKM: ' + e.message);
+        }
+      }
+      // Kalau tidak ada ?id= = mode tambah baru (form kosong)
+    }
+
+    init();
   </script>
 </body>
 </html>
