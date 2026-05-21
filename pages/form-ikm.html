@@ -134,14 +134,8 @@
           <label class="form-label">Jumlah Tenaga Kerja</label>
           <input type="number" id="jumlah_tenaga_kerja" class="form-input" placeholder="Contoh: 5" min="1">
         </div>
-        <div class="form-group">
-          <label class="form-label">Status IKM</label>
-          <select id="status" class="form-select">
-            <option value="menunggu">Menunggu Verifikasi</option>
-            <option value="aktif">Aktif</option>
-            <option value="nonaktif">Nonaktif</option>
-          </select>
-        </div>
+        <!-- Status diatur otomatis, tersembunyi dari pengguna -->
+<input type="hidden" id="status" value="menunggu">
       </div>
 
       <div class="form-group">
