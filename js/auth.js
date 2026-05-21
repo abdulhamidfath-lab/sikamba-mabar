@@ -1,5 +1,5 @@
 // ============================================
-// SIKAMBA MABAR - Fungsi Login & Daftar
+// SIKAMBA MABAR - Fungsi Login & Daftar (Fixed)
 // ============================================
 
 // LOGIN
@@ -9,14 +9,23 @@ async function login(email, password) {
   return data;
 }
 
-// DAFTAR AKUN BARU
+// DAFTAR AKUN BARU — peran tersimpan lewat metadata
 async function daftar(email, password, namaLengkap, peran) {
-  const { data, error } = await db.auth.signUp({ email, password });
+  const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        nama_lengkap: namaLengkap,
+        peran: peran
+      }
+    }
+  });
   if (error) throw error;
 
-  // Simpan profil pengguna ke tabel profiles
+  // Simpan juga langsung ke tabel profiles sebagai backup
   if (data.user) {
-    await db.from('profiles').insert({
+    await db.from('profiles').upsert({
       id: data.user.id,
       nama_lengkap: namaLengkap,
       peran: peran
@@ -32,7 +41,7 @@ async function logout() {
 }
 
 // LUPA PASSWORD
-async function lupaPasword(email) {
+async function lupaPassword(email) {
   const { error } = await db.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.origin + '/pages/reset-password.html'
   });
