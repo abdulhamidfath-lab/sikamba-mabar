@@ -71,7 +71,31 @@
         </a>
       </div>
     </div>
-
+<!-- Panel verifikasi IKM — hanya muncul untuk admin -->
+<div class="card" id="panelVerifikasi" style="display:none;margin-bottom:1.5rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+    <h3>⏳ IKM Menunggu Verifikasi</h3>
+    <span class="badge badge-menunggu" id="jumlahMenunggu">0 IKM</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nama Usaha</th>
+          <th>Pemilik</th>
+          <th>Kategori</th>
+          <th>Kecamatan</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tabelMenunggu">
+        <tr><td colspan="5" style="text-align:center;color:var(--text2);padding:1.5rem;">
+          Tidak ada IKM yang menunggu verifikasi
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
     <!-- IKM terbaru -->
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
@@ -119,7 +143,7 @@
       document.getElementById('namaUser').textContent = profil?.nama_lengkap || user.email;
       const peran = profil?.peran || 'konsumen';
       document.getElementById('peranUser').innerHTML =
-        `<span class="badge ${badgeProfil[peran] || 'badge-kategori'}" style="font-size:12px;">${peran.toUpperCase()}</span>`;
+        `loadMenunggu(peran);<span class="badge ${badgeProfil[peran] || 'badge-kategori'}" style="font-size:12px;">${peran.toUpperCase()}</span>`;
 
       // Load statistik
       try {
@@ -150,7 +174,55 @@
           '<tr><td colspan="4" style="text-align:center;color:var(--text2);">Gagal memuat data.</td></tr>';
       }
     }
+async function loadMenunggu(peran) {
+  if (peran !== 'admin') return;
+  
+  document.getElementById('panelVerifikasi').style.display = 'block';
+  
+  const { data } = await db.from('ikm')
+    .select('*')
+    .eq('status', 'menunggu')
+    .order('created_at', { ascending: false });
+  
+  const jumlah = data?.length || 0;
+  document.getElementById('jumlahMenunggu').textContent = jumlah + ' IKM';
+  
+  if (jumlah === 0) return;
+  
+  document.getElementById('tabelMenunggu').innerHTML = data.map(ikm => `
+    <tr id="row-${ikm.id}">
+      <td><strong>${ikm.nama_usaha}</strong><br>
+        <small style="color:var(--text2)">${ikm.pemilik}</small></td>
+      <td>${ikm.pemilik}</td>
+      <td><span class="badge badge-kategori">${ikm.kategori}</span></td>
+      <td>${ikm.kecamatan || '-'}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-primary" style="padding:5px 12px;font-size:12px;"
+            onclick="verifikasi('${ikm.id}', 'aktif')">✅ Approve</button>
+          <button class="btn btn-danger" style="padding:5px 12px;font-size:12px;"
+            onclick="verifikasi('${ikm.id}', 'nonaktif')">❌ Tolak</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
 
+async function verifikasi(ikmId, statusBaru) {
+  const { error } = await db.from('ikm')
+    .update({ status: statusBaru })
+    .eq('id', ikmId);
+  
+  if (error) { alert('Gagal: ' + error.message); return; }
+  
+  // Hapus baris dari tabel langsung tanpa reload
+  document.getElementById('row-' + ikmId)?.remove();
+  
+  const sisa = document.querySelectorAll('#tabelMenunggu tr').length;
+  document.getElementById('jumlahMenunggu').textContent = sisa + ' IKM';
+  
+  alert(statusBaru === 'aktif' ? '✅ IKM berhasil diapprove!' : '❌ IKM ditolak.');
+}
     init();
   </script>
 </body>
