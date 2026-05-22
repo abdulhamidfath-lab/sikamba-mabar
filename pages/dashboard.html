@@ -64,6 +64,7 @@
         <a href="peta.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;"><span style="font-size:24px;">🗺️</span>Peta Industri</a>
         <a href="marketplace.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;"><span style="font-size:24px;">🛍️</span>Marketplace</a>
         <a href="profil.html" class="btn btn-secondary" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;"><span style="font-size:24px;">👤</span>Profil Saya</a>
+        <a href="produk-saya.html" class="btn btn-secondary" id="menuProduk" style="flex-direction:column;padding:1rem;gap:6px;font-size:13px;display:none;"><span style="font-size:24px;">📦</span>Produk Saya</a>
       </div>
     </div>
 
@@ -197,6 +198,10 @@
 
       if (peran === 'admin') {
         loadMenunggu();
+        document.getElementById('menuProduk').style.display = 'flex';
+      }
+      if (peran === 'ikm') {
+        document.getElementById('menuProduk').style.display = 'flex';
       }
     }
 
