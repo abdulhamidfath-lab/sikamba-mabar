@@ -48,11 +48,14 @@
       <input type="text" class="search-input" id="searchInput" placeholder="🔍 Cari nama usaha, pemilik, atau desa...">
       <select class="form-select" id="filterKategori" style="width:auto;min-width:160px;margin-bottom:0;">
         <option value="">Semua Kategori</option>
-        <option value="Anyaman">Anyaman</option>
-        <option value="Tenun">Tenun</option>
+        <option value="Anyaman & Kerajinan">Anyaman & Kerajinan</option>
+        <option value="Tenun Tradisional">Tenun Tradisional</option>
         <option value="Makanan & Minuman">Makanan & Minuman</option>
-        <option value="Kerajinan">Kerajinan</option>
-        <option value="Industri Logam">Industri Logam</option>
+        <option value="Kopi & Minuman Herbal">Kopi & Minuman Herbal</option>
+        <option value="Fashion & Konveksi">Fashion & Konveksi</option>
+        <option value="Furniture & Kayu">Furniture & Kayu</option>
+        <option value="Perbengkelan">Perbengkelan</option>
+        <option value="Jasa & Lainnya">Jasa & Lainnya</option>
       </select>
       <select class="form-select" id="filterKecamatan" style="width:auto;min-width:160px;margin-bottom:0;">
         <option value="">Semua Kecamatan</option>
@@ -90,8 +93,14 @@
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
     const ikonKategori = {
-      'Anyaman': '🧺', 'Tenun': '🧵', 'Makanan & Minuman': '☕',
-      'Kerajinan': '🏺', 'Industri Logam': '⚒️', 'Lainnya': '🏭'
+      'Anyaman & Kerajinan': '🧺',
+      'Tenun Tradisional': '🧵',
+      'Makanan & Minuman': '🍽️',
+      'Kopi & Minuman Herbal': '☕',
+      'Fashion & Konveksi': '👗',
+      'Furniture & Kayu': '🪵',
+      'Perbengkelan': '🔧',
+      'Jasa & Lainnya': '🏢'
     };
 
     let semuaIKM = [];
