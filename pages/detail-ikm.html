@@ -158,11 +158,16 @@
           &nbsp;<span class="badge badge-kategori">${ikm.kategori}</span>
         `;
 
-        // Tombol aksi (admin bisa edit)
+        // Tombol aksi berdasarkan peran
         const user = await getUser();
         if (user) {
           const profil = await getProfil(user.id);
-          if (profil?.peran === 'admin' || profil?.ikm_id === ikm.id) {
+          const peran = profil?.peran || 'konsumen';
+          const bolehEdit =
+            peran === 'admin' ||
+            (peran === 'ikm' && profil?.ikm_id === ikm.id);
+
+          if (bolehEdit) {
             document.getElementById('tombolAksi').innerHTML = `
               <a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold">✏️ Edit IKM</a>
             `;
