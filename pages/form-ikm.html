@@ -149,9 +149,46 @@
 
       <div class="form-group">
         <label class="form-label">Foto Usaha</label>
-        <input type="file" id="foto" class="form-input" accept="image/*" style="padding:8px;">
-        <p class="form-hint">Format: JPG, PNG. Ukuran maksimal 5MB.</p>
-        <div id="previewFoto" style="margin-top:8px;"></div>
+
+        <!-- Panduan ukuran -->
+        <div style="background:var(--blue-light);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--blue);line-height:1.7;">
+          📐 <strong>Panduan foto terbaik:</strong><br>
+          • Rasio ideal: <strong>16:9</strong> (landscape/horizontal)<br>
+          • Contoh ukuran: 1280×720px, 1920×1080px, atau foto HP landscape<br>
+          • Format: JPG atau PNG — Maksimal 5 MB<br>
+          • Tips: Foto yang terlalu portrait/vertikal akan terpotong di bagian atas dan bawah
+        </div>
+
+        <!-- Preview kotak 16:9 -->
+        <div id="previewKotak" style="
+          width:100%;
+          aspect-ratio:16/9;
+          background:var(--cream2);
+          border:2px dashed rgba(61,31,13,0.2);
+          border-radius:var(--radius);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          overflow:hidden;
+          margin-bottom:10px;
+          position:relative;
+        ">
+          <div id="previewPlaceholder" style="text-align:center;color:var(--text2);">
+            <div style="font-size:36px;margin-bottom:8px;">🖼️</div>
+            <div style="font-size:13px;">Preview foto akan muncul di sini</div>
+            <div style="font-size:11px;margin-top:4px;opacity:0.7;">Rasio 16:9 — seperti tampilan di halaman detail</div>
+          </div>
+          <img id="previewImg" src="" alt="Preview" style="
+            display:none;
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            object-position:center;
+          ">
+        </div>
+
+        <input type="file" id="foto" class="form-input" accept="image/jpeg,image/png,image/webp" style="padding:8px;">
+        <div id="infoFoto" style="font-size:12px;color:var(--text2);margin-top:6px;"></div>
       </div>
 
       <div style="display:flex;gap:12px;margin-top:1.5rem;flex-wrap:wrap;">
@@ -195,15 +232,32 @@
       );
     }
 
-    // Preview foto sebelum upload
+    // Preview foto 16:9 sebelum upload
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('foto').addEventListener('change', function() {
         const file = this.files[0];
         if (!file) return;
+
+        // Validasi ukuran file
+        const maxMB = 5;
+        if (file.size > maxMB * 1024 * 1024) {
+          showAlert(`Ukuran foto terlalu besar (${(file.size/1024/1024).toFixed(1)} MB). Maksimal ${maxMB} MB.`);
+          this.value = '';
+          return;
+        }
+
         const reader = new FileReader();
         reader.onload = e => {
-          document.getElementById('previewFoto').innerHTML =
-            `<img src="${e.target.result}" style="max-width:200px;max-height:150px;border-radius:8px;border:2px solid var(--cream2);">`;
+          const img = document.getElementById('previewImg');
+          img.src = e.target.result;
+          img.style.display = 'block';
+          document.getElementById('previewPlaceholder').style.display = 'none';
+
+          // Info file
+          const kb = (file.size / 1024).toFixed(0);
+          const mb = (file.size / 1024 / 1024).toFixed(2);
+          document.getElementById('infoFoto').innerHTML =
+            `✅ <strong>${file.name}</strong> — ${kb > 1024 ? mb + ' MB' : kb + ' KB'}`;
         };
         reader.readAsDataURL(file);
       });
@@ -227,9 +281,12 @@
         document.getElementById('status').value = ikm.status || 'menunggu';
       }
       if (ikm.foto_url) {
-        document.getElementById('previewFoto').innerHTML =
-          `<img src="${ikm.foto_url}" style="max-width:200px;max-height:150px;border-radius:8px;border:2px solid var(--cream2);">
-           <p class="form-hint">Foto saat ini. Upload baru untuk mengganti.</p>`;
+        const img = document.getElementById('previewImg');
+        img.src = ikm.foto_url;
+        img.style.display = 'block';
+        document.getElementById('previewPlaceholder').style.display = 'none';
+        document.getElementById('infoFoto').innerHTML =
+          '📷 Foto saat ini. Upload foto baru untuk mengganti.';
       }
     }
 
