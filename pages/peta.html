@@ -50,6 +50,21 @@
         <option value="Perbengkelan">Perbengkelan</option>
         <option value="Jasa & Lainnya">Jasa & Lainnya</option>
       </select>
+      <select class="form-select" id="filterKec" style="width:auto;min-width:160px;margin-bottom:0;" onchange="filterPeta()">
+        <option value="">Semua Kecamatan</option>
+        <option value="Komodo">Komodo</option>
+        <option value="Boleng">Boleng</option>
+        <option value="Sano Nggoang">Sano Nggoang</option>
+        <option value="Mbeliling">Mbeliling</option>
+        <option value="Lembor">Lembor</option>
+        <option value="Lembor Selatan">Lembor Selatan</option>
+        <option value="Welak">Welak</option>
+        <option value="Kuwus">Kuwus</option>
+        <option value="Kuwus Barat">Kuwus Barat</option>
+        <option value="Pacar">Pacar</option>
+        <option value="Mancang Pacar">Mancang Pacar</option>
+        <option value="Ndoso">Ndoso</option>
+      </select>
       <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap;">
         <div class="map-stat"><div class="num" id="statTotal">–</div><div class="lbl">Total IKM</div></div>
         <div class="map-stat"><div class="num" id="statDiPeta">–</div><div class="lbl">Tampil di Peta</div></div>
@@ -157,7 +172,12 @@
 
     function filterPeta() {
       const kat = document.getElementById('filterKat').value;
-      const hasil = kat ? semuaIKM.filter(i => i.kategori === kat) : semuaIKM;
+      const kec = document.getElementById('filterKec').value;
+      const hasil = semuaIKM.filter(i => {
+        const cocokKat = !kat || i.kategori === kat;
+        const cocokKec = !kec || i.kecamatan === kec;
+        return cocokKat && cocokKec;
+      });
       renderMarker(hasil);
     }
 
