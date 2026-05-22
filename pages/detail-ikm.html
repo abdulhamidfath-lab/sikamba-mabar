@@ -168,8 +168,12 @@
             (peran === 'ikm' && profil?.ikm_id === ikm.id);
 
           if (bolehEdit) {
+            const tombolHapus = peran === 'admin'
+              ? `<button class="btn btn-danger" onclick="hapusIKM('${ikm.id}', '${ikm.nama_usaha}')">🗑️ Hapus</button>`
+              : '';
             document.getElementById('tombolAksi').innerHTML = `
               <a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold">✏️ Edit IKM</a>
+              ${tombolHapus}
             `;
           }
         }
@@ -222,6 +226,26 @@
       } catch(e) {
         document.getElementById('namaUsaha').textContent = 'IKM tidak ditemukan';
         document.getElementById('infoUsaha').innerHTML = `<p style="color:var(--red);">Error: ${e.message}</p>`;
+      }
+    }
+
+    async function hapusIKM(id, nama) {
+      const konfirmasi = confirm(
+        `⚠️ Hapus IKM "${nama}"?\n\nSemua data produk terkait juga akan terhapus.\nTindakan ini TIDAK bisa dibatalkan.`
+      );
+      if (!konfirmasi) return;
+
+      // Konfirmasi kedua untuk keamanan
+      const konfirmasi2 = confirm(`Ketik OK untuk konfirmasi hapus "${nama}" secara permanen.`);
+      if (!konfirmasi2) return;
+
+      try {
+        const { error } = await db.from('ikm').delete().eq('id', id);
+        if (error) throw error;
+        alert('✅ Data IKM berhasil dihapus.');
+        window.location.href = 'data-ikm.html';
+      } catch(e) {
+        alert('Gagal menghapus: ' + e.message);
       }
     }
 
