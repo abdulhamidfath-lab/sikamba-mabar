@@ -151,13 +151,22 @@
     });
 
     async function generateQR(text) {
-      return new Promise((resolve, reject) => {
-        QRCode.toDataURL(text, { width: 300, margin: 2, color: { dark: '#3D1F0D', light: '#FFFFFF' } }, (err, url) => {
-          if (err) reject(err);
-          else resolve(url);
-        });
-      });
-    }
+  return new Promise((resolve) => {
+    const div = document.createElement('div');
+    const qr = new QRCode(div, {
+      text: text,
+      width: 300,
+      height: 300,
+      colorDark: '#3D1F0D',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    setTimeout(() => {
+      const img = div.querySelector('img');
+      resolve(img ? img.src : '');
+    }, 200);
+  });
+}
 
     async function simpan() {
       const btn = document.getElementById('btnSimpan');
