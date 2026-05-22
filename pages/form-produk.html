@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Produk — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="produk-saya.html">Produk Saya</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;">
+      <a href="produk-saya.html" class="btn btn-secondary" style="padding:8px 14px;">← Kembali</a>
+      <h2 style="margin:0;" id="pageTitle">Tambah Produk</h2>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <div class="card">
+      <h3 style="margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:1px solid var(--cream2);">
+        📦 Informasi Produk
+      </h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nama Produk *</label>
+          <input type="text" id="nama_produk" class="form-input" placeholder="Nama produk">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori Produk *</label>
+          <select id="kategori" class="form-select">
+            <option value="">-- Pilih Kategori --</option>
+            <option value="Anyaman & Kerajinan">Anyaman & Kerajinan</option>
+            <option value="Tenun Tradisional">Tenun Tradisional</option>
+            <option value="Makanan & Minuman">Makanan & Minuman</option>
+            <option value="Kopi & Minuman Herbal">Kopi & Minuman Herbal</option>
+            <option value="Fashion & Konveksi">Fashion & Konveksi</option>
+            <option value="Furniture & Kayu">Furniture & Kayu</option>
+            <option value="Perbengkelan">Perbengkelan</option>
+            <option value="Jasa & Lainnya">Jasa & Lainnya</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Deskripsi Produk</label>
+        <textarea id="deskripsi" class="form-textarea" placeholder="Ceritakan tentang produk ini — keunikan, cara pembuatan, kegunaan..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Harga (Rp) *</label>
+          <input type="number" id="harga" class="form-input" placeholder="Contoh: 150000" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stok Tersedia</label>
+          <input type="number" id="stok" class="form-input" placeholder="Contoh: 10" min="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bahan Baku</label>
+        <input type="text" id="bahan_baku" class="form-input" placeholder="Contoh: Lontar, Bambu, Rotan...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Status Produk</label>
+        <select id="aktif" class="form-select">
+          <option value="true">Aktif — tampil di marketplace</option>
+          <option value="false">Nonaktif — tidak tampil</option>
+        </select>
+      </div>
+
+      <h3 style="margin:1.5rem 0 1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--cream2);">
+        🖼️ Foto Produk
+      </h3>
+
+      <div class="form-group">
+        <div style="background:var(--blue-light);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--blue);line-height:1.7;">
+          📐 <strong>Panduan foto terbaik:</strong> Rasio 1:1 (kotak) atau 4:3 — foto dari depan dengan latar bersih. Format JPG/PNG, maksimal 5 MB.
+        </div>
+        <div id="previewKotak" style="width:100%;max-width:320px;aspect-ratio:1/1;background:var(--cream2);border:2px dashed rgba(61,31,13,0.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;">
+          <div id="previewPlaceholder" style="text-align:center;color:var(--text2);">
+            <div style="font-size:36px;margin-bottom:8px;">📷</div>
+            <div style="font-size:13px;">Preview foto produk</div>
+          </div>
+          <img id="previewImg" src="" alt="Preview" style="display:none;width:100%;height:100%;object-fit:cover;">
+        </div>
+        <input type="file" id="foto" class="form-input" accept="image/jpeg,image/png,image/webp" style="padding:8px;">
+        <div id="infoFoto" style="font-size:12px;color:var(--text2);margin-top:6px;"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:1.5rem;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-lg" id="btnSimpan" onclick="simpan()">💾 Simpan Produk</button>
+        <a href="produk-saya.html" class="btn btn-secondary btn-lg">Batal</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/ikm.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    let editId = null;
+    let ikmId = null;
+
+    function showAlert(pesan, tipe = 'error') {
+      const el = document.getElementById('alertBox');
+      el.innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function formatRupiah(angka) {
+      return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    }
+
+    document.getElementById('foto').addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showAlert('Ukuran foto terlalu besar. Maksimal 5 MB.');
+        this.value = ''; return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('previewImg').style.display = 'block';
+        document.getElementById('previewPlaceholder').style.display = 'none';
+        document.getElementById('infoFoto').textContent = `✅ ${file.name} — ${(file.size/1024).toFixed(0)} KB`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    async function generateQR(text) {
+      return new Promise((resolve, reject) => {
+        QRCode.toDataURL(text, { width: 300, margin: 2, color: { dark: '#3D1F0D', light: '#FFFFFF' } }, (err, url) => {
+          if (err) reject(err);
+          else resolve(url);
+        });
+      });
+    }
+
+    async function simpan() {
+      const btn = document.getElementById('btnSimpan');
+      const nama = document.getElementById('nama_produk').value.trim();
+      const kategori = document.getElementById('kategori').value;
+      const harga = parseInt(document.getElementById('harga').value);
+
+      if (!nama || !kategori || !harga) {
+        showAlert('Nama produk, kategori, dan harga wajib diisi.'); return;
+      }
+
+      btn.textContent = 'Menyimpan...';
+      btn.disabled = true;
+
+      try {
+        const data = {
+          ikm_id:     ikmId,
+          nama_produk: nama,
+          kategori:   kategori,
+          deskripsi:  document.getElementById('deskripsi').value.trim(),
+          harga:      harga,
+          stok:       parseInt(document.getElementById('stok').value) || 0,
+          bahan_baku: document.getElementById('bahan_baku').value.trim(),
+          aktif:      document.getElementById('aktif').value === 'true',
+        };
+
+        let produkId = editId;
+
+        if (editId) {
+          await db.from('produk').update(data).eq('id', editId);
+        } else {
+          const { data: produk, error } = await db.from('produk').insert(data).select().single();
+          if (error) throw error;
+          produkId = produk.id;
+        }
+
+        // Generate QR code
+        const qrUrl = window.location.origin + `/pages/qr-produk.html?id=${produkId}`;
+        const qrData = await generateQR(qrUrl);
+        await db.from('produk').update({ qr_code: qrData }).eq('id', produkId);
+
+        // Upload foto jika ada
+        const fotoFile = document.getElementById('foto').files[0];
+        if (fotoFile && produkId) {
+          const ext = fotoFile.name.split('.').pop();
+          const path = `${produkId}/foto.${ext}`;
+          const { error: upErr } = await db.storage.from('foto-produk').upload(path, fotoFile, { upsert: true });
+          if (!upErr) {
+            const { data: urlData } = db.storage.from('foto-produk').getPublicUrl(path);
+            await db.from('produk').update({ foto_url: urlData.publicUrl }).eq('id', produkId);
+          }
+        }
+
+        showAlert(editId ? '✅ Produk berhasil diperbarui!' : '✅ Produk berhasil disimpan! QR code sudah digenerate.', 'success');
+        setTimeout(() => window.location.href = 'produk-saya.html', 1500);
+      } catch(e) {
+        showAlert('Gagal menyimpan: ' + e.message);
+        btn.textContent = '💾 Simpan Produk';
+        btn.disabled = false;
+      }
+    }
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      const peran = profil?.peran || 'konsumen';
+
+      if (peran === 'konsumen') {
+        showAlert('⛔ Anda tidak memiliki akses ke halaman ini.');
+        return;
+      }
+
+      ikmId = profil?.ikm_id;
+      if (!ikmId && peran !== 'admin') {
+        showAlert('⛔ Anda belum memiliki IKM terdaftar. Daftarkan IKM Anda terlebih dahulu.');
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (id) {
+        editId = id;
+        document.getElementById('pageTitle').textContent = 'Edit Produk';
+        document.getElementById('btnSimpan').textContent = '💾 Simpan Perubahan';
+        const { data: p } = await db.from('produk').select('*').eq('id', id).single();
+        if (p) {
+          document.getElementById('nama_produk').value = p.nama_produk || '';
+          document.getElementById('kategori').value = p.kategori || '';
+          document.getElementById('deskripsi').value = p.deskripsi || '';
+          document.getElementById('harga').value = p.harga || '';
+          document.getElementById('stok').value = p.stok || '';
+          document.getElementById('bahan_baku').value = p.bahan_baku || '';
+          document.getElementById('aktif').value = p.aktif ? 'true' : 'false';
+          if (p.foto_url) {
+            document.getElementById('previewImg').src = p.foto_url;
+            document.getElementById('previewImg').style.display = 'block';
+            document.getElementById('previewPlaceholder').style.display = 'none';
+            document.getElementById('infoFoto').textContent = '📷 Foto saat ini. Upload baru untuk mengganti.';
+          }
+        }
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

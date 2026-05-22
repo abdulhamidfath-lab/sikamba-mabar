@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Produk — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .produk-hero { width:100%; aspect-ratio:1/1; max-height:420px; background:linear-gradient(135deg,var(--brown),var(--gold)); display:flex; align-items:center; justify-content:center; font-size:80px; overflow:hidden; }
+    .produk-hero img { width:100%; height:100%; object-fit:cover; }
+    .info-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--cream2); font-size:14px; }
+    .info-row:last-child { border-bottom:none; }
+    .info-key { color:var(--text2); font-weight:500; }
+    .info-val { color:var(--text); font-weight:600; text-align:right; }
+    .btn-wa { background:#25D366; color:white; border:none; font-size:16px; font-weight:600; }
+    .btn-wa:hover { background:#1EB855; color:white; }
+    .ikm-mini { display:flex; align-items:center; gap:12px; padding:14px; background:var(--cream2); border-radius:var(--radius); cursor:pointer; transition:background 0.2s; }
+    .ikm-mini:hover { background:var(--cream); }
+    .ikm-mini-icon { width:48px; height:48px; border-radius:12px; background:var(--brown); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="../index.html">Beranda</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="data-ikm.html">Data IKM</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div style="max-width:720px;margin:0 auto;padding-bottom:3rem;">
+
+    <div class="produk-hero" id="heroSection">
+      <span id="heroIcon">📦</span>
+    </div>
+
+    <div style="padding:0 1.5rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin:1rem 0 0.5rem;font-size:13px;color:var(--text2);">
+        <a href="marketplace.html">← Marketplace</a>
+        <span>/</span>
+        <span id="breadNama">Detail Produk</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:1rem;">
+        <div>
+          <h1 style="font-size:1.8rem;margin-bottom:4px;" id="namaProduk">Memuat...</h1>
+          <div id="subHeader"></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:1.8rem;font-weight:700;color:var(--brown);" id="hargaProduk"></div>
+          <div style="font-size:13px;color:var(--text2);" id="stokProduk"></div>
+        </div>
+      </div>
+
+      <!-- Tombol WA -->
+      <button class="btn btn-wa btn-full btn-lg" id="btnWA" style="margin-bottom:1.5rem;display:none;">
+        💬 Hubungi IKM via WhatsApp
+      </button>
+
+      <!-- Info produk -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <h3 style="margin-bottom:1rem;">📋 Detail Produk</h3>
+        <div id="infoProduk"><div class="spinner"></div></div>
+      </div>
+
+      <!-- Deskripsi -->
+      <div class="card" id="cardDeskripsi" style="margin-bottom:1.2rem;display:none;">
+        <h3 style="margin-bottom:0.8rem;">📝 Deskripsi</h3>
+        <p id="deskripsiProduk" style="font-size:14px;color:var(--text2);line-height:1.8;"></p>
+      </div>
+
+      <!-- QR Code -->
+      <div class="card" id="cardQR" style="margin-bottom:1.2rem;display:none;">
+        <h3 style="margin-bottom:0.8rem;">📱 QR Keaslian Produk</h3>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <img id="qrImg" src="" alt="QR Code" style="width:120px;height:120px;border:2px solid var(--cream2);border-radius:8px;">
+          <div>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Scan QR ini untuk memverifikasi keaslian produk Manggarai Barat.</p>
+            <span style="background:var(--green-light);color:var(--green);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;">✅ Produk Asli Manggarai Barat</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info IKM -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <h3 style="margin-bottom:1rem;">🏭 Tentang Produsen</h3>
+        <div id="infoIKM"><div class="spinner"></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/ikm.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
+
+    const ikonKategori = {
+      'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
+      'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
+      'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
+    };
+
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) { window.location.href = 'marketplace.html'; return; }
+
+      const { data: p, error } = await db
+        .from('produk')
+        .select('*, ikm:ikm_id(*)')
+        .eq('id', id)
+        .single();
+
+      if (error || !p) {
+        document.getElementById('namaProduk').textContent = 'Produk tidak ditemukan';
+        return;
+      }
+
+      document.title = p.nama_produk + ' — SIKAMBA MABAR';
+      const ikon = ikonKategori[p.kategori] || '📦';
+
+      if (p.foto_url) {
+        document.getElementById('heroSection').innerHTML = `<img src="${p.foto_url}" alt="${p.nama_produk}">`;
+      } else {
+        document.getElementById('heroIcon').textContent = ikon;
+      }
+
+      document.getElementById('namaProduk').textContent = p.nama_produk;
+      document.getElementById('breadNama').textContent = p.nama_produk;
+      document.getElementById('hargaProduk').textContent = rupiah(p.harga);
+      document.getElementById('stokProduk').textContent = `Stok: ${p.stok} unit`;
+      document.getElementById('subHeader').innerHTML = `<span class="badge badge-kategori">${p.kategori}</span>`;
+
+      // Tombol WA
+      if (p.ikm?.no_telp) {
+        const noWA = '62' + p.ikm.no_telp.replace(/^0/, '');
+        const pesan = encodeURIComponent(`Halo, saya tertarik dengan produk *${p.nama_produk}* dari ${p.ikm.nama_usaha}. Apakah masih tersedia?`);
+        const btnWA = document.getElementById('btnWA');
+        btnWA.style.display = 'flex';
+        btnWA.onclick = () => window.open(`https://wa.me/${noWA}?text=${pesan}`, '_blank');
+      }
+
+      // Detail produk
+      document.getElementById('infoProduk').innerHTML = `
+        <div class="info-row"><span class="info-key">Nama Produk</span><span class="info-val">${p.nama_produk}</span></div>
+        <div class="info-row"><span class="info-key">Kategori</span><span class="info-val"><span class="badge badge-kategori">${p.kategori}</span></span></div>
+        <div class="info-row"><span class="info-key">Harga</span><span class="info-val" style="color:var(--brown);font-size:1.1rem;">${rupiah(p.harga)}</span></div>
+        <div class="info-row"><span class="info-key">Stok</span><span class="info-val">${p.stok} unit</span></div>
+        <div class="info-row"><span class="info-key">Bahan Baku</span><span class="info-val">${p.bahan_baku || '-'}</span></div>
+      `;
+
+      // Deskripsi
+      if (p.deskripsi) {
+        document.getElementById('cardDeskripsi').style.display = 'block';
+        document.getElementById('deskripsiProduk').textContent = p.deskripsi;
+      }
+
+      // QR Code
+      if (p.qr_code) {
+        document.getElementById('cardQR').style.display = 'block';
+        document.getElementById('qrImg').src = p.qr_code;
+      }
+
+      // Info IKM
+      const ikm = p.ikm;
+      if (ikm) {
+        document.getElementById('infoIKM').innerHTML = `
+          <div class="ikm-mini" onclick="window.location.href='detail-ikm.html?id=${ikm.id}'">
+            <div class="ikm-mini-icon">
+              ${ikm.foto_url ? `<img src="${ikm.foto_url}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : ikon}
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;color:var(--brown);margin-bottom:2px;">${ikm.nama_usaha}</div>
+              <div style="font-size:12px;color:var(--text2);">📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}</div>
+              ${ikm.no_telp ? `<div style="font-size:12px;color:var(--text2);">📞 ${ikm.no_telp}</div>` : ''}
+            </div>
+            <span style="color:var(--text2);font-size:18px;">›</span>
+          </div>
+        `;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produk Saya — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .produk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; }
+    .produk-card { background:white; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow); border:1px solid rgba(61,31,13,0.07); }
+    .produk-foto { height:180px; background:linear-gradient(135deg,var(--brown),var(--gold)); display:flex; align-items:center; justify-content:center; font-size:48px; overflow:hidden; position:relative; }
+    .produk-foto img { width:100%; height:100%; object-fit:cover; }
+    .produk-status { position:absolute; top:8px; right:8px; }
+    .produk-body { padding:1rem; }
+    .produk-nama { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--brown); margin-bottom:4px; }
+    .produk-harga { font-size:1.1rem; font-weight:700; color:var(--brown); margin:6px 0; }
+    .produk-info { font-size:12px; color:var(--text2); margin-bottom:2px; }
+    .qr-thumb { width:60px; height:60px; border:1px solid var(--cream2); border-radius:6px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="produk-saya.html" class="active">Produk Saya</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h2 style="margin:0;">📦 Produk Saya</h2>
+        <p style="font-size:13px;color:var(--text2);margin-top:4px;" id="namaIKM">Memuat...</p>
+      </div>
+      <a href="form-produk.html" class="btn btn-primary">➕ Tambah Produk</a>
+    </div>
+
+    <div class="produk-grid" id="produkGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:3rem;">
+        <div class="spinner"></div>
+        <p style="color:var(--text2);margin-top:1rem;">Memuat produk...</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/ikm.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    const ikonKategori = {
+      'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
+      'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
+      'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
+    };
+
+    function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
+
+    async function hapusProduk(id, nama) {
+      if (!confirm(`Hapus produk "${nama}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+      const { error } = await db.from('produk').delete().eq('id', id);
+      if (error) { alert('Gagal: ' + error.message); return; }
+      document.getElementById('card-' + id)?.remove();
+      alert('✅ Produk berhasil dihapus.');
+    }
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      const peran = profil?.peran || 'konsumen';
+
+      if (peran === 'konsumen') {
+        window.location.href = 'dashboard.html'; return;
+      }
+
+      let ikmIdFilter = profil?.ikm_id;
+
+      // Admin bisa lihat semua produk, atau filter per IKM via URL
+      const params = new URLSearchParams(window.location.search);
+      const ikmParam = params.get('ikm');
+      if (ikmParam) ikmIdFilter = ikmParam;
+
+      // Tampilkan nama IKM
+      if (ikmIdFilter) {
+        const { data: ikm } = await db.from('ikm').select('nama_usaha').eq('id', ikmIdFilter).single();
+        document.getElementById('namaIKM').textContent = ikm?.nama_usaha || '';
+      } else if (peran === 'admin') {
+        document.getElementById('namaIKM').textContent = 'Semua produk (Admin)';
+      }
+
+      // Query produk
+      let query = db.from('produk').select('*').order('created_at', { ascending: false });
+      if (ikmIdFilter) query = query.eq('ikm_id', ikmIdFilter);
+
+      const { data, error } = await query;
+      const grid = document.getElementById('produkGrid');
+
+      if (error || !data || data.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--text2);">
+          <div style="font-size:48px;margin-bottom:1rem;">📦</div>
+          <p>Belum ada produk.</p>
+          <a href="form-produk.html" class="btn btn-primary" style="margin-top:1rem;">Tambah Produk Pertama</a>
+        </div>`;
+        return;
+      }
+
+      grid.innerHTML = data.map(p => `
+        <div class="produk-card" id="card-${p.id}">
+          <div class="produk-foto">
+            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}">` : `<span>${ikonKategori[p.kategori] || '📦'}</span>`}
+            <div class="produk-status">
+              <span class="badge ${p.aktif ? 'badge-aktif' : 'badge-nonaktif'}">${p.aktif ? 'Aktif' : 'Nonaktif'}</span>
+            </div>
+          </div>
+          <div class="produk-body">
+            <div class="produk-nama">${p.nama_produk}</div>
+            <div class="produk-harga">${rupiah(p.harga)}</div>
+            <div class="produk-info">📦 Stok: ${p.stok} unit</div>
+            <div class="produk-info">🧵 Bahan: ${p.bahan_baku || '-'}</div>
+            ${p.qr_code ? `<div style="margin:10px 0;"><img src="${p.qr_code}" class="qr-thumb" title="QR Produk"></div>` : ''}
+            <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;">
+              <a href="detail-produk.html?id=${p.id}" class="btn btn-secondary" style="flex:1;font-size:12px;padding:7px;">Lihat</a>
+              <a href="form-produk.html?id=${p.id}" class="btn btn-gold" style="font-size:12px;padding:7px 12px;">Edit</a>
+              <button class="btn btn-danger" style="font-size:12px;padding:7px 10px;" onclick="hapusProduk('${p.id}','${p.nama_produk.replace(/'/g,"\\'")}')">🗑️</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    init();
+  </script>
+</body>
+</html>
