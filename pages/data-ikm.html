@@ -144,6 +144,7 @@
             <div style="display:flex;gap:8px;margin-top:12px;">
               <a href="detail-ikm.html?id=${ikm.id}" class="btn btn-secondary" style="flex:1;font-size:12px;padding:7px;">Lihat Detail</a>
               ${bisaEdit(ikm) ? `<a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold" style="font-size:12px;padding:7px 12px;">Edit</a>` : ''}
+              ${peranUser === 'admin' ? `<button class="btn btn-danger" style="font-size:12px;padding:7px 12px;" onclick="hapusIKM('${ikm.id}','${ikm.nama_usaha.replace(/'/g,"\\'")}')">🗑️</button>` : ''}
             </div>
           </div>
         </div>
@@ -198,6 +199,21 @@
       } catch(e) {
         document.getElementById('ikmGrid').innerHTML =
           `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--red);">Gagal memuat data: ${e.message}</div>`;
+      }
+    }
+
+    async function hapusIKM(id, nama) {
+      const konfirmasi = confirm(`⚠️ Hapus IKM "${nama}"?\n\nTindakan ini TIDAK bisa dibatalkan.`);
+      if (!konfirmasi) return;
+      try {
+        const { error } = await db.from('ikm').delete().eq('id', id);
+        if (error) throw error;
+        // Hapus kartu dari tampilan tanpa reload
+        semuaIKM = semuaIKM.filter(i => i.id !== id);
+        filter();
+        alert('✅ Data IKM berhasil dihapus.');
+      } catch(e) {
+        alert('Gagal menghapus: ' + e.message);
       }
     }
 
