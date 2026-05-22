@@ -354,23 +354,54 @@
     async function init() {
       const user = await requireLogin();
       const profil = await getProfil(user.id);
-      isAdmin = profil?.peran === 'admin';
+      const peran = profil?.peran || 'konsumen';
+      isAdmin = peran === 'admin';
+
+      // =============================================
+      // CEK HAK AKSES BERDASARKAN PERAN
+      // =============================================
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+
+      // Konsumen tidak boleh akses form sama sekali
+      if (peran === 'konsumen') {
+        document.getElementById('alertBox').innerHTML =
+          `<div class="alert alert-error">
+            ⛔ Anda tidak memiliki akses untuk menambah atau mengedit data IKM.
+            <br><a href="data-ikm.html" style="font-weight:600;">← Kembali ke Data IKM</a>
+          </div>`;
+        document.getElementById('btnSimpan').style.display = 'none';
+        document.querySelector('.card').style.opacity = '0.4';
+        document.querySelector('.card').style.pointerEvents = 'none';
+        return; // Hentikan eksekusi
+      }
+
+      // Pelaku IKM di mode EDIT — cek apakah IKM ini miliknya
+      if (id && peran === 'ikm') {
+        const ikmIdMilik = profil?.ikm_id;
+        if (ikmIdMilik !== id) {
+          document.getElementById('alertBox').innerHTML =
+            `<div class="alert alert-error">
+              ⛔ Anda hanya dapat mengedit data IKM milik Anda sendiri.
+              <br><a href="data-ikm.html" style="font-weight:600;">← Kembali ke Data IKM</a>
+            </div>`;
+          document.getElementById('btnSimpan').style.display = 'none';
+          document.querySelector('.card').style.opacity = '0.4';
+          document.querySelector('.card').style.pointerEvents = 'none';
+          return; // Hentikan eksekusi
+        }
+      }
 
       // Tampilkan pilihan status hanya untuk admin
       if (isAdmin) {
         document.getElementById('groupStatus').style.display = 'block';
       }
 
-      // Cek apakah mode edit (ada ?id= di URL)
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
-
+      // Mode edit — isi form dengan data lama
       if (id) {
-        // MODE EDIT
         editId = id;
         document.getElementById('pageTitle').textContent = 'Edit Data IKM';
         document.getElementById('btnSimpan').textContent = '💾 Simpan Perubahan';
-
         try {
           const { data: ikm, error } = await db.from('ikm').select('*').eq('id', id).single();
           if (error) throw error;
@@ -379,7 +410,7 @@
           showAlert('Gagal memuat data IKM: ' + e.message);
         }
       }
-      // Kalau tidak ada ?id= = mode tambah baru (form kosong)
+      // Tidak ada ?id= = mode tambah baru (form kosong)
     }
 
     init();
