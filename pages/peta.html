@@ -41,11 +41,14 @@
     <div class="map-controls">
       <select class="form-select" id="filterKat" style="width:auto;min-width:160px;margin-bottom:0;" onchange="filterPeta()">
         <option value="">Semua Kategori</option>
-        <option value="Anyaman">Anyaman</option>
-        <option value="Tenun">Tenun</option>
+        <option value="Anyaman & Kerajinan">Anyaman & Kerajinan</option>
+        <option value="Tenun Tradisional">Tenun Tradisional</option>
         <option value="Makanan & Minuman">Makanan & Minuman</option>
-        <option value="Kerajinan">Kerajinan</option>
-        <option value="Industri Logam">Industri Logam</option>
+        <option value="Kopi & Minuman Herbal">Kopi & Minuman Herbal</option>
+        <option value="Fashion & Konveksi">Fashion & Konveksi</option>
+        <option value="Furniture & Kayu">Furniture & Kayu</option>
+        <option value="Perbengkelan">Perbengkelan</option>
+        <option value="Jasa & Lainnya">Jasa & Lainnya</option>
       </select>
       <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap;">
         <div class="map-stat"><div class="num" id="statTotal">–</div><div class="lbl">Total IKM</div></div>
@@ -85,12 +88,14 @@
 
     // Warna per kategori
     const warna = {
-      'Anyaman': '#9B59B6',
-      'Tenun': '#2ECC71',
+      'Anyaman & Kerajinan': '#9B59B6',
+      'Tenun Tradisional': '#2ECC71',
       'Makanan & Minuman': '#E67E22',
-      'Kerajinan': '#3498DB',
-      'Industri Logam': '#E74C3C',
-      'Lainnya': '#95A5A6'
+      'Kopi & Minuman Herbal': '#8B4513',
+      'Fashion & Konveksi': '#E91E63',
+      'Furniture & Kayu': '#795548',
+      'Perbengkelan': '#FF5722',
+      'Jasa & Lainnya': '#607D8B'
     };
 
     // Inisialisasi peta — terpusat di Manggarai Barat
