@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Masuk — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .pass-wrap { position: relative; margin-bottom: 16px; }
+    .pass-wrap .form-input { padding-right: 44px; margin-bottom: 0; }
+    .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text2); font-size: 18px; padding: 4px; display: flex; align-items: center; }
+    .pass-toggle:hover { color: var(--brown); }
+  </style>
 </head>
 <body>
   <div class="batik-strip"></div>
@@ -24,7 +30,10 @@
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input type="password" id="password" class="form-input" placeholder="Masukkan password">
+        <div class="pass-wrap">
+          <input type="password" id="password" class="form-input" placeholder="Masukkan password">
+          <button class="pass-toggle" type="button" onclick="togglePass('password', this)" aria-label="Lihat password">👁️</button>
+        </div>
       </div>
       <div style="text-align:right;margin-bottom:1.2rem;">
         <a href="lupa-password.html" style="font-size:13px;">Lupa password?</a>
@@ -46,6 +55,12 @@
   <script>
     // Jika sudah login, langsung ke dashboard
     redirectIfLoggedIn();
+
+    function togglePass(id, btn) {
+      const el = document.getElementById(id);
+      if (el.type === 'password') { el.type = 'text'; btn.textContent = '🙈'; }
+      else { el.type = 'password'; btn.textContent = '👁️'; }
+    }
 
     function showAlert(pesan, tipe = 'error') {
       document.getElementById('alertBox').innerHTML =
