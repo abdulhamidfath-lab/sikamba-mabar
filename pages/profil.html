@@ -3,10 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profil — SIKAMBA MABAR</title>
+  <title>Profil Saya — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .profile-hero { background: var(--brown); padding: 2rem 0 2.5rem; }
+    .profile-hero .container { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--gold-light); display: flex; align-items: center; justify-content: center; font-size: 36px; border: 3px solid rgba(255,255,255,0.25); flex-shrink: 0; }
+    .profile-info { flex: 1; }
+    .profile-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: white; font-weight: 700; margin-bottom: 4px; }
+    .profile-email { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 8px; }
+
+    /* GRID KARTU */
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
+    @media (max-width: 680px) { .cards-grid { grid-template-columns: 1fr; } }
+
+    /* PASSWORD INPUT WRAPPER */
+    .pass-wrap { position: relative; margin-bottom: 1.2rem; }
+    .pass-wrap .form-input { padding-right: 44px; margin-bottom: 0; }
+    .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text2); font-size: 18px; padding: 4px; display: flex; align-items: center; justify-content: center; }
+    .pass-toggle:hover { color: var(--brown); }
+
+    /* GANTI PERAN CARD */
+    .peran-card { background: white; border-radius: var(--radius-lg); padding: 1.5rem; border: 1.5px solid var(--gold-light); box-shadow: 0 2px 12px rgba(200,134,43,0.12); margin-bottom: 1.2rem; }
+    .peran-option { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius); border: 1.5px solid rgba(61,31,13,0.12); cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
+    .peran-option:hover { border-color: var(--gold); background: var(--cream); }
+    .peran-option.selected { border-color: var(--brown); background: var(--cream2); }
+    .peran-option:last-child { margin-bottom: 0; }
+    .peran-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--cream2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .peran-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .peran-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+    .peran-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(61,31,13,0.2); margin-left: auto; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .peran-option.selected .peran-radio { border-color: var(--brown); background: var(--brown); }
+    .peran-option.selected .peran-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
+  </style>
 </head>
 <body>
+
   <nav class="navbar">
     <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
     <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
@@ -14,52 +46,102 @@
       <a href="dashboard.html">Dashboard</a>
       <a href="data-ikm.html">Data IKM</a>
       <a href="peta.html">Peta Industri</a>
-      <a href="profil.html">Profil Saya</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="profil.html" class="active">Profil Saya</a>
       <a href="#" onclick="logout()">Keluar</a>
     </div>
   </nav>
   <div class="batik-strip"></div>
 
-  <div style="background:var(--brown);padding:2.5rem 0;">
-    <div class="container" style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
-      <div style="width:72px;height:72px;border-radius:50%;background:var(--gold-light);display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid rgba(255,255,255,0.3);">👤</div>
-      <div>
-        <h2 style="color:white;margin-bottom:4px;" id="namaUser">Memuat...</h2>
-        <p style="color:rgba(255,255,255,0.7);font-size:13px;" id="emailUser"></p>
-        <span class="badge badge-aktif" style="margin-top:6px;display:inline-block;" id="peranUser"></span>
+  <!-- HERO PROFIL -->
+  <div class="profile-hero">
+    <div class="container">
+      <div class="avatar">👤</div>
+      <div class="profile-info">
+        <div class="profile-name" id="namaUser">Memuat...</div>
+        <div class="profile-email" id="emailUser"></div>
+        <div id="peranBadge"></div>
       </div>
     </div>
   </div>
 
   <div class="container" style="padding-top:2rem;padding-bottom:3rem;">
     <div id="alertBox"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
 
+    <!-- GRID: Edit Profil + Ubah Password -->
+    <div class="cards-grid">
+
+      <!-- EDIT PROFIL -->
       <div class="card">
         <h3 style="margin-bottom:1.2rem;">✏️ Edit Profil</h3>
         <div class="form-group">
           <label class="form-label">Nama Lengkap</label>
-          <input type="text" id="editNama" class="form-input">
+          <input type="text" id="editNama" class="form-input" placeholder="Nama lengkap Anda">
         </div>
         <button class="btn btn-primary" onclick="simpanProfil()">Simpan Perubahan</button>
       </div>
 
+      <!-- UBAH PASSWORD -->
       <div class="card">
         <h3 style="margin-bottom:1.2rem;">🔒 Ubah Password</h3>
-        <div class="form-group">
-          <label class="form-label">Password Baru</label>
+
+        <label class="form-label">Password Baru</label>
+        <div class="pass-wrap">
           <input type="password" id="passBar" class="form-input" placeholder="Min. 6 karakter">
+          <button class="pass-toggle" onclick="togglePass('passBar', this)" type="button" aria-label="Lihat password">
+            👁️
+          </button>
         </div>
-        <div class="form-group">
-          <label class="form-label">Konfirmasi Password</label>
+
+        <label class="form-label">Konfirmasi Password</label>
+        <div class="pass-wrap">
           <input type="password" id="passKonfirmasi" class="form-input" placeholder="Ulangi password baru">
+          <button class="pass-toggle" onclick="togglePass('passKonfirmasi', this)" type="button" aria-label="Lihat konfirmasi password">
+            👁️
+          </button>
         </div>
-        <button class="btn btn-secondary" onclick="ubahPassword()">Ubah Password</button>
+
+        <button class="btn btn-secondary" onclick="ubahPassword()" style="margin-top:0.5rem;">Ubah Password</button>
+      </div>
+
+    </div>
+
+    <!-- GANTI PERAN — hanya tampil untuk konsumen -->
+    <div class="peran-card" id="cardGantiPeran" style="display:none;">
+      <h3 style="margin-bottom:0.5rem;">🔄 Ubah Peran Akun</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:1.2rem;line-height:1.7;">
+        Anda saat ini terdaftar sebagai <strong>Konsumen</strong>. Jika Anda adalah pelaku usaha/IKM di Manggarai Barat, ubah peran agar bisa menambahkan data IKM dan produk Anda.
+      </p>
+
+      <div class="peran-option" id="opsiKonsumen" onclick="pilihPeran('konsumen')">
+        <div class="peran-icon">🛍️</div>
+        <div style="flex:1;">
+          <div class="peran-name">Konsumen / Pembeli</div>
+          <div class="peran-desc">Bisa melihat produk dan menghubungi IKM via WhatsApp</div>
+        </div>
+        <div class="peran-radio"></div>
+      </div>
+
+      <div class="peran-option" id="opsiIKM" onclick="pilihPeran('ikm')">
+        <div class="peran-icon">🏭</div>
+        <div style="flex:1;">
+          <div class="peran-name">Pelaku IKM</div>
+          <div class="peran-desc">Bisa mendaftarkan usaha, menambah produk, dan tampil di marketplace & peta industri</div>
+        </div>
+        <div class="peran-radio"></div>
+      </div>
+
+      <div style="margin-top:1.2rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="btnSimpanPeran" onclick="simpanPeran()" style="display:none;">
+          Simpan Perubahan Peran
+        </button>
+        <p id="infoGantiPeran" style="font-size:12px;color:var(--text2);margin:0;"></p>
       </div>
     </div>
 
-    <div class="card" style="margin-top:1.5rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
+    <!-- KELUAR -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div>
           <h3>🚪 Keluar dari Akun</h3>
           <p style="font-size:13px;color:var(--text2);margin-top:4px;">Anda akan keluar dari sesi ini.</p>
@@ -80,16 +162,83 @@
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
     function showAlert(pesan, tipe = 'success') {
-      document.getElementById('alertBox').innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
+      const el = document.getElementById('alertBox');
+      el.innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => el.innerHTML = '', 4000);
     }
 
-    async function init() {
-      const user = await requireLogin();
-      const profil = await getProfil(user.id);
-      document.getElementById('namaUser').textContent = profil?.nama_lengkap || user.email;
-      document.getElementById('emailUser').textContent = user.email;
-      document.getElementById('peranUser').textContent = (profil?.peran || 'konsumen').toUpperCase();
-      document.getElementById('editNama').value = profil?.nama_lengkap || '';
+    // Toggle lihat/sembunyikan password
+    function togglePass(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+        btn.setAttribute('aria-label', 'Sembunyikan password');
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+        btn.setAttribute('aria-label', 'Lihat password');
+      }
+    }
+
+    // Ganti peran
+    let peranPilihan = null;
+    let peranAktif = null;
+
+    function pilihPeran(peran) {
+      peranPilihan = peran;
+      document.getElementById('opsiKonsumen').classList.toggle('selected', peran === 'konsumen');
+      document.getElementById('opsiIKM').classList.toggle('selected', peran === 'ikm');
+
+      const btnSimpan = document.getElementById('btnSimpanPeran');
+      const info = document.getElementById('infoGantiPeran');
+
+      if (peran !== peranAktif) {
+        btnSimpan.style.display = 'inline-flex';
+        if (peran === 'ikm') {
+          info.innerHTML = '⚠️ Setelah berganti ke Pelaku IKM, Anda bisa mendaftarkan usaha dan menambah produk.';
+        } else {
+          info.innerHTML = '';
+        }
+      } else {
+        btnSimpan.style.display = 'none';
+        info.innerHTML = '';
+      }
+    }
+
+    async function simpanPeran() {
+      if (!peranPilihan || peranPilihan === peranAktif) return;
+
+      const konfirmasi = confirm(
+        peranPilihan === 'ikm'
+          ? '✅ Ubah peran menjadi Pelaku IKM?\n\nAnda akan bisa mendaftarkan usaha dan menambah produk.'
+          : '⚠️ Ubah peran kembali ke Konsumen?\n\nAnda tidak akan bisa mengelola data IKM.'
+      );
+      if (!konfirmasi) return;
+
+      const user = await getUser();
+      const { error } = await db.from('profiles').update({ peran: peranPilihan }).eq('id', user.id);
+
+      if (error) { showAlert('Gagal mengubah peran: ' + error.message, 'error'); return; }
+
+      peranAktif = peranPilihan;
+      document.getElementById('btnSimpanPeran').style.display = 'none';
+      document.getElementById('infoGantiPeran').innerHTML = '';
+
+      // Update badge di hero
+      const warna = { admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu' };
+      document.getElementById('peranBadge').innerHTML =
+        `<span class="badge ${warna[peranPilihan]||'badge-kategori'}" style="font-size:12px;">${peranPilihan.toUpperCase()}</span>`;
+
+      showAlert(
+        peranPilihan === 'ikm'
+          ? '✅ Peran berhasil diubah menjadi Pelaku IKM! Anda sekarang bisa mendaftarkan usaha.'
+          : '✅ Peran berhasil diubah kembali ke Konsumen.'
+      );
+
+      // Refresh halaman setelah 2 detik agar menu dashboard terupdate
+      setTimeout(() => window.location.reload(), 2000);
     }
 
     async function simpanProfil() {
@@ -112,6 +261,28 @@
       showAlert('✅ Password berhasil diubah!');
       document.getElementById('passBar').value = '';
       document.getElementById('passKonfirmasi').value = '';
+    }
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      const peran = profil?.peran || 'konsumen';
+      peranAktif = peran;
+      peranPilihan = peran;
+
+      document.getElementById('namaUser').textContent = profil?.nama_lengkap || user.email;
+      document.getElementById('emailUser').textContent = user.email;
+      document.getElementById('editNama').value = profil?.nama_lengkap || '';
+
+      const warna = { admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu' };
+      document.getElementById('peranBadge').innerHTML =
+        `<span class="badge ${warna[peran]||'badge-kategori'}" style="font-size:12px;">${peran.toUpperCase()}</span>`;
+
+      // Tampilkan kartu ganti peran hanya untuk konsumen
+      if (peran === 'konsumen') {
+        document.getElementById('cardGantiPeran').style.display = 'block';
+        pilihPeran('konsumen');
+      }
     }
 
     init();
