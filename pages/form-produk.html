@@ -8,12 +8,13 @@
 </head>
 <body>
   <nav class="navbar">
-    <div class="navbar-brand">🏛️ <span>SIKAMBA MABAR</span></div>
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
     <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
     <div class="navbar-menu" id="navMenu">
       <a href="dashboard.html">Dashboard</a>
       <a href="produk-saya.html">Produk Saya</a>
       <a href="marketplace.html">Marketplace</a>
+      <a href="profil.html">Profil Saya</a>
       <a href="#" onclick="logout()">Keluar</a>
     </div>
   </nav>
@@ -113,7 +114,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
@@ -151,22 +152,13 @@
     });
 
     async function generateQR(text) {
-  return new Promise((resolve) => {
-    const div = document.createElement('div');
-    const qr = new QRCode(div, {
-      text: text,
-      width: 300,
-      height: 300,
-      colorDark: '#3D1F0D',
-      colorLight: '#FFFFFF',
-      correctLevel: QRCode.CorrectLevel.H
-    });
-    setTimeout(() => {
-      const img = div.querySelector('img');
-      resolve(img ? img.src : '');
-    }, 200);
-  });
-}
+      return new Promise((resolve, reject) => {
+        QRCode.toDataURL(text, { width: 300, margin: 2, color: { dark: '#3D1F0D', light: '#FFFFFF' } }, (err, url) => {
+          if (err) reject(err);
+          else resolve(url);
+        });
+      });
+    }
 
     async function simpan() {
       const btn = document.getElementById('btnSimpan');
