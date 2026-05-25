@@ -106,12 +106,24 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <a href="index.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <form class="navbar-search" onsubmit="goSearch(event)">
+      <input type="text" class="navbar-search-input" placeholder="🔍  Cari IKM atau produk..." id="navSearch">
+      <button type="submit" class="navbar-search-btn">Cari</button>
+    </form>
+    <script>
+      function goSearch(e) {
+        e.preventDefault();
+        const q = document.getElementById('navSearch').value.trim();
+        if (q) window.location.href = 'pages/cari.html?q=' + encodeURIComponent(q);
+      }
+    </script>
     <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
     <div class="navbar-menu" id="navMenu">
       <a href="index.html" class="active">Beranda</a>
       <a href="pages/data-ikm.html">Data IKM</a>
       <a href="pages/peta.html">Peta Industri</a>
       <a href="pages/marketplace.html">Marketplace</a>
+      <a href="pages/tentang.html">Tentang</a>
       <a href="login.html" id="navLogin" class="btn btn-gold" style="padding:7px 16px;">Masuk</a>
       <a href="pages/dashboard.html" id="navDashboard" style="display:none;" class="btn btn-gold" style="padding:7px 16px;">Dashboard</a>
     </div>
