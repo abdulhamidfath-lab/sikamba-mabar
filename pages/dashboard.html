@@ -385,8 +385,17 @@
       } catch(e) {}
 
       // Panel verifikasi hanya admin
-      if (peran === 'admin') loadMenunggu();
-    }
+      if (peran === 'admin') {
+        loadMenunggu();
+        // Tampilkan menu admin di navbar
+        document.getElementById('navLaporan').style.display = 'block';
+        document.getElementById('navPengguna').style.display = 'block';
+        // Tampilkan menu admin di menu cepat
+        const mLaporan = document.getElementById('menuLaporan');
+        const mPengguna = document.getElementById('menuPengguna');
+        if (mLaporan) mLaporan.style.display = 'flex';
+        if (mPengguna) mPengguna.style.display = 'flex';
+      }
 
     init();
   </script>
