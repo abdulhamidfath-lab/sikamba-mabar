@@ -33,6 +33,17 @@
 <body>
   <nav class="navbar">
     <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <form class="navbar-search" onsubmit="goSearch(event)">
+      <input type="text" class="navbar-search-input" placeholder="🔍  Cari IKM atau produk..." id="navSearch">
+      <button type="submit" class="navbar-search-btn">Cari</button>
+    </form>
+    <script>
+      function goSearch(e) {
+        e.preventDefault();
+        const q = document.getElementById('navSearch').value.trim();
+        if (q) window.location.href = '../pages/cari.html?q=' + encodeURIComponent(q);
+      }
+    </script>
     <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
     <div class="navbar-menu" id="navMenu">
       <a href="../index.html">Beranda</a>
@@ -57,6 +68,19 @@
         <span class="search-icon">🔍</span>
         <input type="text" class="search-input" id="searchInput" placeholder="Cari produk atau nama IKM...">
       </div>
+      <select class="form-select" id="filterHarga" style="width:auto;min-width:150px;margin-bottom:0;" onchange="render()">
+        <option value="">Semua Harga</option>
+        <option value="0-50000">Di bawah Rp 50.000</option>
+        <option value="50000-150000">Rp 50.000 – 150.000</option>
+        <option value="150000-500000">Rp 150.000 – 500.000</option>
+        <option value="500000-99999999">Di atas Rp 500.000</option>
+      </select>
+      <select class="form-select" id="sortBy" style="width:auto;min-width:150px;margin-bottom:0;" onchange="render()">
+        <option value="terbaru">Terbaru</option>
+        <option value="termurah">Harga Termurah</option>
+        <option value="termahal">Harga Termahal</option>
+        <option value="nama">Nama A–Z</option>
+      </select>
       <select class="form-select" id="filterKec" style="width:auto;min-width:150px;margin-bottom:0;">
         <option value="">Semua Kecamatan</option>
         <option value="Komodo">Komodo</option>
@@ -127,14 +151,27 @@
     function render() {
       const cari = document.getElementById('searchInput').value.toLowerCase();
       const kec = document.getElementById('filterKec').value;
-      const hasil = semuaProduk.filter(p => {
+      const harga = document.getElementById('filterHarga').value;
+      const sort = document.getElementById('sortBy').value;
+
+      let hasil = semuaProduk.filter(p => {
         const cocokKat = !katAktif || p.kategori === katAktif;
         const cocokKec = !kec || p.ikm?.kecamatan === kec;
         const cocokCari = !cari ||
           p.nama_produk?.toLowerCase().includes(cari) ||
           p.ikm?.nama_usaha?.toLowerCase().includes(cari);
-        return cocokKat && cocokKec && cocokCari;
+        let cocokHarga = true;
+        if (harga) {
+          const [min, max] = harga.split('-').map(Number);
+          cocokHarga = p.harga >= min && p.harga <= max;
+        }
+        return cocokKat && cocokKec && cocokCari && cocokHarga;
       });
+
+      // Sort
+      if (sort === 'termurah') hasil.sort((a,b) => a.harga - b.harga);
+      else if (sort === 'termahal') hasil.sort((a,b) => b.harga - a.harga);
+      else if (sort === 'nama') hasil.sort((a,b) => a.nama_produk.localeCompare(b.nama_produk));
 
       document.getElementById('jumlahTampil').textContent = hasil.length;
       const grid = document.getElementById('produkGrid');
