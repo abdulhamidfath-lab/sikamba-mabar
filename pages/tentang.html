@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tentang SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .tentang-hero { background: linear-gradient(135deg, var(--brown), var(--brown-mid)); padding: 3.5rem 0 3rem; text-align: center; }
+    .panduan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; }
+    .panduan-card { background: white; border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid rgba(61,31,13,0.07); }
+    .panduan-num { width: 36px; height: 36px; border-radius: 50%; background: var(--brown); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+    .kontak-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .kontak-item { background: var(--cream2); border-radius: var(--radius); padding: 1rem; text-align: center; }
+    .kontak-icon { font-size: 28px; margin-bottom: 6px; }
+    .kontak-label { font-size: 12px; color: var(--text2); font-weight: 600; }
+    .kontak-val { font-size: 13px; font-weight: 700; color: var(--brown); margin-top: 2px; }
+    .versi-badge { background: var(--cream2); border-radius: var(--radius); padding: 6px 14px; font-size: 12px; color: var(--text2); display: inline-block; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="../index.html">Beranda</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="peta.html">Peta Industri</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="tentang.html" class="active">Tentang</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="tentang-hero">
+    <div class="container">
+      <div style="font-size:56px;margin-bottom:1rem;">🏛️</div>
+      <h1 style="color:white;margin-bottom:0.5rem;">SIKAMBA MABAR</h1>
+      <p style="color:rgba(255,255,255,0.75);font-size:14px;max-width:500px;margin:0 auto 1rem;">Sistem Industri Kreatif, Anyaman, Makanan, dan Bina Usaha Manggarai Barat</p>
+      <span class="versi-badge">Versi 1.0 · 2024</span>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:2.5rem;padding-bottom:3rem;">
+
+    <!-- Tentang -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <h2 style="margin-bottom:1rem;">Tentang Platform</h2>
+      <p style="color:var(--text2);line-height:1.8;font-size:14px;">
+        SIKAMBA MABAR adalah platform digital yang dikembangkan oleh <strong>Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat</strong> untuk mendukung pendataan, pengembangan, dan pemasaran produk industri kecil menengah (IKM) di wilayah Kabupaten Manggarai Barat, Provinsi Nusa Tenggara Timur.
+      </p>
+      <p style="color:var(--text2);line-height:1.8;font-size:14px;margin-top:0.8rem;">
+        Platform ini bertujuan untuk mendigitalisasi data IKM, memudahkan verifikasi dan monitoring oleh Dinas, serta membuka akses pasar yang lebih luas bagi pelaku usaha lokal melalui fitur marketplace digital.
+      </p>
+    </div>
+
+    <!-- Fitur -->
+    <div style="margin-bottom:2rem;">
+      <h2 style="margin-bottom:1.2rem;">Fitur Utama</h2>
+      <div class="feature-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+        <div style="background:white;border-radius:var(--radius-lg);padding:1.2rem;border:1px solid rgba(61,31,13,0.07);">
+          <div style="font-size:28px;margin-bottom:8px;">📊</div>
+          <div style="font-weight:700;margin-bottom:4px;">Data IKM Terintegrasi</div>
+          <div style="font-size:13px;color:var(--text2);">Pendataan lengkap profil, lokasi, dan perkembangan IKM seluruh Mabar.</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius-lg);padding:1.2rem;border:1px solid rgba(61,31,13,0.07);">
+          <div style="font-size:28px;margin-bottom:8px;">🗺️</div>
+          <div style="font-weight:700;margin-bottom:4px;">Peta Industri</div>
+          <div style="font-size:13px;color:var(--text2);">Visualisasi sebaran IKM per kecamatan dan kategori secara realtime.</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius-lg);padding:1.2rem;border:1px solid rgba(61,31,13,0.07);">
+          <div style="font-size:28px;margin-bottom:8px;">🛍️</div>
+          <div style="font-weight:700;margin-bottom:4px;">Pasar Digital</div>
+          <div style="font-size:13px;color:var(--text2);">Marketplace produk lokal yang bisa diakses siapa saja.</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius-lg);padding:1.2rem;border:1px solid rgba(61,31,13,0.07);">
+          <div style="font-size:28px;margin-bottom:8px;">📱</div>
+          <div style="font-weight:700;margin-bottom:4px;">QR Produk Asli</div>
+          <div style="font-size:13px;color:var(--text2);">QR code verifikasi keaslian setiap produk IKM Manggarai Barat.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panduan Penggunaan -->
+    <div style="margin-bottom:2rem;">
+      <h2 style="margin-bottom:1.2rem;">Panduan Penggunaan</h2>
+      <div class="panduan-grid">
+        <div class="panduan-card">
+          <div class="panduan-num">1</div>
+          <div style="font-weight:700;margin-bottom:6px;">Daftar Akun</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;">Buka halaman Daftar, isi nama, email, password, dan pilih peran Anda — Pelaku IKM atau Konsumen.</div>
+        </div>
+        <div class="panduan-card">
+          <div class="panduan-num">2</div>
+          <div style="font-weight:700;margin-bottom:6px;">Daftarkan IKM</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;">Masuk sebagai Pelaku IKM → klik Tambah IKM → isi data usaha lengkap termasuk koordinat GPS dan foto.</div>
+        </div>
+        <div class="panduan-card">
+          <div class="panduan-num">3</div>
+          <div style="font-weight:700;margin-bottom:6px;">Tunggu Verifikasi</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;">Admin Dinas akan memverifikasi data IKM Anda. Setelah disetujui, IKM tampil di peta dan marketplace.</div>
+        </div>
+        <div class="panduan-card">
+          <div class="panduan-num">4</div>
+          <div style="font-weight:700;margin-bottom:6px;">Tambah Produk</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;">Setelah IKM aktif, tambahkan produk Anda — nama, foto, harga, stok. QR code keaslian otomatis dibuat.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kontak Dinas -->
+    <div class="card">
+      <h2 style="margin-bottom:1.2rem;">Kontak & Informasi</h2>
+      <div class="kontak-grid">
+        <div class="kontak-item">
+          <div class="kontak-icon">🏛️</div>
+          <div class="kontak-label">Instansi</div>
+          <div class="kontak-val">Disperindag Kab. Manggarai Barat</div>
+        </div>
+        <div class="kontak-item">
+          <div class="kontak-icon">📍</div>
+          <div class="kontak-label">Alamat</div>
+          <div class="kontak-val">Labuan Bajo, Manggarai Barat, NTT</div>
+        </div>
+        <div class="kontak-item">
+          <div class="kontak-icon">🌐</div>
+          <div class="kontak-label">Website Pemkab</div>
+          <div class="kontak-val">manggaraibaratkab.go.id</div>
+        </div>
+        <div class="kontak-item">
+          <div class="kontak-icon">📧</div>
+          <div class="kontak-label">Email</div>
+          <div class="kontak-val">disperindag@manggaraibaratkab.go.id</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+  </script>
+</body>
+</html>

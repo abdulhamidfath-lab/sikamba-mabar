@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan & Statistik — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .stat-hero { background: var(--brown); padding: 1.8rem 0 2.5rem; }
+    .stat-grid-top { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: -1.2rem; margin-bottom: 1.5rem; }
+    .stat-top { background: white; border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow); text-align: center; }
+    .stat-top .num { font-size: 2rem; font-weight: 700; }
+    .stat-top .lbl { font-size: 11px; color: var(--text2); font-weight: 600; margin-top: 4px; }
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.5rem; }
+    .chart-card { background: white; border-radius: 16px; padding: 1.2rem; border: 1px solid rgba(61,31,13,0.07); box-shadow: var(--shadow); }
+    .chart-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 1rem; }
+    .chart-wrap { position: relative; height: 220px; }
+    @media (max-width: 640px) { .charts-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="laporan.html" class="active">Laporan</a>
+      <a href="peta.html">Peta Industri</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="profil.html">Profil Saya</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="stat-hero">
+    <div class="container">
+      <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-bottom:3px;">Dinas Perdagangan dan Perindustrian</p>
+      <h2 style="color:white;font-family:'Playfair Display',serif;margin-bottom:0;">📊 Laporan & Statistik IKM</h2>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:0;padding-bottom:3rem;">
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid-top">
+      <div class="stat-top"><div class="num" style="color:var(--blue);" id="sTotal">–</div><div class="lbl">Total IKM</div></div>
+      <div class="stat-top"><div class="num" style="color:var(--green);" id="sAktif">–</div><div class="lbl">IKM Aktif</div></div>
+      <div class="stat-top"><div class="num" style="color:var(--orange);" id="sMenunggu">–</div><div class="lbl">Menunggu Verifikasi</div></div>
+      <div class="stat-top"><div class="num" style="color:#7B5EA7;" id="sProduk">–</div><div class="lbl">Total Produk</div></div>
+      <div class="stat-top"><div class="num" style="color:var(--brown);" id="sKecamatan">–</div><div class="lbl">Kecamatan Aktif</div></div>
+    </div>
+
+    <!-- GRAFIK -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">IKM per Kecamatan</div>
+        <div class="chart-wrap"><canvas id="chartKecamatan"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">IKM per Kategori</div>
+        <div class="chart-wrap"><canvas id="chartKategori"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Status IKM</div>
+        <div class="chart-wrap" style="height:180px;"><canvas id="chartStatus"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Produk per Kategori</div>
+        <div class="chart-wrap"><canvas id="chartProdukKat"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TABEL RINGKASAN PER KECAMATAN -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:10px;">
+        <h3 style="margin:0;">📋 Ringkasan per Kecamatan</h3>
+        <button class="btn btn-secondary" onclick="eksporCSV()">⬇️ Ekspor CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table id="tabelKecamatan">
+          <thead>
+            <tr><th>Kecamatan</th><th>Total IKM</th><th>Aktif</th><th>Menunggu</th><th>Produk</th></tr>
+          </thead>
+          <tbody id="bodyKecamatan">
+            <tr><td colspan="5" style="text-align:center;padding:2rem;"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    const WARNA = ['#9B59B6','#2ECC71','#E67E22','#8B4513','#E91E63','#795548','#FF5722','#607D8B','#3498DB','#1ABC9C','#F39C12','#E74C3C'];
+    const KECAMATAN_LIST = ['Komodo','Boleng','Sano Nggoang','Mbeliling','Lembor','Lembor Selatan','Welak','Kuwus','Kuwus Barat','Pacar','Mancang Pacar','Ndoso'];
+
+    let ikmData = [], produkData = [];
+
+    function buatGrafik(id, type, labels, datasets, opts={}) {
+      const ctx = document.getElementById(id).getContext('2d');
+      new Chart(ctx, {
+        type,
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: type === 'pie' || type === 'doughnut' ? 'right' : 'top', labels: { font: { size: 11 }, boxWidth: 12 } } },
+          scales: type === 'bar' ? {
+            y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } } },
+            x: { ticks: { font: { size: 10 }, maxRotation: 45 } }
+          } : {},
+          ...opts
+        }
+      });
+    }
+
+    function analisis(ikm, produk) {
+      // Stat cards
+      const aktif = ikm.filter(i => i.status === 'aktif').length;
+      const menunggu = ikm.filter(i => i.status === 'menunggu').length;
+      const kecs = [...new Set(ikm.filter(i => i.kecamatan).map(i => i.kecamatan))];
+      document.getElementById('sTotal').textContent = ikm.length;
+      document.getElementById('sAktif').textContent = aktif;
+      document.getElementById('sMenunggu').textContent = menunggu;
+      document.getElementById('sProduk').textContent = produk.length;
+      document.getElementById('sKecamatan').textContent = kecs.length;
+
+      // Grafik per kecamatan
+      const perKec = {};
+      KECAMATAN_LIST.forEach(k => perKec[k] = 0);
+      ikm.forEach(i => { if (i.kecamatan && perKec[i.kecamatan] !== undefined) perKec[i.kecamatan]++; });
+      const kecAktif = Object.entries(perKec).filter(([,v]) => v > 0);
+      buatGrafik('chartKecamatan', 'bar',
+        kecAktif.map(([k]) => k),
+        [{ label: 'Jumlah IKM', data: kecAktif.map(([,v]) => v), backgroundColor: WARNA.slice(0,kecAktif.length), borderRadius: 6 }]
+      );
+
+      // Grafik per kategori
+      const perKat = {};
+      ikm.forEach(i => { perKat[i.kategori] = (perKat[i.kategori]||0) + 1; });
+      const katEntries = Object.entries(perKat).sort((a,b) => b[1]-a[1]);
+      buatGrafik('chartKategori', 'doughnut',
+        katEntries.map(([k]) => k),
+        [{ data: katEntries.map(([,v]) => v), backgroundColor: WARNA.slice(0,katEntries.length), borderWidth: 2 }]
+      );
+
+      // Grafik status
+      buatGrafik('chartStatus', 'pie',
+        ['Aktif', 'Menunggu', 'Nonaktif'],
+        [{ data: [aktif, menunggu, ikm.filter(i=>i.status==='nonaktif').length], backgroundColor: ['#2ECC71','#F39C12','#E74C3C'], borderWidth: 2 }]
+      );
+
+      // Grafik produk per kategori
+      const perKatProd = {};
+      produk.forEach(p => { perKatProd[p.kategori] = (perKatProd[p.kategori]||0) + 1; });
+      const prodEntries = Object.entries(perKatProd).sort((a,b) => b[1]-a[1]);
+      buatGrafik('chartProdukKat', 'bar',
+        prodEntries.map(([k]) => k),
+        [{ label: 'Jumlah Produk', data: prodEntries.map(([,v]) => v), backgroundColor: WARNA.slice(0,prodEntries.length), borderRadius: 6 }]
+      );
+
+      // Tabel kecamatan
+      const tbody = document.getElementById('bodyKecamatan');
+      const rows = KECAMATAN_LIST.map(kec => {
+        const ikmKec = ikm.filter(i => i.kecamatan === kec);
+        const prodKec = produk.filter(p => ikmKec.some(i => i.id === p.ikm_id)).length;
+        if (!ikmKec.length) return null;
+        return {kec, total: ikmKec.length, aktif: ikmKec.filter(i=>i.status==='aktif').length, menunggu: ikmKec.filter(i=>i.status==='menunggu').length, produk: prodKec};
+      }).filter(Boolean).sort((a,b) => b.total - a.total);
+
+      tbody.innerHTML = rows.length ? rows.map(r => `
+        <tr>
+          <td><strong>${r.kec}</strong></td>
+          <td style="text-align:center;"><strong>${r.total}</strong></td>
+          <td style="text-align:center;"><span class="badge badge-aktif">${r.aktif}</span></td>
+          <td style="text-align:center;">${r.menunggu > 0 ? `<span class="badge badge-menunggu">${r.menunggu}</span>` : '–'}</td>
+          <td style="text-align:center;">${r.produk}</td>
+        </tr>
+      `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text2);">Belum ada data</td></tr>';
+    }
+
+    function eksporCSV() {
+      if (!ikmData.length) { alert('Tidak ada data untuk diekspor.'); return; }
+      const header = ['Nama Usaha','Pemilik','Kategori','Kecamatan','Desa','Status','Tahun Berdiri','Tenaga Kerja','No. Telp'];
+      const rows = ikmData.map(i => [
+        i.nama_usaha, i.pemilik, i.kategori, i.kecamatan, i.desa,
+        i.status, i.tahun_berdiri||'', i.jumlah_tenaga_kerja||'', i.no_telp||''
+      ].map(v => `"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+      const csv = [header.join(','), ...rows].join('\n');
+      const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Data_IKM_SIKAMBA_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      if (profil?.peran !== 'admin') {
+        window.location.href = 'dashboard.html'; return;
+      }
+
+      const [{ data: ikm }, { data: produk }] = await Promise.all([
+        db.from('ikm').select('*'),
+        db.from('produk').select('*').eq('aktif', true)
+      ]);
+
+      ikmData = ikm || [];
+      produkData = produk || [];
+      analisis(ikmData, produkData);
+    }
+
+    init();
+  </script>
+</body>
+</html>

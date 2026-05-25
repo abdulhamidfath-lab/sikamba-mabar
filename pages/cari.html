@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pencarian — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .search-hero { background: var(--brown); padding: 2rem 0 3rem; }
+    .search-box-wrap { position: relative; max-width: 640px; margin: 1rem auto 0; }
+    .search-big { width: 100%; border: none; border-radius: 14px; padding: 16px 56px 16px 20px; font-size: 16px; font-family: inherit; outline: none; box-shadow: 0 4px 24px rgba(0,0,0,0.2); color: var(--text); background: white; }
+    .search-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: var(--brown); border: none; border-radius: 10px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 18px; }
+    .search-hint { text-align: center; color: rgba(255,255,255,0.55); font-size: 13px; margin-top: 10px; }
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(61,31,13,0.1); margin-bottom: 1.5rem; }
+    .tab { padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text2); transition: all 0.2s; }
+    .tab.active { color: var(--brown); border-bottom-color: var(--brown); }
+    .result-count { font-size: 13px; color: var(--text2); margin-bottom: 1rem; }
+    .result-count strong { color: var(--brown); }
+    .ikm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    .ikm-card { background: white; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(61,31,13,0.07); box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s; }
+    .ikm-card:hover { transform: translateY(-2px); }
+    .ikm-foto { height: 120px; background: linear-gradient(135deg, var(--brown), var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 40px; overflow: hidden; }
+    .ikm-foto img { width: 100%; height: 100%; object-fit: cover; }
+    .ikm-body { padding: 12px 14px; }
+    .ikm-nama { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--brown); margin-bottom: 3px; }
+    .ikm-meta { font-size: 12px; color: var(--text2); }
+    .produk-list { display: flex; flex-direction: column; gap: 10px; }
+    .produk-row { background: white; border-radius: var(--radius-lg); padding: 12px 14px; display: flex; gap: 12px; align-items: center; border: 1px solid rgba(61,31,13,0.07); cursor: pointer; transition: box-shadow 0.2s; }
+    .produk-row:hover { box-shadow: var(--shadow); }
+    .produk-thumb { width: 64px; height: 64px; border-radius: 10px; background: linear-gradient(135deg, var(--brown), var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; overflow: hidden; }
+    .produk-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .produk-nama { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .produk-ikm  { font-size: 12px; color: var(--text2); }
+    .produk-harga { font-size: 14px; font-weight: 700; color: var(--brown); margin-top: 4px; }
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--text2); }
+    .empty .icon { font-size: 48px; margin-bottom: 1rem; }
+    .highlight { background: rgba(200,134,43,0.2); border-radius: 3px; padding: 0 2px; }
+    .loading { text-align: center; padding: 3rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <form class="navbar-search" onsubmit="goSearch(event)">
+      <input type="text" class="navbar-search-input" placeholder="🔍  Cari IKM atau produk..." id="navSearch">
+      <button type="submit" class="navbar-search-btn">Cari</button>
+    </form>
+    <script>
+      function goSearch(e) {
+        e.preventDefault();
+        const q = document.getElementById('navSearch').value.trim();
+        if (q) window.location.href = '../pages/cari.html?q=' + encodeURIComponent(q);
+      }
+    </script>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="peta.html">Peta Industri</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="profil.html">Profil Saya</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="search-hero">
+    <div class="container">
+      <h2 style="color:white;text-align:center;margin-bottom:0.3rem;">🔍 Pencarian</h2>
+      <p style="color:rgba(255,255,255,0.65);text-align:center;font-size:13px;margin-bottom:0;">Cari IKM dan produk di seluruh Manggarai Barat</p>
+      <div class="search-box-wrap">
+        <input type="text" id="searchInput" class="search-big" placeholder="Ketik nama IKM, produk, kecamatan..." autofocus>
+        <button class="search-btn" onclick="doSearch()">🔍</button>
+      </div>
+      <p class="search-hint" id="searchHint">Tekan Enter atau klik tombol pencarian</p>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:1.5rem;padding-bottom:3rem;" id="hasilWrap" style="display:none;">
+
+    <div class="tabs">
+      <div class="tab active" id="tabSemua" onclick="switchTab('semua')">Semua</div>
+      <div class="tab" id="tabIKM" onclick="switchTab('ikm')">IKM <span id="countIKM" style="font-size:11px;color:var(--text2);"></span></div>
+      <div class="tab" id="tabProduk" onclick="switchTab('produk')">Produk <span id="countProduk" style="font-size:11px;color:var(--text2);"></span></div>
+    </div>
+
+    <div id="hasilSemua">
+      <div id="seksiIKM"></div>
+      <div id="seksiProduk" style="margin-top:1.5rem;"></div>
+    </div>
+    <div id="hasilIKM" style="display:none;"></div>
+    <div id="hasilProduk" style="display:none;"></div>
+
+  </div>
+
+  <div class="container" id="emptyState" style="padding:4rem 0;text-align:center;display:none;">
+    <div style="font-size:48px;margin-bottom:1rem;">🔍</div>
+    <p style="color:var(--text2);">Ketik sesuatu untuk mulai mencari</p>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/ikm.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    const ikonKat = {
+      'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
+      'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
+      'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
+    };
+    function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
+
+    function highlight(text, query) {
+      if (!query || !text) return text || '';
+      const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+      return text.replace(re, '<mark class="highlight">$1</mark>');
+    }
+
+    let tabAktif = 'semua';
+    function switchTab(tab) {
+      tabAktif = tab;
+      ['semua','ikm','produk'].forEach(t => {
+        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.toggle('active', t === tab);
+        document.getElementById('hasil' + t.charAt(0).toUpperCase() + t.slice(1))?.style && (document.getElementById('hasil' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === tab ? 'block' : 'none');
+      });
+      document.getElementById('hasilSemua').style.display = tab === 'semua' ? 'block' : 'none';
+    }
+
+    function renderIKMGrid(list, query, targetId) {
+      const el = document.getElementById(targetId);
+      if (!list.length) {
+        el.innerHTML = `<div class="empty"><div class="icon">🏭</div><p>Tidak ada IKM ditemukan.</p></div>`;
+        return;
+      }
+      el.innerHTML = `
+        <div class="result-count">Ditemukan <strong>${list.length}</strong> IKM</div>
+        <div class="ikm-grid">
+          ${list.map(ikm => `
+            <div class="ikm-card" onclick="window.location.href='detail-ikm.html?id=${ikm.id}'">
+              <div class="ikm-foto">
+                ${ikm.foto_url ? `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">` : (ikonKat[ikm.kategori]||'🏭')}
+              </div>
+              <div class="ikm-body">
+                <div class="ikm-nama">${highlight(ikm.nama_usaha, query)}</div>
+                <div class="ikm-meta">👤 ${highlight(ikm.pemilik, query)}</div>
+                <div class="ikm-meta">📍 ${highlight([ikm.desa, ikm.kecamatan].filter(Boolean).join(', '), query) || '-'}</div>
+                <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+                  <span class="badge badge-kategori" style="font-size:10px;">${ikm.kategori}</span>
+                  <span class="badge badge-${ikm.status==='aktif'?'aktif':'menunggu'}" style="font-size:10px;">${ikm.status}</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    function renderProdukList(list, query, targetId) {
+      const el = document.getElementById(targetId);
+      if (!list.length) {
+        el.innerHTML = `<div class="empty"><div class="icon">📦</div><p>Tidak ada produk ditemukan.</p></div>`;
+        return;
+      }
+      el.innerHTML = `
+        <div class="result-count">Ditemukan <strong>${list.length}</strong> produk</div>
+        <div class="produk-list">
+          ${list.map(p => `
+            <div class="produk-row" onclick="window.location.href='detail-produk.html?id=${p.id}'">
+              <div class="produk-thumb">
+                ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}">` : (ikonKat[p.kategori]||'📦')}
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div class="produk-nama">${highlight(p.nama_produk, query)}</div>
+                <div class="produk-ikm">🏭 ${highlight(p.ikm?.nama_usaha||'', query)}</div>
+                <div class="produk-ikm">📍 ${p.ikm?.kecamatan||'-'}</div>
+                <div class="produk-harga">${rupiah(p.harga)}</div>
+              </div>
+              <span class="badge badge-kategori" style="font-size:10px;flex-shrink:0;">${p.kategori}</span>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    async function doSearch() {
+      const q = document.getElementById('searchInput').value.trim();
+      if (!q) return;
+
+      document.getElementById('searchHint').textContent = `Mencari "${q}"...`;
+      document.getElementById('hasilWrap').style.display = 'block';
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('seksiIKM').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      document.getElementById('seksiProduk').innerHTML = '';
+      document.getElementById('hasilIKM').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      document.getElementById('hasilProduk').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+      const ql = q.toLowerCase();
+
+      try {
+        // Cari IKM
+        const { data: ikmData } = await db.from('ikm').select('*')
+          .or(`nama_usaha.ilike.%${q}%,pemilik.ilike.%${q}%,kecamatan.ilike.%${q}%,desa.ilike.%${q}%,kategori.ilike.%${q}%,deskripsi.ilike.%${q}%`)
+          .order('status', { ascending: false });
+
+        // Cari produk
+        const { data: produkData } = await db.from('produk')
+          .select('*, ikm:ikm_id(nama_usaha, kecamatan)')
+          .or(`nama_produk.ilike.%${q}%,kategori.ilike.%${q}%,deskripsi.ilike.%${q}%,bahan_baku.ilike.%${q}%`)
+          .eq('aktif', true);
+
+        const ikmList = ikmData || [];
+        const produkList = produkData || [];
+
+        // Update counter tab
+        document.getElementById('countIKM').textContent = `(${ikmList.length})`;
+        document.getElementById('countProduk').textContent = `(${produkList.length})`;
+        document.getElementById('searchHint').textContent = `${ikmList.length + produkList.length} hasil ditemukan untuk "${q}"`;
+
+        // Render tab semua
+        if (ikmList.length === 0 && produkList.length === 0) {
+          document.getElementById('seksiIKM').innerHTML = `
+            <div class="empty">
+              <div class="icon">😕</div>
+              <p>Tidak ada hasil untuk <strong>"${q}"</strong></p>
+              <p style="font-size:13px;margin-top:8px;">Coba kata kunci lain seperti nama produk, kecamatan, atau kategori.</p>
+            </div>`;
+          document.getElementById('seksiProduk').innerHTML = '';
+        } else {
+          if (ikmList.length) {
+            document.getElementById('seksiIKM').innerHTML = `<h3 style="margin-bottom:1rem;font-size:1rem;">🏭 IKM (${ikmList.length})</h3>`;
+            renderIKMGrid(ikmList.slice(0,4), q, 'seksiIKM');
+            if (ikmList.length > 4) {
+              document.getElementById('seksiIKM').innerHTML += `<button class="btn btn-secondary" onclick="switchTab('ikm')" style="margin-top:10px;">Lihat semua ${ikmList.length} IKM →</button>`;
+            }
+          } else {
+            document.getElementById('seksiIKM').innerHTML = '';
+          }
+          if (produkList.length) {
+            const sec = document.getElementById('seksiProduk');
+            sec.innerHTML = `<h3 style="margin-bottom:1rem;font-size:1rem;">📦 Produk (${produkList.length})</h3>`;
+            renderProdukList(produkList.slice(0,4), q, 'seksiProduk');
+            if (produkList.length > 4) {
+              sec.innerHTML += `<button class="btn btn-secondary" onclick="switchTab('produk')" style="margin-top:10px;">Lihat semua ${produkList.length} produk →</button>`;
+            }
+          } else {
+            document.getElementById('seksiProduk').innerHTML = '';
+          }
+        }
+
+        // Render tab IKM
+        renderIKMGrid(ikmList, q, 'hasilIKM');
+        // Render tab produk
+        renderProdukList(produkList, q, 'hasilProduk');
+
+      } catch(e) {
+        document.getElementById('seksiIKM').innerHTML = `<div class="alert alert-error">Gagal mencari: ${e.message}</div>`;
+      }
+    }
+
+    // Enter untuk search
+    document.getElementById('searchInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch();
+    });
+
+    // Search real-time setelah 500ms berhenti mengetik
+    let timer;
+    document.getElementById('searchInput').addEventListener('input', () => {
+      clearTimeout(timer);
+      const q = document.getElementById('searchInput').value.trim();
+      if (q.length >= 2) {
+        timer = setTimeout(doSearch, 500);
+      }
+    });
+
+    // Ambil query dari URL jika ada (?q=...)
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q');
+      if (q) {
+        document.getElementById('searchInput').value = q;
+        doSearch();
+      } else {
+        document.getElementById('emptyState').style.display = 'block';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

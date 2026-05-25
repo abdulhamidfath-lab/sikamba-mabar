@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen Pengguna — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .user-hero { background: var(--brown); padding: 1.8rem 0 2.5rem; }
+    .filter-bar { background: white; border-radius: var(--radius-lg); padding: 1rem 1.2rem; margin-bottom: 1.2rem; box-shadow: var(--shadow); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .search-wrap { flex: 1; min-width: 200px; position: relative; }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 14px; }
+    .search-input { width: 100%; border: 1.5px solid rgba(61,31,13,0.15); border-radius: var(--radius); padding: 9px 14px 9px 34px; font-size: 14px; font-family: inherit; background: var(--cream); outline: none; }
+    .search-input:focus { border-color: var(--gold); }
+    .user-card { background: white; border-radius: var(--radius-lg); padding: 14px 16px; border: 1px solid rgba(61,31,13,0.07); display: flex; align-items: center; gap: 14px; margin-bottom: 8px; transition: box-shadow 0.2s; }
+    .user-card:hover { box-shadow: var(--shadow); }
+    .user-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--gold-light); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .user-nama { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .user-email { font-size: 12px; color: var(--text2); }
+    .user-meta { font-size: 11px; color: var(--text2); margin-top: 3px; }
+    .user-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; align-items: center; }
+    .peran-select { border: 1.5px solid rgba(61,31,13,0.15); border-radius: var(--radius-sm); padding: 5px 8px; font-size: 12px; font-family: inherit; background: var(--cream); color: var(--text); cursor: pointer; }
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: -1.2rem; margin-bottom: 1.5rem; }
+    .stat-mini { background: white; border-radius: 14px; padding: 12px 14px; text-align: center; box-shadow: var(--shadow); }
+    .stat-mini .num { font-size: 1.8rem; font-weight: 700; }
+    .stat-mini .lbl { font-size: 11px; color: var(--text2); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="laporan.html">Laporan</a>
+      <a href="manajemen-pengguna.html" class="active">Pengguna</a>
+      <a href="profil.html">Profil Saya</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="user-hero">
+    <div class="container">
+      <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-bottom:3px;">Kelola akun pengguna sistem</p>
+      <h2 style="color:white;font-family:'Playfair Display',serif;margin-bottom:0;">👥 Manajemen Pengguna</h2>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:0;padding-bottom:3rem;">
+
+    <div class="stat-row">
+      <div class="stat-mini"><div class="num" style="color:var(--blue);" id="sTotal">–</div><div class="lbl">Total Pengguna</div></div>
+      <div class="stat-mini"><div class="num" style="color:var(--green);" id="sAdmin">–</div><div class="lbl">Admin</div></div>
+      <div class="stat-mini"><div class="num" style="color:var(--orange);" id="sIKM">–</div><div class="lbl">Pelaku IKM</div></div>
+      <div class="stat-mini"><div class="num" style="color:#7B5EA7;" id="sKonsumen">–</div><div class="lbl">Konsumen</div></div>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" id="searchInput" placeholder="Cari nama atau email...">
+      </div>
+      <select class="form-select" id="filterPeran" style="width:auto;min-width:140px;margin-bottom:0;">
+        <option value="">Semua Peran</option>
+        <option value="admin">Admin</option>
+        <option value="ikm">Pelaku IKM</option>
+        <option value="konsumen">Konsumen</option>
+      </select>
+    </div>
+
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">
+      Menampilkan <strong id="jumlahTampil">0</strong> pengguna
+    </p>
+
+    <div id="userList">
+      <div style="text-align:center;padding:3rem;"><div class="spinner"></div></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2024
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    function showAlert(pesan, tipe='success') {
+      document.getElementById('alertBox').innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
+      setTimeout(() => document.getElementById('alertBox').innerHTML = '', 3500);
+    }
+
+    const warnaBadge = { admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu' };
+    const ikonPeran = { admin:'👑', ikm:'🏭', konsumen:'🛍️' };
+
+    let semuaUsers = [];
+
+    function render() {
+      const cari = document.getElementById('searchInput').value.toLowerCase();
+      const peranFilter = document.getElementById('filterPeran').value;
+
+      const list = semuaUsers.filter(u => {
+        const cocokCari = !cari ||
+          u.nama_lengkap?.toLowerCase().includes(cari) ||
+          u.email?.toLowerCase().includes(cari);
+        const cocokPeran = !peranFilter || u.peran === peranFilter;
+        return cocokCari && cocokPeran;
+      });
+
+      document.getElementById('jumlahTampil').textContent = list.length;
+      const el = document.getElementById('userList');
+
+      if (!list.length) {
+        el.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text2);">
+          <div style="font-size:40px;margin-bottom:1rem;">👥</div>
+          <p>Tidak ada pengguna ditemukan.</p>
+        </div>`;
+        return;
+      }
+
+      el.innerHTML = list.map(u => `
+        <div class="user-card" id="ucard-${u.id}">
+          <div class="user-avatar">${ikonPeran[u.peran] || '👤'}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="user-nama">${u.nama_lengkap || '(Belum diisi)'}</div>
+            <div class="user-email">${u.email || '-'}</div>
+            <div class="user-meta">
+              <span class="badge ${warnaBadge[u.peran]||'badge-kategori'}" style="font-size:10px;">${(u.peran||'konsumen').toUpperCase()}</span>
+              ${u.ikm_id ? `<span style="margin-left:6px;">· IKM terhubung</span>` : ''}
+              <span style="margin-left:6px;">· Daftar: ${new Date(u.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</span>
+            </div>
+          </div>
+          <div class="user-actions">
+            <select class="peran-select" id="sel-${u.id}" onchange="ubahPeran('${u.id}', this.value)">
+              <option value="admin" ${u.peran==='admin'?'selected':''}>Admin</option>
+              <option value="ikm" ${u.peran==='ikm'?'selected':''}>Pelaku IKM</option>
+              <option value="konsumen" ${u.peran==='konsumen'?'selected':''}>Konsumen</option>
+            </select>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function ubahPeran(userId, peranBaru) {
+      if (!confirm(`Ubah peran pengguna ini menjadi "${peranBaru}"?`)) {
+        // Kembalikan select ke nilai lama
+        const user = semuaUsers.find(u => u.id === userId);
+        if (user) document.getElementById('sel-'+userId).value = user.peran;
+        return;
+      }
+      const { error } = await db.from('profiles').update({ peran: peranBaru }).eq('id', userId);
+      if (error) { showAlert('Gagal mengubah peran: ' + error.message, 'error'); return; }
+
+      // Update data lokal
+      const user = semuaUsers.find(u => u.id === userId);
+      if (user) {
+        user.peran = peranBaru;
+        // Update stat
+        updateStat();
+      }
+      showAlert(`✅ Peran berhasil diubah menjadi ${peranBaru}.`);
+      render();
+    }
+
+    function updateStat() {
+      document.getElementById('sTotal').textContent = semuaUsers.length;
+      document.getElementById('sAdmin').textContent = semuaUsers.filter(u=>u.peran==='admin').length;
+      document.getElementById('sIKM').textContent = semuaUsers.filter(u=>u.peran==='ikm').length;
+      document.getElementById('sKonsumen').textContent = semuaUsers.filter(u=>u.peran==='konsumen'||!u.peran).length;
+    }
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      if (profil?.peran !== 'admin') {
+        window.location.href = 'dashboard.html'; return;
+      }
+
+      // Ambil semua profil + join dengan auth.users lewat RPC tidak tersedia
+      // Pakai tabel profiles yang sudah ada
+      const { data, error } = await db
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('userList').innerHTML =
+          `<div class="alert alert-error">Gagal memuat data: ${error.message}</div>`;
+        return;
+      }
+
+      semuaUsers = data || [];
+      updateStat();
+      render();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', render);
+    document.getElementById('filterPeran').addEventListener('change', render);
+    init();
+  </script>
+</body>
+</html>
