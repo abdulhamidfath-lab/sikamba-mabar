@@ -183,9 +183,9 @@
         window.location.href = 'dashboard.html'; return;
       }
 
-      // Ambil semua profil + join dengan auth.users lewat RPC tidak tersedia
-      // Pakai tabel profiles yang sudah ada
-      const { data, error } = await db
+      // Ambil semua user dari auth + join profiles
+      // Gunakan admin auth untuk list semua user
+      const { data: profileData, error } = await db
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
@@ -196,9 +196,50 @@
         return;
       }
 
-      semuaUsers = data || [];
+      // Cek apakah ada user yang tidak punya profil
+      // dengan mengambil session dan menggunakan supabase admin
+      semuaUsers = profileData || [];
+
+      // Jika hanya 1 user tampil, kemungkinan ada user tanpa profil
+      // Tampilkan peringatan ke admin
+      if (semuaUsers.length <= 1) {
+        document.getElementById('alertBox').innerHTML = `
+          <div class="alert alert-warning" style="margin-bottom:1rem;">
+            ⚠️ Beberapa akun mungkin tidak tampil karena profil belum tersinkronisasi.
+            <br>Buka <strong>Supabase → SQL Editor</strong> dan jalankan query sinkronisasi profil,
+            atau <a href="#" onclick="sinkronisasi()" style="font-weight:600;">klik di sini untuk coba sinkronisasi otomatis</a>.
+          </div>`;
+      }
+
       updateStat();
       render();
+    }
+
+    // Fungsi sinkronisasi profil user yang belum punya profil
+    async function sinkronisasi() {
+      document.getElementById('alertBox').innerHTML =
+        '<div class="alert alert-info">⏳ Mencoba sinkronisasi... Silakan refresh halaman setelah selesai.</div>';
+      try {
+        // Insert profil untuk user yang belum punya dengan RPC
+        const { error } = await db.rpc('sync_missing_profiles');
+        if (error) throw error;
+        showAlert('✅ Sinkronisasi berhasil! Refresh halaman untuk melihat hasilnya.');
+        setTimeout(() => window.location.reload(), 2000);
+      } catch(e) {
+        // Fallback: tampilkan instruksi manual
+        document.getElementById('alertBox').innerHTML = `
+          <div class="alert alert-warning">
+            Sinkronisasi otomatis tidak tersedia. Silakan jalankan query ini di 
+            <a href="https://supabase.com/dashboard" target="_blank" style="font-weight:600;">Supabase SQL Editor</a>:<br><br>
+            <code style="font-size:11px;display:block;background:rgba(0,0,0,0.05);padding:8px;border-radius:6px;margin-top:6px;">
+              INSERT INTO public.profiles (id, nama_lengkap, peran, created_at)<br>
+              SELECT au.id, COALESCE(au.raw_user_meta_data->>'nama_lengkap', split_part(au.email, '@', 1)),<br>
+              COALESCE(au.raw_user_meta_data->>'peran', 'konsumen'), au.created_at<br>
+              FROM auth.users au LEFT JOIN public.profiles p ON au.id = p.id<br>
+              WHERE p.id IS NULL ON CONFLICT (id) DO NOTHING;
+            </code>
+          </div>`;
+      }
     }
 
     document.getElementById('searchInput').addEventListener('input', render);
