@@ -58,6 +58,8 @@
       <a href="data-ikm.html">Data IKM</a>
       <a href="peta.html">Peta Industri</a>
       <a href="marketplace.html">Marketplace</a>
+      <a href="laporan.html" id="navLaporan" style="display:none;">Laporan</a>
+      <a href="manajemen-pengguna.html" id="navPengguna" style="display:none;">Pengguna</a>
       <a href="profil.html">Profil Saya</a>
       <a href="#" onclick="logout()">Keluar</a>
     </div>
@@ -289,6 +291,23 @@
     }
 
     init();
+  </script>
+
+  <script>
+    // Tampilkan menu admin di navbar jika peran = admin
+    (async function tampilkanNavAdmin() {
+      try {
+        const user = await getUser();
+        if (!user) return;
+        const profil = await getProfil(user.id);
+        if (profil?.peran === 'admin') {
+          const nl = document.getElementById('navLaporan');
+          const np = document.getElementById('navPengguna');
+          if (nl) nl.style.display = 'block';
+          if (np) np.style.display = 'block';
+        }
+      } catch(e) {}
+    })();
   </script>
 </body>
 </html>
