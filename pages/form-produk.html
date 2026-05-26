@@ -9,11 +9,24 @@
 <body>
   <nav class="navbar">
     <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <form class="navbar-search" onsubmit="goSearch(event)">
+      <input type="text" class="navbar-search-input" placeholder="🔍  Cari IKM atau produk..." id="navSearch">
+      <button type="submit" class="navbar-search-btn">Cari</button>
+    </form>
+    <script>
+      function goSearch(e) {
+        e.preventDefault();
+        const q = document.getElementById('navSearch').value.trim();
+        if (q) window.location.href = '../pages/cari.html?q=' + encodeURIComponent(q);
+      }
+    </script>
     <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
     <div class="navbar-menu" id="navMenu">
       <a href="dashboard.html">Dashboard</a>
       <a href="produk-saya.html">Produk Saya</a>
       <a href="marketplace.html">Marketplace</a>
+      <a href="laporan.html" id="navLaporan" style="display:none;">Laporan</a>
+      <a href="manajemen-pengguna.html" id="navPengguna" style="display:none;">Pengguna</a>
       <a href="profil.html">Profil Saya</a>
       <a href="#" onclick="logout()">Keluar</a>
     </div>
@@ -263,6 +276,23 @@
     }
 
     init();
+  </script>
+
+  <script>
+    // Tampilkan menu admin di navbar jika peran = admin
+    (async function tampilkanNavAdmin() {
+      try {
+        const user = await getUser();
+        if (!user) return;
+        const profil = await getProfil(user.id);
+        if (profil?.peran === 'admin') {
+          const nl = document.getElementById('navLaporan');
+          const np = document.getElementById('navPengguna');
+          if (nl) nl.style.display = 'block';
+          if (np) np.style.display = 'block';
+        }
+      } catch(e) {}
+    })();
   </script>
 </body>
 </html>
