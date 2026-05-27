@@ -448,5 +448,15 @@
       } catch(e) {}
     })();
   </script>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    // Init sidebar admin — hanya tampil jika peran admin
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initAdminSidebar === 'function') {
+        initAdminSidebar('form-ikm');
+      }
+    });
+  </script>
 </body>
 </html>
