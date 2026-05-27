@@ -38,6 +38,17 @@
 <body>
   <nav class="navbar">
     <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <form class="navbar-search" onsubmit="goSearch(event)">
+      <input type="text" class="navbar-search-input" placeholder="🔍  Cari IKM atau produk..." id="navSearch">
+      <button type="submit" class="navbar-search-btn">Cari</button>
+    </form>
+    <script>
+      function goSearch(e) {
+        e.preventDefault();
+        const q = document.getElementById('navSearch').value.trim();
+        if (q) window.location.href = '../pages/cari.html?q=' + encodeURIComponent(q);
+      }
+    </script>
     <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
     <div class="navbar-menu" id="navMenu">
       <a href="dashboard.html">Dashboard</a>
@@ -288,6 +299,16 @@
     }
 
     init();
+  </script>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    // Init sidebar admin — hanya tampil jika peran admin
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initAdminSidebar === 'function') {
+        initAdminSidebar('detail-ikm');
+      }
+    });
   </script>
 </body>
 </html>
