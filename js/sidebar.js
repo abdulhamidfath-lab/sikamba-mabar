@@ -141,6 +141,32 @@ const SIDEBAR_CSS = `
       z-index: 49;
     }
 
+    /* FIX LEBAR KONTEN — override container yang terlalu sempit */
+    body.has-sidebar .container,
+    body.has-sidebar .container-sm {
+      max-width: 100% !important;
+      padding: 0 1.5rem !important;
+    }
+    body.has-sidebar .admin-main > .container,
+    body.has-sidebar .admin-main > .container-sm {
+      max-width: 100% !important;
+    }
+
+    /* FIX PETA — pastikan peta mengisi ruang yang tersedia */
+    body.has-sidebar #map {
+      width: 100% !important;
+    }
+
+    /* FIX OVERFLOW */
+    body.has-sidebar .admin-main {
+      overflow-x: hidden;
+    }
+
+    /* Padding konten setelah topbar */
+    body.has-sidebar .admin-main > *:not(.admin-topbar):not(.batik-strip) {
+      max-width: 100%;
+    }
+
     @media (max-width: 900px) {
       .admin-sidebar {
         position: fixed;
@@ -160,7 +186,7 @@ const SIDEBAR_CSS = `
   </style>
 `;
 
-const SIDEBAR_HTML = `
+const _UNUSED_SIDEBAR_HTML = `
   <div class="admin-sidebar-overlay" id="adminOverlay" onclick="closeSidebar()"></div>
 
   <div class="sidebar-layout">
@@ -245,43 +271,124 @@ async function initAdminSidebar(pageName) {
     // Tambah class ke body
     document.body.classList.add('has-sidebar');
 
-    // Sembunyikan navbar lama
+    // Sembunyikan navbar lama dan batik strip
     const oldNavbar = document.querySelector('.navbar');
     const oldBatik = document.querySelector('.batik-strip');
     if (oldNavbar) oldNavbar.style.display = 'none';
     if (oldBatik) oldBatik.style.display = 'none';
 
-    // Bungkus semua konten body dalam layout sidebar
-    const bodyContent = document.body.innerHTML;
-    document.body.innerHTML = SIDEBAR_HTML + bodyContent + SIDEBAR_CLOSE;
+    // Buat wrapper layout dengan DOM manipulation (BUKAN innerHTML)
+    // agar script dan peta tidak rusak
+    const overlay = document.createElement('div');
+    overlay.className = 'admin-sidebar-overlay';
+    overlay.id = 'adminOverlay';
+    overlay.onclick = closeSidebar;
+
+    const layout = document.createElement('div');
+    layout.className = 'sidebar-layout';
+
+    // Buat sidebar element
+    const sidebarEl = document.createElement('aside');
+    sidebarEl.className = 'admin-sidebar';
+    sidebarEl.id = 'adminSidebar';
+    sidebarEl.innerHTML = `
+      <a href="dashboard.html" class="admin-sidebar-logo">
+        <span class="admin-sidebar-logo-icon">🏛️</span>
+        <div>
+          <div class="admin-sidebar-logo-text">SIKAMBA MABAR</div>
+          <div class="admin-sidebar-logo-sub">Dinas Perindustrian & Perdagangan</div>
+        </div>
+      </a>
+      <div class="admin-sidebar-section">
+        <div class="admin-sidebar-label">Utama</div>
+        <a href="dashboard.html" class="admin-sidebar-link" data-page="dashboard"><span class="si">🏠</span>Dashboard</a>
+        <a href="data-ikm.html" class="admin-sidebar-link" data-page="data-ikm"><span class="si">🏭</span>Data IKM</a>
+        <a href="peta.html" class="admin-sidebar-link" data-page="peta"><span class="si">🗺️</span>Peta Industri</a>
+        <a href="marketplace.html" class="admin-sidebar-link" data-page="marketplace"><span class="si">🛍️</span>Marketplace</a>
+        <a href="cari.html" class="admin-sidebar-link" data-page="cari"><span class="si">🔍</span>Pencarian</a>
+      </div>
+      <hr class="admin-sidebar-divider">
+      <div class="admin-sidebar-section">
+        <div class="admin-sidebar-label">Administrasi</div>
+        <a href="laporan.html" class="admin-sidebar-link" data-page="laporan"><span class="si">📊</span>Laporan & Statistik</a>
+        <a href="manajemen-pengguna.html" class="admin-sidebar-link" data-page="manajemen-pengguna"><span class="si">👥</span>Manajemen Pengguna</a>
+        <a href="form-ikm.html" class="admin-sidebar-link" data-page="form-ikm"><span class="si">➕</span>Tambah IKM</a>
+      </div>
+      <hr class="admin-sidebar-divider">
+      <div class="admin-sidebar-section">
+        <div class="admin-sidebar-label">Akun</div>
+        <a href="profil.html" class="admin-sidebar-link" data-page="profil"><span class="si">👤</span>Profil Saya</a>
+        <a href="tentang.html" class="admin-sidebar-link" data-page="tentang"><span class="si">ℹ️</span>Tentang SIKAMBA</a>
+        <button class="admin-sidebar-link" onclick="logout()"><span class="si">🚪</span>Keluar</button>
+      </div>
+      <div class="admin-sidebar-bottom">
+        <div class="admin-sidebar-user">
+          <div class="admin-sidebar-avatar">👑</div>
+          <div>
+            <div class="admin-sidebar-user-name" id="sidebarNamaAdmin">Admin</div>
+            <div class="admin-sidebar-user-role">Administrator</div>
+          </div>
+        </div>
+      </div>`;
+
+    // Buat topbar element
+    const topbarEl = document.createElement('div');
+    topbarEl.className = 'admin-topbar';
+    topbarEl.innerHTML = `
+      <button class="admin-topbar-toggle" onclick="toggleSidebar()">☰</button>
+      <a href="dashboard.html" class="admin-topbar-brand">🏛️ SIKAMBA</a>
+      <form class="admin-topbar-search" onsubmit="goSearchAdmin(event)">
+        <input type="text" id="adminNavSearch" placeholder="🔍 Cari IKM atau produk...">
+        <button type="submit">Cari</button>
+      </form>
+      <div class="admin-topbar-right">
+        <span class="admin-topbar-page" id="adminTopbarPage"></span>
+      </div>`;
+
+    // Buat main wrapper
+    const mainEl = document.createElement('div');
+    mainEl.className = 'admin-main';
+    mainEl.id = 'adminMain';
+
+    // Pindahkan semua child body ke dalam mainEl
+    // (kecuali script dan elemen yang sudah ada)
+    const bodyChildren = Array.from(document.body.childNodes);
+    mainEl.appendChild(topbarEl);
+    bodyChildren.forEach(child => mainEl.appendChild(child));
+
+    // Susun layout
+    layout.appendChild(sidebarEl);
+    layout.appendChild(mainEl);
+    document.body.appendChild(overlay);
+    document.body.appendChild(layout);
 
     // Set nama admin
     const nama = profil?.nama_lengkap || user.email;
-    const el = document.getElementById('sidebarNamaAdmin');
-    if (el) el.textContent = nama;
+    const elNama = document.getElementById('sidebarNamaAdmin');
+    if (elNama) elNama.textContent = nama;
 
     // Set active page
-    const links = document.querySelectorAll('.admin-sidebar-link[data-page]');
-    links.forEach(link => {
+    document.querySelectorAll('.admin-sidebar-link[data-page]').forEach(link => {
       if (link.dataset.page === pageName) link.classList.add('active');
     });
 
-    // Set label halaman di topbar
+    // Set label topbar
     const pageLabels = {
-      'dashboard': 'Dashboard',
-      'data-ikm': 'Data IKM',
-      'peta': 'Peta Industri',
-      'marketplace': 'Marketplace',
-      'cari': 'Pencarian',
-      'laporan': 'Laporan & Statistik',
-      'manajemen-pengguna': 'Manajemen Pengguna',
-      'form-ikm': 'Tambah IKM',
-      'detail-ikm': 'Detail IKM',
-      'profil': 'Profil Saya',
-      'tentang': 'Tentang',
+      'dashboard':'Dashboard','data-ikm':'Data IKM','peta':'Peta Industri',
+      'marketplace':'Marketplace','cari':'Pencarian','laporan':'Laporan & Statistik',
+      'manajemen-pengguna':'Manajemen Pengguna','form-ikm':'Tambah IKM',
+      'detail-ikm':'Detail IKM','form-produk':'Tambah Produk',
+      'produk-saya':'Produk Saya','profil':'Profil Saya','tentang':'Tentang',
     };
     const topbarPage = document.getElementById('adminTopbarPage');
     if (topbarPage) topbarPage.textContent = pageLabels[pageName] || '';
+
+    // Resize peta Leaflet jika ada (fix blank map)
+    setTimeout(() => {
+      if (window.map && typeof window.map.invalidateSize === 'function') {
+        window.map.invalidateSize();
+      }
+    }, 300);
 
   } catch(e) {
     console.log('Sidebar init error:', e.message);
