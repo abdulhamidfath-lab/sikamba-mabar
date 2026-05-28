@@ -129,6 +129,7 @@
 
     // Inisialisasi peta — terpusat di Manggarai Barat
     const map = L.map('map').setView([-8.5, 120.0], 9);
+    window.map = map; // expose untuk sidebar resize
 
     // Tile OpenStreetMap — GRATIS
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
