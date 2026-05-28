@@ -141,30 +141,59 @@ const SIDEBAR_CSS = `
       z-index: 49;
     }
 
-    /* FIX LEBAR KONTEN — override container yang terlalu sempit */
+    /* FIX LEBAR KONTEN — paksa semua container mengisi penuh */
+    body.has-sidebar { overflow-x: hidden; }
+
+    body.has-sidebar .admin-main {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* Override SEMUA container */
     body.has-sidebar .container,
-    body.has-sidebar .container-sm {
+    body.has-sidebar .container-sm,
+    body.has-sidebar [class*="container"] {
+      max-width: 100% !important;
+      width: 100% !important;
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    /* Override stat grid dan card grid */
+    body.has-sidebar .stat-row,
+    body.has-sidebar .stat-grid,
+    body.has-sidebar .ikm-grid,
+    body.has-sidebar .produk-grid,
+    body.has-sidebar .charts-grid,
+    body.has-sidebar .feature-grid,
+    body.has-sidebar .cards-grid {
+      width: 100% !important;
+    }
+
+    /* Override halaman manajemen pengguna */
+    body.has-sidebar .user-hero .container,
+    body.has-sidebar .user-hero > div {
       max-width: 100% !important;
       padding: 0 1.5rem !important;
     }
-    body.has-sidebar .admin-main > .container,
-    body.has-sidebar .admin-main > .container-sm {
-      max-width: 100% !important;
+
+    /* Override filter bar */
+    body.has-sidebar .filter-bar {
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
 
-    /* FIX PETA — pastikan peta mengisi ruang yang tersedia */
+    /* FIX PETA */
     body.has-sidebar #map {
       width: 100% !important;
     }
 
-    /* FIX OVERFLOW */
-    body.has-sidebar .admin-main {
-      overflow-x: hidden;
-    }
-
-    /* Padding konten setelah topbar */
-    body.has-sidebar .admin-main > *:not(.admin-topbar):not(.batik-strip) {
-      max-width: 100%;
+    /* FIX section padding */
+    body.has-sidebar .section,
+    body.has-sidebar > div[style*="padding"] {
+      box-sizing: border-box;
     }
 
     @media (max-width: 900px) {
