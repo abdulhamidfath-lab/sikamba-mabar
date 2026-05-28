@@ -288,3 +288,21 @@ footer strong { color: white; }
 .navbar-search-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 6px 10px; color: white; cursor: pointer; font-size: 14px; white-space: nowrap; }
 .navbar-search-btn:hover { background: rgba(255,255,255,0.25); }
 @media (max-width: 768px) { .navbar-search { display: none; } }
+
+/* === ADMIN SIDEBAR LAYOUT OVERRIDE === */
+body.has-sidebar {
+  background: var(--cream);
+}
+body.has-sidebar .container,
+body.has-sidebar .container-sm {
+  max-width: 100% !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
+/* Pastikan hero dan stat sections juga melebar */
+body.has-sidebar .stat-hero,
+body.has-sidebar .user-hero,
+body.has-sidebar .search-hero,
+body.has-sidebar .tentang-hero {
+  width: 100% !important;
+}
