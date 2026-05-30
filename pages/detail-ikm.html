@@ -211,17 +211,7 @@
             `;
           }
 
-          // Share bar — selalu tampil untuk semua peran
-          const shareUrl = encodeURIComponent(window.location.href);
-          const sharePesan = encodeURIComponent(
-            `🏭 *${ikm.nama_usaha}*\n` +
-            `📦 ${ikm.kategori}\n` +
-            `📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}\n` +
-            (ikm.no_telp ? `📞 ${ikm.no_telp}\n` : '') +
-            `\nLihat selengkapnya: ${window.location.href}\n\n` +
-            `_Produk asli Manggarai Barat — SIKAMBA MABAR_`
-          );
-          document.getElementById('shareIKMWA').href = `https://wa.me/?text=${sharePesan}`;
+
         }
 
         // Info usaha
@@ -262,6 +252,20 @@
         // Load produk IKM
         loadProdukIKM(ikm.id);
 
+        // Set share link (setelah semua data dimuat, elemen sudah pasti ada)
+        setTimeout(() => {
+          const sharePesanFinal = encodeURIComponent(
+            `🏭 *${ikm.nama_usaha}*\n` +
+            `📦 ${ikm.kategori}\n` +
+            `📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}\n` +
+            (ikm.no_telp ? `📞 ${ikm.no_telp}\n` : '') +
+            `\nLihat selengkapnya: ${window.location.href}\n\n` +
+            `_Produk asli Manggarai Barat — SIKAMBA MABAR_`
+          );
+          const shareElFinal = document.getElementById('shareIKMWA');
+          if (shareElFinal) shareElFinal.href = `https://wa.me/?text=${sharePesanFinal}`;
+        }, 500);
+
         // Kontak
         document.getElementById('infoKontak').innerHTML = `
           <div class="info-row"><span class="info-key">No. Telepon/WA</span><span class="info-val">
@@ -273,8 +277,15 @@
         `;
 
       } catch(e) {
-        document.getElementById('namaUsaha').textContent = 'IKM tidak ditemukan';
-        document.getElementById('infoUsaha').innerHTML = `<p style="color:var(--red);">Error: ${e.message}</p>`;
+        console.error('Detail IKM error:', e);
+        // Hanya tampilkan error jika IKM memang tidak ditemukan
+        if (e.message && e.message.includes('tidak ditemukan')) {
+          document.getElementById('namaUsaha').textContent = 'IKM tidak ditemukan';
+        }
+        const infoEl = document.getElementById('infoUsaha');
+        if (infoEl && infoEl.querySelector('.spinner')) {
+          infoEl.innerHTML = `<p style="color:var(--red);">Gagal memuat data: ${e.message}</p>`;
+        }
       }
     }
 
