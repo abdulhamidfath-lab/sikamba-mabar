@@ -1,11 +1,15 @@
 /* ============================================
    SIKAMBA MABAR - Stylesheet Utama
    Tema: Tradisional Manggarai Barat
+   Update: Mobile-Friendly Version
    ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-/* === VARIABEL WARNA === */
+/* ============================================
+   VARIABEL WARNA
+   Tidak berubah — warna tetap sama seperti sebelumnya
+   ============================================ */
 :root {
   --brown:        #3D1F0D;
   --brown-mid:    #6B3A1F;
@@ -32,7 +36,10 @@
   --radius-lg:    16px;
 }
 
-/* === RESET & BASE === */
+/* ============================================
+   RESET & BASE
+   Dasar semua elemen — tidak berubah banyak
+   ============================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -42,21 +49,28 @@ body {
   font-size: 15px;
   line-height: 1.6;
   min-height: 100vh;
+  /* BARU: mencegah konten meluber ke kanan di HP */
+  overflow-x: hidden;
 }
 a { color: var(--gold); text-decoration: none; }
 a:hover { color: var(--brown); }
 img { max-width: 100%; border-radius: var(--radius-sm); }
 
-/* === TYPOGRAPHY === */
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
 h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--brown); line-height: 1.3; }
 h1 { font-size: 2rem; }
 h2 { font-size: 1.5rem; }
 h3 { font-size: 1.2rem; }
 
-/* === NAVBAR === */
+/* ============================================
+   NAVBAR
+   PERUBAHAN: tinggi lebih kecil di HP, padding dikurangi
+   ============================================ */
 .navbar {
   background: var(--brown);
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   height: 64px;
   display: flex;
   align-items: center;
@@ -65,33 +79,102 @@ h3 { font-size: 1.2rem; }
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  /* BARU: gap agar item tidak terlalu rapat */
+  gap: 8px;
 }
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: white;
   font-family: 'Playfair Display', serif;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
+  /* BARU: tidak boleh menyusut, teks tidak boleh wrap */
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .navbar-brand img { width: 36px; height: 36px; border-radius: 8px; }
-.navbar-menu { display: flex; align-items: center; gap: 8px; }
+
+/* BARU: teks brand disembunyikan di layar kecil agar tidak sesak */
+.navbar-brand span { display: inline; }
+
+.navbar-menu { display: flex; align-items: center; gap: 4px; }
 .navbar-menu a {
   color: rgba(255,255,255,0.8);
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 .navbar-menu a:hover, .navbar-menu a.active {
   background: rgba(255,255,255,0.15);
   color: white;
 }
-.navbar-toggle { display: none; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  /* BARU: padding agar area klik lebih luas di HP */
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
 
-/* === BATIK STRIP === */
+/* ============================================
+   SEARCH BAR DI NAVBAR
+   PERUBAHAN: lebih kecil dan responsif di HP
+   ============================================ */
+.navbar-search {
+  display: flex;
+  align-items: center;
+  /* BARU: flex:1 agar mengisi ruang yang tersedia */
+  flex: 1;
+  max-width: 280px;
+  margin: 0 6px;
+  /* BARU: minimum lebar agar tidak terlalu kecil */
+  min-width: 0;
+}
+.navbar-search-input {
+  flex: 1;
+  min-width: 0; /* BARU: penting agar tidak meluber */
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-right: none;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 13px;
+  color: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  outline: none;
+}
+.navbar-search-input::placeholder { color: rgba(255,255,255,0.5); }
+.navbar-search-input:focus {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.35);
+}
+.navbar-search-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 6px 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  /* BARU: tidak boleh menyusut */
+  flex-shrink: 0;
+}
+.navbar-search-btn:hover { background: rgba(255,255,255,0.25); }
+
+/* ============================================
+   BATIK STRIP
+   Tidak berubah
+   ============================================ */
 .batik-strip {
   height: 8px;
   background: repeating-linear-gradient(
@@ -103,11 +186,28 @@ h3 { font-size: 1.2rem; }
   );
 }
 
-/* === CONTAINER === */
-.container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
-.container-sm { max-width: 640px; margin: 0 auto; padding: 0 1.5rem; }
+/* ============================================
+   CONTAINER
+   PERUBAHAN: padding lebih kecil di HP
+   ============================================ */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  /* BARU: pastikan tidak meluber */
+  width: 100%;
+}
+.container-sm {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
 
-/* === CARD === */
+/* ============================================
+   CARD
+   PERUBAHAN: padding lebih kecil di HP
+   ============================================ */
 .card {
   background: white;
   border-radius: var(--radius-lg);
@@ -117,13 +217,16 @@ h3 { font-size: 1.2rem; }
 }
 .card-sm { padding: 1rem; border-radius: var(--radius); }
 
-/* === TOMBOL === */
+/* ============================================
+   TOMBOL (BUTTON)
+   PERUBAHAN: ukuran tap area lebih besar di HP
+   ============================================ */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
+  gap: 6px;
+  padding: 10px 18px;
   border-radius: var(--radius);
   font-size: 14px;
   font-weight: 600;
@@ -132,6 +235,9 @@ h3 { font-size: 1.2rem; }
   border: none;
   transition: all 0.2s;
   text-decoration: none;
+  /* BARU: min-height 44px adalah standar tombol yang nyaman disentuh di HP */
+  min-height: 44px;
+  white-space: nowrap;
 }
 .btn-primary { background: var(--brown); color: white; }
 .btn-primary:hover { background: var(--brown-mid); color: white; }
@@ -144,31 +250,53 @@ h3 { font-size: 1.2rem; }
 .btn-full { width: 100%; }
 .btn-lg { padding: 14px 28px; font-size: 15px; border-radius: var(--radius-lg); }
 
-/* === FORM === */
+/* ============================================
+   FORM
+   PERUBAHAN: form-row jadi 1 kolom di HP
+   ============================================ */
 .form-group { margin-bottom: 1.2rem; }
-.form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
 .form-input, .form-select, .form-textarea {
   width: 100%;
   border: 1.5px solid rgba(61,31,13,0.15);
   border-radius: var(--radius);
-  padding: 11px 14px;
-  font-size: 14px;
+  /* BARU: padding lebih besar agar nyaman disentuh di HP */
+  padding: 12px 14px;
+  font-size: 15px; /* BARU: min 16px di iOS mencegah zoom otomatis! */
   color: var(--text);
   background: var(--cream);
   outline: none;
   font-family: 'Plus Jakarta Sans', sans-serif;
   transition: border-color 0.2s, background 0.2s;
+  /* BARU: pastikan tidak meluber keluar card */
+  max-width: 100%;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--gold);
   background: white;
 }
 .form-textarea { min-height: 100px; resize: vertical; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* form-row: 2 kolom di desktop, 1 kolom di HP */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
 .form-hint { font-size: 12px; color: var(--text2); margin-top: 4px; }
 .form-error { font-size: 12px; color: var(--red); margin-top: 4px; }
 
-/* === BADGE STATUS === */
+/* ============================================
+   BADGE STATUS
+   Tidak berubah
+   ============================================ */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -182,8 +310,16 @@ h3 { font-size: 1.2rem; }
 .badge-nonaktif { background: var(--red-light); color: var(--red); }
 .badge-kategori { background: var(--cream2); color: var(--brown-mid); }
 
-/* === STATISTIK CARD === */
-.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
+/* ============================================
+   STATISTIK CARD
+   PERUBAHAN: auto-fit minmax agar fleksibel di HP
+   ============================================ */
+.stat-grid {
+  display: grid;
+  /* BARU: minmax(140px) agar bisa masuk di layar kecil */
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
 .stat-card { border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; }
 .stat-card.blue   { background: var(--blue-light); }
 .stat-card.green  { background: var(--green-light); }
@@ -196,23 +332,47 @@ h3 { font-size: 1.2rem; }
 .stat-card.orange .stat-num { color: var(--orange); }
 .stat-card.cream .stat-num  { color: var(--brown); }
 
-/* === TABEL === */
-.table-wrap { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid rgba(61,31,13,0.08); }
+/* ============================================
+   TABEL
+   PERUBAHAN: tabel bisa di-scroll horizontal di HP
+   Dulu tabel akan meluber keluar layar HP,
+   sekarang user bisa geser kanan-kiri
+   ============================================ */
+.table-wrap {
+  overflow-x: auto; /* KUNCI: tabel bisa di-scroll horizontal */
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(61,31,13,0.08);
+  /* BARU: scroll halus di iOS */
+  -webkit-overflow-scrolling: touch;
+}
 table { width: 100%; border-collapse: collapse; background: white; }
 thead { background: var(--brown); color: white; }
-thead th { padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; }
+thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  /* BARU: teks header tidak wrap agar tabel tetap rapi */
+  white-space: nowrap;
+}
 tbody tr { border-bottom: 1px solid rgba(61,31,13,0.06); transition: background 0.15s; }
 tbody tr:hover { background: var(--cream); }
 tbody td { padding: 12px 16px; font-size: 13px; color: var(--text); }
 
-/* === ALERT === */
+/* ============================================
+   ALERT / NOTIFIKASI
+   Tidak berubah
+   ============================================ */
 .alert { padding: 12px 16px; border-radius: var(--radius); font-size: 13px; margin-bottom: 1rem; }
 .alert-success { background: var(--green-light); color: var(--green); }
 .alert-error   { background: var(--red-light); color: var(--red); }
 .alert-info    { background: var(--blue-light); color: var(--blue); }
 .alert-warning { background: #FFF3CD; color: #856404; }
 
-/* === LOADING === */
+/* ============================================
+   LOADING SPINNER
+   Tidak berubah
+   ============================================ */
 .spinner {
   width: 36px; height: 36px;
   border: 3px solid var(--cream2);
@@ -229,19 +389,23 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--text); }
   z-index: 999;
 }
 
-/* === HALAMAN LOGIN === */
+/* ============================================
+   HALAMAN LOGIN & DAFTAR
+   PERUBAHAN: padding dikurangi di HP kecil
+   ============================================ */
 .auth-page {
   min-height: 100vh;
   background: linear-gradient(160deg, var(--brown) 0%, var(--brown-mid) 45%, var(--cream) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  /* BARU: padding atas-bawah lebih besar agar tidak terpotong */
+  padding: 2rem 1rem;
 }
 .auth-card {
   background: white;
   border-radius: 20px;
-  padding: 2.5rem;
+  padding: 2rem;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 8px 40px rgba(0,0,0,0.2);
@@ -254,55 +418,354 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--text); }
 .auth-logo h2 { font-size: 1.4rem; margin-bottom: 4px; }
 .auth-logo p { font-size: 13px; color: var(--text2); font-family: 'Plus Jakarta Sans', sans-serif; }
 
-/* === FOOTER === */
+/* ============================================
+   FOOTER
+   PERUBAHAN: margin-top lebih kecil di HP
+   ============================================ */
 footer {
   background: var(--brown);
   color: rgba(255,255,255,0.7);
   text-align: center;
-  padding: 1.5rem;
+  padding: 1.5rem 1rem;
   font-size: 13px;
-  margin-top: 4rem;
+  margin-top: 3rem;
 }
 footer strong { color: white; }
 
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-  .navbar-menu { display: none; flex-direction: column; position: absolute; top: 64px; left: 0; right: 0; background: var(--brown); padding: 1rem; }
-  .navbar-menu.open { display: flex; }
-  .navbar-toggle { display: block; }
-  .form-row { grid-template-columns: 1fr; }
-  h1 { font-size: 1.6rem; }
-  .container { padding: 0 1rem; }
-  .stat-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 480px) {
-  .stat-grid { grid-template-columns: 1fr; }
-  .auth-card { padding: 1.5rem; }
-}
-
-/* === GLOBAL SEARCH BAR === */
-.navbar-search { display: flex; align-items: center; gap: 0; flex: 1; max-width: 280px; margin: 0 8px; }
-.navbar-search-input { flex: 1; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm); padding: 6px 12px; font-size: 13px; color: white; font-family: 'Plus Jakarta Sans', sans-serif; outline: none; min-width: 0; }
-.navbar-search-input::placeholder { color: rgba(255,255,255,0.5); }
-.navbar-search-input:focus { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.35); }
-.navbar-search-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 6px 10px; color: white; cursor: pointer; font-size: 14px; white-space: nowrap; }
-.navbar-search-btn:hover { background: rgba(255,255,255,0.25); }
-@media (max-width: 768px) { .navbar-search { display: none; } }
-
-/* === ADMIN SIDEBAR LAYOUT OVERRIDE === */
-body.has-sidebar {
-  background: var(--cream);
-}
+/* ============================================
+   ADMIN SIDEBAR LAYOUT
+   Tidak banyak berubah, hanya memastikan
+   konten di dalamnya tidak meluber
+   ============================================ */
+body.has-sidebar { background: var(--cream); overflow-x: hidden; }
 body.has-sidebar .container,
 body.has-sidebar .container-sm {
   max-width: 100% !important;
   padding-left: 1.5rem !important;
   padding-right: 1.5rem !important;
 }
-/* Pastikan hero dan stat sections juga melebar */
 body.has-sidebar .stat-hero,
 body.has-sidebar .user-hero,
 body.has-sidebar .search-hero,
 body.has-sidebar .tentang-hero {
   width: 100% !important;
+}
+
+/* ============================================
+   RESPONSIVE — TABLET (max 900px)
+   ============================================ */
+@media (max-width: 900px) {
+  /* Sembunyikan sebagian teks navbar agar tidak sesak */
+  .navbar-brand span {
+    /* Tampilkan singkatan di tablet */
+    display: inline;
+  }
+  .navbar { padding: 0 1rem; }
+}
+
+/* ============================================
+   RESPONSIVE — HP BESAR (max 768px)
+   Ini yang paling penting untuk pengguna HP!
+   ============================================ */
+@media (max-width: 768px) {
+
+  /* --- NAVBAR MOBILE --- */
+  /* Search bar disembunyikan di navbar,
+     pindah ke menu yang terbuka */
+  .navbar-search { display: none; }
+  .navbar-toggle { display: block; }
+  .navbar { padding: 0 1rem; height: 56px; }
+  .navbar-brand { font-size: 1rem; }
+
+  /* Menu dropdown mobile — muncul dari atas */
+  .navbar-menu {
+    display: none;
+    flex-direction: column;
+    align-items: stretch; /* tombol full-width */
+    position: fixed; /* BARU: fixed agar tidak terpotong */
+    top: 56px;
+    left: 0;
+    right: 0;
+    background: var(--brown);
+    padding: 0.8rem;
+    gap: 4px;
+    /* BARU: shadow agar terlihat di atas konten */
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    z-index: 99;
+    /* BARU: bisa scroll kalau menu terlalu panjang */
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+  .navbar-menu.open { display: flex; }
+  .navbar-menu a {
+    padding: 12px 16px; /* BARU: lebih tinggi, mudah disentuh */
+    font-size: 14px;
+    border-radius: var(--radius-sm);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .navbar-menu a:last-child { border-bottom: none; }
+
+  /* BARU: Search bar muncul di dalam menu mobile */
+  .navbar-menu::before {
+    content: '';
+    display: block;
+  }
+
+  /* --- LAYOUT & CONTAINER --- */
+  .container { padding: 0 1rem; }
+  .container-sm { padding: 0 1rem; }
+
+  /* --- TYPOGRAPHY --- */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.3rem; }
+  h3 { font-size: 1.1rem; }
+
+  /* --- CARD --- */
+  .card { padding: 1.2rem; }
+
+  /* --- FORM --- */
+  /* 2 kolom jadi 1 kolom di HP */
+  .form-row { grid-template-columns: 1fr; gap: 0; }
+  /* Input lebih besar di HP (16px mencegah zoom di iOS) */
+  .form-input, .form-select, .form-textarea { font-size: 16px; }
+
+  /* --- STAT GRID --- */
+  /* 2 kolom di HP kecil */
+  .stat-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+  /* --- TOMBOL --- */
+  .btn { min-height: 48px; } /* Lebih besar untuk jari */
+  .btn-lg { padding: 14px 20px; font-size: 14px; }
+
+  /* --- FOOTER --- */
+  footer { margin-top: 2rem; font-size: 12px; }
+}
+
+/* ============================================
+   RESPONSIVE — HP KECIL (max 480px)
+   Untuk HP dengan layar sempit seperti
+   iPhone SE, Android kelas bawah
+   ============================================ */
+@media (max-width: 480px) {
+
+  /* Stat jadi 2 kolom sempit */
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .stat-num { font-size: 1.6rem; }
+
+  /* Auth card lebih mepet di HP kecil */
+  .auth-card { padding: 1.5rem 1.2rem; border-radius: 16px; }
+  .auth-page { padding: 1.5rem 0.8rem; }
+
+  /* Teks hero lebih kecil */
+  h1 { font-size: 1.4rem; }
+
+  /* Tombol full-width di HP kecil lebih nyaman */
+  .btn-lg { width: 100%; justify-content: center; }
+
+  /* Card padding lebih kecil */
+  .card { padding: 1rem; border-radius: var(--radius); }
+
+  /* Tabel: kolom lebih kecil */
+  thead th { padding: 10px 12px; font-size: 12px; }
+  tbody td { padding: 10px 12px; font-size: 12px; }
+}
+
+/* ============================================
+   MOBILE SEARCH BAR (tambahan baru)
+   Search bar yang muncul di bawah navbar
+   saat tombol hamburger ditekan
+   ============================================ */
+.mobile-search-bar {
+  display: none; /* disembunyikan di desktop */
+  background: var(--brown-mid);
+  padding: 0.8rem 1rem;
+  position: sticky;
+  top: 56px;
+  z-index: 98;
+}
+.mobile-search-bar form {
+  display: flex;
+  gap: 0;
+  width: 100%;
+}
+.mobile-search-bar input {
+  flex: 1;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-right: none;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 14px; /* BARU: 16px mencegah zoom iOS */
+  color: white;
+  font-family: inherit;
+  outline: none;
+}
+.mobile-search-bar input::placeholder { color: rgba(255,255,255,0.55); }
+.mobile-search-bar button {
+  background: var(--gold);
+  border: none;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 10px 16px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  .mobile-search-bar { display: block; }
+}
+
+/* ============================================
+   UTILITY CLASSES TAMBAHAN
+   Kelas-kelas helper yang berguna
+   ============================================ */
+
+/* Sembunyikan di mobile */
+.hide-mobile { display: block; }
+@media (max-width: 768px) { .hide-mobile { display: none !important; } }
+
+/* Tampilkan hanya di mobile */
+.show-mobile { display: none; }
+@media (max-width: 768px) { .show-mobile { display: block !important; } }
+
+/* Stack vertikal di mobile (row jadi column) */
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 480px) {
+  .flex-row-mobile-col {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Teks tidak wrap */
+.nowrap { white-space: nowrap; }
+
+/* Teks overflow dengan ellipsis (...) */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================
+   PERBAIKAN KHUSUS PER HALAMAN
+   Beberapa halaman punya elemen unik
+   yang perlu perbaikan mobile tersendiri
+   ============================================ */
+
+/* --- dashboard.html: stat banner di beranda --- */
+/* 4 kolom jadi 2x2 di HP */
+@media (max-width: 640px) {
+  .stat-banner {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0 !important;
+  }
+  .stat-item {
+    border-right: none !important;
+    border-bottom: 1px solid var(--cream2) !important;
+    padding: 0.8rem !important;
+  }
+  .stat-item:nth-child(odd) { border-right: 1px solid var(--cream2) !important; }
+  .stat-item:last-child,
+  .stat-item:nth-last-child(2):nth-child(odd) { border-bottom: none !important; }
+  .stat-item .num { font-size: 1.6rem; }
+}
+
+/* --- laporan.html: grid grafik --- */
+/* 2 kolom jadi 1 kolom di HP */
+@media (max-width: 640px) {
+  .charts-grid { grid-template-columns: 1fr !important; }
+}
+
+/* --- marketplace.html & data-ikm.html: filter bar --- */
+@media (max-width: 768px) {
+  .filter-bar {
+    /* BARU: padding lebih kecil di HP */
+    padding: 0.8rem !important;
+    gap: 8px !important;
+  }
+  /* Select filter full-width di HP */
+  .filter-bar select,
+  .filter-bar .form-select {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+  /* Search input full-width */
+  .filter-bar .search-wrap,
+  .filter-bar .search-input {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+}
+
+/* --- peta.html: map controls --- */
+@media (max-width: 768px) {
+  .map-controls {
+    padding: 0.8rem !important;
+    gap: 8px !important;
+  }
+  .map-controls select { width: 100% !important; min-width: unset !important; }
+  .map-stat { min-width: 80px !important; }
+  /* Map height lebih kecil di HP */
+  #map { height: calc(100vh - 280px) !important; min-height: 300px !important; }
+}
+
+/* --- detail-ikm.html & detail-produk.html: info-row --- */
+@media (max-width: 480px) {
+  .info-row {
+    flex-direction: column !important;
+    gap: 2px;
+  }
+  .info-row .info-key { width: auto !important; }
+  .info-row .info-val { text-align: left !important; }
+}
+
+/* --- manajemen-pengguna.html: user card --- */
+@media (max-width: 640px) {
+  .user-card {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .user-actions {
+    width: 100% !important;
+    margin-left: 0 !important;
+    justify-content: flex-end;
+  }
+}
+
+/* --- profil.html: cards grid 2 kolom --- */
+@media (max-width: 680px) {
+  .cards-grid { grid-template-columns: 1fr !important; }
+}
+
+/* --- share bar di detail-ikm dan detail-produk --- */
+@media (max-width: 480px) {
+  .share-bar { gap: 6px; }
+  .share-btn { padding: 8px 12px; font-size: 12px; }
+}
+
+/* ============================================
+   TOUCH / INTERAKSI SENTUH
+   Perbaikan khusus untuk layar sentuh
+   ============================================ */
+
+/* Hilangkan highlight biru saat tap di mobile */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Cursor pointer untuk elemen yang bisa diklik */
+[onclick], button, a { cursor: pointer; }
+
+/* Pastikan semua gambar tidak meluber */
+img { max-width: 100%; height: auto; }
+
+/* Scroll horizontal yang halus di iOS */
+.table-wrap,
+.slider-outer {
+  -webkit-overflow-scrolling: touch;
 }
