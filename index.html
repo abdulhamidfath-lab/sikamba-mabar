@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -92,12 +93,45 @@
     .cta-section p { color: rgba(255,255,255,0.72); margin-bottom: 2rem; position: relative; }
     .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
 
-    @media (max-width: 640px) {
+    /* =============================================
+       MOBILE OVERRIDES khusus index.html
+       ============================================= */
+    @media (max-width: 768px) {
+      /* Hero lebih kompak di HP */
+      .hero { padding: 3rem 0 3rem; }
       .hero h1 { font-size: 2rem; }
-      .stat-banner { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .stat-item { border-right: none; border-bottom: 1px solid var(--cream2); padding: 0.8rem; }
-      .stat-item:nth-child(odd) { border-right: 1px solid var(--cream2); }
-      .stat-item:last-child, .stat-item:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+      .hero p { font-size: 0.95rem; margin-bottom: 1.8rem; }
+      .hero-badge { font-size: 11px; padding: 6px 14px; }
+
+      /* Tombol hero jadi full-width di HP kecil */
+      .hero-btns { flex-direction: column; align-items: center; padding: 0 2rem; }
+      .hero-btns .btn { width: 100%; max-width: 320px; }
+
+      /* Stat banner margin lebih kecil di HP */
+      .stat-banner { margin: -1rem 1rem 0; padding: 1rem; }
+
+      /* Slider: slide lebih kecil di HP */
+      .produk-slide { flex: 0 0 160px; }
+      .produk-foto { height: 110px; font-size: 36px; }
+
+      /* Tombol navigasi slider lebih kecil */
+      .slide-nav { gap: 4px; }
+      .slide-btn { width: 28px; height: 28px; font-size: 14px; }
+
+      /* Section padding lebih kecil */
+      section { padding-top: 2.5rem !important; padding-bottom: 2rem !important; }
+
+      /* CTA tombol jadi full-width */
+      .cta-section { padding: 2.5rem 0; }
+      .cta-btns { flex-direction: column; align-items: center; padding: 0 2rem; }
+      .cta-btns .btn { width: 100%; max-width: 320px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero { padding: 2.5rem 0 2.5rem; }
+      .hero h1 { font-size: 1.7rem; }
+      .stat-banner { margin: -0.8rem 0.8rem 0; grid-template-columns: 1fr 1fr; gap: 0; }
+      .stat-item .num { font-size: 1.5rem; }
     }
   </style>
 </head>
@@ -130,6 +164,14 @@
   </nav>
   <div class="batik-strip"></div>
 
+  <!-- ✅ BARU: Search bar khusus HP, muncul di bawah navbar -->
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
   <!-- HERO -->
   <section class="hero">
     <div class="container">
@@ -154,7 +196,7 @@
       <div class="stat-item"><div class="num" id="statIKM">–</div><div class="lbl">IKM Terdaftar</div></div>
       <div class="stat-item"><div class="num" id="statProduk">–</div><div class="lbl">Produk Lokal</div></div>
       <div class="stat-item"><div class="num">12</div><div class="lbl">Kecamatan</div></div>
-      <div class="stat-item"><div class="num">8</div><div class="lbl">Kategori Industri</div></div>
+      <div class="stat-item"><div class="num">8</div><div class="lbl">Kategori</div></div>
     </div>
   </div>
 
@@ -257,6 +299,13 @@
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
+    // ✅ BARU: fungsi search untuk search bar HP
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'pages/cari.html?q=' + encodeURIComponent(q);
+    }
+
     const ikonKategori = {
       'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
       'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
@@ -321,9 +370,7 @@
       document.querySelectorAll('#dotsProduk .dot').forEach((d, i) => d.classList.toggle('active', i === dotIdx));
     }
 
-    // Load data
     async function init() {
-      // Cek login untuk update navbar
       try {
         const user = await getUser();
         if (user) {
@@ -332,14 +379,12 @@
         }
       } catch(e) {}
 
-      // Statistik
       try {
         const stats = await getStatistik();
         document.getElementById('statIKM').textContent = stats.totalIKM;
         document.getElementById('statProduk').textContent = stats.totalProduk;
       } catch(e) {}
 
-      // Produk slider
       try {
         const { data } = await db.from('produk')
           .select('*, ikm:ikm_id(nama_usaha)')
@@ -349,7 +394,6 @@
         renderProdukSlider(data || []);
       } catch(e) {}
 
-      // IKM spotlight
       try {
         const { data } = await db.from('ikm').select('*').eq('status','aktif')
           .order('created_at', { ascending: false }).limit(4);
