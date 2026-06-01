@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6,10 +7,45 @@
   <title>Masuk — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
+    /* ✅ BARU: password toggle lebih mudah disentuh di HP */
     .pass-wrap { position: relative; margin-bottom: 16px; }
-    .pass-wrap .form-input { padding-right: 44px; margin-bottom: 0; }
-    .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text2); font-size: 18px; padding: 4px; display: flex; align-items: center; }
+    .pass-wrap .form-input { padding-right: 52px; margin-bottom: 0; }
+    .pass-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 20px;
+      padding: 8px;           /* ✅ BARU: area sentuh lebih besar */
+      display: flex;
+      align-items: center;
+      min-width: 40px;
+      min-height: 40px;
+      justify-content: center;
+    }
     .pass-toggle:hover { color: var(--brown); }
+
+    /* ✅ BARU: lupa password link lebih mudah disentuh */
+    .lupa-link {
+      display: inline-block;
+      font-size: 13px;
+      padding: 4px 0;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ✅ BARU: auth-card di HP tidak punya border-radius besar
+       agar konten tidak terpotong di layar sempit */
+    @media (max-width: 480px) {
+      .auth-card {
+        border-radius: 16px;
+        padding: 1.5rem 1.2rem;
+      }
+      .auth-logo h2 { font-size: 1.3rem; }
+    }
   </style>
 </head>
 <body>
@@ -26,19 +62,30 @@
 
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" id="email" class="form-input" placeholder="Masukkan email Anda">
+        <input type="email" id="email" class="form-input"
+          placeholder="Masukkan email Anda"
+          autocomplete="email"
+          inputmode="email">
+          <!-- ✅ BARU: inputmode="email" memunculkan keyboard email di HP -->
       </div>
+
       <div class="form-group">
         <label class="form-label">Password</label>
         <div class="pass-wrap">
-          <input type="password" id="password" class="form-input" placeholder="Masukkan password">
-          <button class="pass-toggle" type="button" onclick="togglePass('password', this)" aria-label="Lihat password">👁️</button>
+          <input type="password" id="password" class="form-input"
+            placeholder="Masukkan password"
+            autocomplete="current-password">
+          <button class="pass-toggle" type="button"
+            onclick="togglePass('password', this)"
+            aria-label="Lihat password">👁️</button>
         </div>
       </div>
+
       <div style="text-align:right;margin-bottom:1.2rem;">
-        <a href="lupa-password.html" style="font-size:13px;">Lupa password?</a>
+        <a href="lupa-password.html" class="lupa-link">Lupa password?</a>
       </div>
 
+      <!-- ✅ BARU: tombol login ukurannya nyaman di HP -->
       <button class="btn btn-primary btn-full btn-lg" id="btnLogin" onclick="doLogin()">
         Masuk
       </button>
@@ -53,7 +100,6 @@
   <script src="js/supabase.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // Jika sudah login, langsung ke dashboard
     redirectIfLoggedIn();
 
     function togglePass(id, btn) {
@@ -91,7 +137,7 @@
       }
     }
 
-    // Bisa tekan Enter untuk login
+    // Enter untuk login
     document.addEventListener('keydown', e => {
       if (e.key === 'Enter') doLogin();
     });
