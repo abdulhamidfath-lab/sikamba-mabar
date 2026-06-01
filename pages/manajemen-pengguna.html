@@ -7,23 +7,58 @@
   <link rel="stylesheet" href="../css/style.css">
   <style>
     .user-hero { background: var(--brown); padding: 1.8rem 0 2.5rem; }
+
     .filter-bar { background: white; border-radius: var(--radius-lg); padding: 1rem 1.2rem; margin-bottom: 1.2rem; box-shadow: var(--shadow); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .search-wrap { flex: 1; min-width: 200px; position: relative; }
     .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 14px; }
     .search-input { width: 100%; border: 1.5px solid rgba(61,31,13,0.15); border-radius: var(--radius); padding: 9px 14px 9px 34px; font-size: 14px; font-family: inherit; background: var(--cream); outline: none; }
     .search-input:focus { border-color: var(--gold); }
-    .user-card { background: white; border-radius: var(--radius-lg); padding: 14px 16px; border: 1px solid rgba(61,31,13,0.07); display: flex; align-items: center; gap: 14px; margin-bottom: 8px; transition: box-shadow 0.2s; }
+
+    /* ✅ BARU: user card lebih rapi di HP */
+    .user-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      border: 1px solid rgba(61,31,13,0.07);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      transition: box-shadow 0.2s;
+      flex-wrap: wrap; /* ✅ BARU: wrap di HP */
+    }
     .user-card:hover { box-shadow: var(--shadow); }
-    .user-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--gold-light); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .user-nama { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-    .user-email { font-size: 12px; color: var(--text2); }
+    .user-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--gold-light); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-nama { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-meta { font-size: 11px; color: var(--text2); margin-top: 3px; }
-    .user-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; align-items: center; }
-    .peran-select { border: 1.5px solid rgba(61,31,13,0.15); border-radius: var(--radius-sm); padding: 5px 8px; font-size: 12px; font-family: inherit; background: var(--cream); color: var(--text); cursor: pointer; }
-    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: -1.2rem; margin-bottom: 1.5rem; }
+
+    /* ✅ BARU: di HP actions pindah ke bawah, full-width */
+    .user-actions { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+    .peran-select { border: 1.5px solid rgba(61,31,13,0.15); border-radius: var(--radius-sm); padding: 5px 8px; font-size: 12px; font-family: inherit; background: var(--cream); color: var(--text); cursor: pointer; min-height: 36px; }
+
+    /* ✅ BARU: stat row auto-fit */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: -1.2rem;
+      margin-bottom: 1.5rem;
+    }
     .stat-mini { background: white; border-radius: 14px; padding: 12px 14px; text-align: center; box-shadow: var(--shadow); }
     .stat-mini .num { font-size: 1.8rem; font-weight: 700; }
     .stat-mini .lbl { font-size: 11px; color: var(--text2); font-weight: 600; }
+
+    @media (max-width: 600px) {
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .search-wrap { min-width: unset; }
+      .search-input { font-size: 16px; }
+      /* actions jadi full-width di bawah info */
+      .user-actions { margin-left: 0; width: 100%; }
+      .peran-select { flex: 1; }
+      .stat-mini .num { font-size: 1.5rem; }
+    }
   </style>
 </head>
 <body>
@@ -41,6 +76,14 @@
   </nav>
   <div class="batik-strip"></div>
 
+  <!-- ✅ BARU: Search bar khusus HP -->
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
   <div class="user-hero">
     <div class="container">
       <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-bottom:3px;">Kelola akun pengguna sistem</p>
@@ -51,7 +94,7 @@
   <div class="container" style="padding-top:0;padding-bottom:3rem;">
 
     <div class="stat-row">
-      <div class="stat-mini"><div class="num" style="color:var(--blue);" id="sTotal">–</div><div class="lbl">Total Pengguna</div></div>
+      <div class="stat-mini"><div class="num" style="color:var(--blue);" id="sTotal">–</div><div class="lbl">Total</div></div>
       <div class="stat-mini"><div class="num" style="color:var(--green);" id="sAdmin">–</div><div class="lbl">Admin</div></div>
       <div class="stat-mini"><div class="num" style="color:var(--orange);" id="sIKM">–</div><div class="lbl">Pelaku IKM</div></div>
       <div class="stat-mini"><div class="num" style="color:#7B5EA7;" id="sKonsumen">–</div><div class="lbl">Konsumen</div></div>
@@ -64,7 +107,7 @@
         <span class="search-icon">🔍</span>
         <input type="text" class="search-input" id="searchInput" placeholder="Cari nama atau email...">
       </div>
-      <select class="form-select" id="filterPeran" style="width:auto;min-width:140px;margin-bottom:0;">
+      <select class="form-select" id="filterPeran" style="flex:1;min-width:130px;margin-bottom:0;">
         <option value="">Semua Peran</option>
         <option value="admin">Admin</option>
         <option value="ikm">Pelaku IKM</option>
@@ -91,6 +134,11 @@
   <script src="../js/auth.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
 
     function showAlert(pesan, tipe='success') {
       document.getElementById('alertBox').innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
@@ -99,7 +147,6 @@
 
     const warnaBadge = { admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu' };
     const ikonPeran = { admin:'👑', ikm:'🏭', konsumen:'🛍️' };
-
     let semuaUsers = [];
 
     function render() {
@@ -128,20 +175,19 @@
       el.innerHTML = list.map(u => `
         <div class="user-card" id="ucard-${u.id}">
           <div class="user-avatar">${ikonPeran[u.peran] || '👤'}</div>
-          <div style="flex:1;min-width:0;">
+          <div class="user-info">
             <div class="user-nama">${u.nama_lengkap || '(Belum diisi)'}</div>
             <div class="user-email">${u.email || '-'}</div>
             <div class="user-meta">
               <span class="badge ${warnaBadge[u.peran]||'badge-kategori'}" style="font-size:10px;">${(u.peran||'konsumen').toUpperCase()}</span>
-              ${u.ikm_id ? `<span style="margin-left:6px;">· IKM terhubung</span>` : ''}
-              <span style="margin-left:6px;">· Daftar: ${new Date(u.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</span>
+              <span style="margin-left:6px;">· ${new Date(u.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</span>
             </div>
           </div>
           <div class="user-actions">
             <select class="peran-select" id="sel-${u.id}" onchange="ubahPeran('${u.id}', this.value)">
-              <option value="admin" ${u.peran==='admin'?'selected':''}>Admin</option>
-              <option value="ikm" ${u.peran==='ikm'?'selected':''}>Pelaku IKM</option>
-              <option value="konsumen" ${u.peran==='konsumen'?'selected':''}>Konsumen</option>
+              <option value="admin" ${u.peran==='admin'?'selected':''}>👑 Admin</option>
+              <option value="ikm" ${u.peran==='ikm'?'selected':''}>🏭 Pelaku IKM</option>
+              <option value="konsumen" ${u.peran==='konsumen'?'selected':''}>🛍️ Konsumen</option>
             </select>
           </div>
         </div>
@@ -150,21 +196,14 @@
 
     async function ubahPeran(userId, peranBaru) {
       if (!confirm(`Ubah peran pengguna ini menjadi "${peranBaru}"?`)) {
-        // Kembalikan select ke nilai lama
         const user = semuaUsers.find(u => u.id === userId);
         if (user) document.getElementById('sel-'+userId).value = user.peran;
         return;
       }
       const { error } = await db.from('profiles').update({ peran: peranBaru }).eq('id', userId);
       if (error) { showAlert('Gagal mengubah peran: ' + error.message, 'error'); return; }
-
-      // Update data lokal
       const user = semuaUsers.find(u => u.id === userId);
-      if (user) {
-        user.peran = peranBaru;
-        // Update stat
-        updateStat();
-      }
+      if (user) { user.peran = peranBaru; updateStat(); }
       showAlert(`✅ Peran berhasil diubah menjadi ${peranBaru}.`);
       render();
     }
@@ -179,16 +218,10 @@
     async function init() {
       const user = await requireLogin();
       const profil = await getProfil(user.id);
-      if (profil?.peran !== 'admin') {
-        window.location.href = 'dashboard.html'; return;
-      }
+      if (profil?.peran !== 'admin') { window.location.href = 'dashboard.html'; return; }
 
-      // Ambil semua user dari auth + join profiles
-      // Gunakan admin auth untuk list semua user
       const { data: profileData, error } = await db
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from('profiles').select('*').order('created_at', { ascending: false });
 
       if (error) {
         document.getElementById('userList').innerHTML =
@@ -196,50 +229,9 @@
         return;
       }
 
-      // Cek apakah ada user yang tidak punya profil
-      // dengan mengambil session dan menggunakan supabase admin
       semuaUsers = profileData || [];
-
-      // Jika hanya 1 user tampil, kemungkinan ada user tanpa profil
-      // Tampilkan peringatan ke admin
-      if (semuaUsers.length <= 1) {
-        document.getElementById('alertBox').innerHTML = `
-          <div class="alert alert-warning" style="margin-bottom:1rem;">
-            ⚠️ Beberapa akun mungkin tidak tampil karena profil belum tersinkronisasi.
-            <br>Buka <strong>Supabase → SQL Editor</strong> dan jalankan query sinkronisasi profil,
-            atau <a href="#" onclick="sinkronisasi()" style="font-weight:600;">klik di sini untuk coba sinkronisasi otomatis</a>.
-          </div>`;
-      }
-
       updateStat();
       render();
-    }
-
-    // Fungsi sinkronisasi profil user yang belum punya profil
-    async function sinkronisasi() {
-      document.getElementById('alertBox').innerHTML =
-        '<div class="alert alert-info">⏳ Mencoba sinkronisasi... Silakan refresh halaman setelah selesai.</div>';
-      try {
-        // Insert profil untuk user yang belum punya dengan RPC
-        const { error } = await db.rpc('sync_missing_profiles');
-        if (error) throw error;
-        showAlert('✅ Sinkronisasi berhasil! Refresh halaman untuk melihat hasilnya.');
-        setTimeout(() => window.location.reload(), 2000);
-      } catch(e) {
-        // Fallback: tampilkan instruksi manual
-        document.getElementById('alertBox').innerHTML = `
-          <div class="alert alert-warning">
-            Sinkronisasi otomatis tidak tersedia. Silakan jalankan query ini di 
-            <a href="https://supabase.com/dashboard" target="_blank" style="font-weight:600;">Supabase SQL Editor</a>:<br><br>
-            <code style="font-size:11px;display:block;background:rgba(0,0,0,0.05);padding:8px;border-radius:6px;margin-top:6px;">
-              INSERT INTO public.profiles (id, nama_lengkap, peran, created_at)<br>
-              SELECT au.id, COALESCE(au.raw_user_meta_data->>'nama_lengkap', split_part(au.email, '@', 1)),<br>
-              COALESCE(au.raw_user_meta_data->>'peran', 'konsumen'), au.created_at<br>
-              FROM auth.users au LEFT JOIN public.profiles p ON au.id = p.id<br>
-              WHERE p.id IS NULL ON CONFLICT (id) DO NOTHING;
-            </code>
-          </div>`;
-      }
     }
 
     document.getElementById('searchInput').addEventListener('input', render);
@@ -249,11 +241,8 @@
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('manajemen-pengguna');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('manajemen-pengguna');
     });
   </script>
 </body>
