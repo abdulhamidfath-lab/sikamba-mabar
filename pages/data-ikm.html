@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,6 +10,7 @@
     .filter-bar { background:white; border-radius:var(--radius-lg); padding:1rem 1.2rem; margin-bottom:1.2rem; box-shadow:var(--shadow); display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
     .search-input { flex:1; min-width:200px; border:1.5px solid rgba(61,31,13,0.15); border-radius:var(--radius); padding:9px 14px; font-size:14px; font-family:'Plus Jakarta Sans',sans-serif; background:var(--cream); outline:none; }
     .search-input:focus { border-color:var(--gold); }
+
     .ikm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; }
     .ikm-card { background:white; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow); border:1px solid rgba(61,31,13,0.07); transition:transform 0.2s,box-shadow 0.2s; }
     .ikm-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
@@ -21,6 +23,21 @@
     .ikm-lokasi { font-size:12px; color:var(--text2); }
     .empty-state { text-align:center; padding:4rem 2rem; color:var(--text2); }
     .empty-state div { font-size:48px; margin-bottom:1rem; }
+
+    /* ✅ BARU: tombol aksi card — jadi full-width di HP */
+    .ikm-actions { display:flex; gap:8px; margin-top:12px; }
+    .ikm-actions .btn { flex:1; font-size:12px; padding:8px 10px; min-height:40px; }
+    /* Tombol hapus tidak ikut flex:1 agar tidak terlalu lebar */
+    .ikm-actions .btn-hapus { flex:0 0 auto; padding:8px 12px; }
+
+    /* ✅ BARU: grid 1 kolom di HP agar kartu tidak terlalu sempit */
+    @media (max-width: 640px) {
+      .ikm-grid { grid-template-columns: 1fr; }
+      .ikm-foto { height: 160px; }
+      /* filter jadi vertikal di HP */
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .search-input { min-width: unset; font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -51,6 +68,14 @@
   </nav>
   <div class="batik-strip"></div>
 
+  <!-- ✅ BARU: Search bar khusus HP -->
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
   <div class="container" style="padding-top:2rem;padding-bottom:3rem;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;">
       <h2 style="margin:0;">📊 Data IKM Manggarai Barat</h2>
@@ -60,32 +85,35 @@
     <!-- Filter -->
     <div class="filter-bar">
       <input type="text" class="search-input" id="searchInput" placeholder="🔍 Cari nama usaha, pemilik, atau desa...">
-      <select class="form-select" id="filterKategori" style="width:auto;min-width:160px;margin-bottom:0;">
-        <option value="">Semua Kategori</option>
-        <option value="Anyaman & Kerajinan">Anyaman & Kerajinan</option>
-        <option value="Tenun Tradisional">Tenun Tradisional</option>
-        <option value="Makanan & Minuman">Makanan & Minuman</option>
-        <option value="Kopi & Minuman Herbal">Kopi & Minuman Herbal</option>
-        <option value="Fashion & Konveksi">Fashion & Konveksi</option>
-        <option value="Furniture & Kayu">Furniture & Kayu</option>
-        <option value="Perbengkelan">Perbengkelan</option>
-        <option value="Jasa & Lainnya">Jasa & Lainnya</option>
-      </select>
-      <select class="form-select" id="filterKecamatan" style="width:auto;min-width:160px;margin-bottom:0;">
-        <option value="">Semua Kecamatan</option>
-        <option value="Komodo">Komodo</option>
-        <option value="Boleng">Boleng</option>
-        <option value="Sano Nggoang">Sano Nggoang</option>
-        <option value="Mbeliling">Mbeliling</option>
-        <option value="Lembor">Lembor</option>
-        <option value="Lembor Selatan">Lembor Selatan</option>
-        <option value="Welak">Welak</option>
-        <option value="Kuwus">Kuwus</option>
-        <option value="Kuwus Barat">Kuwus Barat</option>
-        <option value="Pacar">Pacar</option>
-        <option value="Mancang Pacar">Mancang Pacar</option>
-        <option value="Ndoso">Ndoso</option>
-      </select>
+      <!-- ✅ BARU: filter select dalam baris sendiri agar rapi di HP -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%;">
+        <select class="form-select" id="filterKategori" style="flex:1;min-width:140px;margin-bottom:0;">
+          <option value="">Semua Kategori</option>
+          <option value="Anyaman & Kerajinan">Anyaman & Kerajinan</option>
+          <option value="Tenun Tradisional">Tenun Tradisional</option>
+          <option value="Makanan & Minuman">Makanan & Minuman</option>
+          <option value="Kopi & Minuman Herbal">Kopi & Minuman Herbal</option>
+          <option value="Fashion & Konveksi">Fashion & Konveksi</option>
+          <option value="Furniture & Kayu">Furniture & Kayu</option>
+          <option value="Perbengkelan">Perbengkelan</option>
+          <option value="Jasa & Lainnya">Jasa & Lainnya</option>
+        </select>
+        <select class="form-select" id="filterKecamatan" style="flex:1;min-width:140px;margin-bottom:0;">
+          <option value="">Semua Kecamatan</option>
+          <option value="Komodo">Komodo</option>
+          <option value="Boleng">Boleng</option>
+          <option value="Sano Nggoang">Sano Nggoang</option>
+          <option value="Mbeliling">Mbeliling</option>
+          <option value="Lembor">Lembor</option>
+          <option value="Lembor Selatan">Lembor Selatan</option>
+          <option value="Welak">Welak</option>
+          <option value="Kuwus">Kuwus</option>
+          <option value="Kuwus Barat">Kuwus Barat</option>
+          <option value="Pacar">Pacar</option>
+          <option value="Mancang Pacar">Mancang Pacar</option>
+          <option value="Ndoso">Ndoso</option>
+        </select>
+      </div>
     </div>
 
     <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">
@@ -110,6 +138,11 @@
   <script src="../js/ikm.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
 
     const ikonKategori = {
       'Anyaman & Kerajinan': '🧺',
@@ -126,7 +159,6 @@
     let peranUser = 'konsumen';
     let ikmIdUser = null;
 
-    // Cek apakah user boleh edit IKM ini
     function bisaEdit(ikm) {
       if (peranUser === 'admin') return true;
       if (peranUser === 'ikm' && ikmIdUser === ikm.id) return true;
@@ -160,10 +192,11 @@
             </div>
             <div class="ikm-lokasi">📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}</div>
             ${ikm.no_telp ? `<div class="ikm-lokasi" style="margin-top:4px;">📞 ${ikm.no_telp}</div>` : ''}
-            <div style="display:flex;gap:8px;margin-top:12px;">
-              <a href="detail-ikm.html?id=${ikm.id}" class="btn btn-secondary" style="flex:1;font-size:12px;padding:7px;">Lihat Detail</a>
-              ${bisaEdit(ikm) ? `<a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold" style="font-size:12px;padding:7px 12px;">Edit</a>` : ''}
-              ${peranUser === 'admin' ? `<button class="btn btn-danger" style="font-size:12px;padding:7px 12px;" onclick="hapusIKM('${ikm.id}','${ikm.nama_usaha.replace(/'/g,"\\'")}')">🗑️</button>` : ''}
+            <!-- ✅ BARU: tombol pakai class ikm-actions agar responsive -->
+            <div class="ikm-actions">
+              <a href="detail-ikm.html?id=${ikm.id}" class="btn btn-secondary">Lihat Detail</a>
+              ${bisaEdit(ikm) ? `<a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold">✏️ Edit</a>` : ''}
+              ${peranUser === 'admin' ? `<button class="btn btn-danger btn-hapus" onclick="hapusIKM('${ikm.id}','${ikm.nama_usaha.replace(/'/g,"\\'")}')">🗑️</button>` : ''}
             </div>
           </div>
         </div>
@@ -186,14 +219,11 @@
       renderIKM(hasil);
     }
 
-
-
     document.getElementById('searchInput').addEventListener('input', filter);
     document.getElementById('filterKategori').addEventListener('change', filter);
     document.getElementById('filterKecamatan').addEventListener('change', filter);
 
     async function init() {
-      // Ambil profil user yang sedang login
       try {
         const user = await getUser();
         if (user) {
@@ -203,13 +233,11 @@
         }
       } catch(e) {}
 
-      // Tampilkan tombol Tambah hanya untuk admin & IKM
       if (peranUser === 'admin' || peranUser === 'ikm') {
         document.getElementById('tombolTambah').innerHTML =
           '<a href="form-ikm.html" class="btn btn-primary">➕ Tambah IKM</a>';
       }
 
-      // Load data IKM
       try {
         const { data, error } = await db.from('ikm').select('*').order('created_at', { ascending: false });
         if (error) throw error;
@@ -227,7 +255,6 @@
       try {
         const { error } = await db.from('ikm').delete().eq('id', id);
         if (error) throw error;
-        // Hapus kartu dari tampilan tanpa reload
         semuaIKM = semuaIKM.filter(i => i.id !== id);
         filter();
         alert('✅ Data IKM berhasil dihapus.');
@@ -240,7 +267,6 @@
   </script>
 
   <script>
-    // Tampilkan menu admin di navbar jika peran = admin
     (async function tampilkanNavAdmin() {
       try {
         const user = await getUser();
@@ -258,11 +284,8 @@
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('data-ikm');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('data-ikm');
     });
   </script>
 </body>
