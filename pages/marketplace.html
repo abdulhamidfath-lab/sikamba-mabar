@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,15 +10,29 @@
     .hero-mkt { background:linear-gradient(135deg,var(--brown),var(--brown-mid)); padding:3rem 0 2.5rem; color:white; text-align:center; }
     .hero-mkt h1 { color:white; font-size:2rem; margin-bottom:0.5rem; }
     .hero-mkt p { color:rgba(255,255,255,0.75); font-size:14px; }
+
     .filter-bar { background:white; border-radius:var(--radius-lg); padding:1rem 1.2rem; margin:1.5rem 0 1rem; box-shadow:var(--shadow); display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
     .search-wrap { flex:1; min-width:200px; position:relative; }
     .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text2); }
     .search-input { width:100%; border:1.5px solid rgba(61,31,13,0.15); border-radius:var(--radius); padding:9px 14px 9px 36px; font-size:14px; font-family:inherit; background:var(--cream); outline:none; }
     .search-input:focus { border-color:var(--gold); }
-    .chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1rem; }
-    .chip { padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:1.5px solid transparent; transition:all 0.2s; }
+
+    /* ✅ BARU: chips scroll horizontal di HP agar semua kategori bisa diakses */
+    .chips-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      /* sembunyikan scrollbar tapi tetap bisa scroll */
+      scrollbar-width: none;
+      margin-bottom: 1rem;
+      /* padding bawah agar shadow tidak terpotong */
+      padding-bottom: 4px;
+    }
+    .chips-wrap::-webkit-scrollbar { display: none; }
+    .chips { display:flex; gap:8px; flex-wrap: nowrap; /* ✅ BARU: nowrap agar bisa scroll */ width: max-content; }
+    .chip { padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:1.5px solid transparent; transition:all 0.2s; white-space: nowrap; /* ✅ teks tidak wrap */ }
     .chip.active { background:var(--brown); color:white; }
     .chip:not(.active) { background:var(--cream2); color:var(--text2); }
+
     .produk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; padding-bottom:2rem; }
     .produk-card { background:white; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow); border:1px solid rgba(61,31,13,0.07); cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; }
     .produk-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); }
@@ -28,6 +43,21 @@
     .produk-ikm { font-size:12px; color:var(--text2); margin-bottom:8px; }
     .produk-harga { font-size:1.1rem; font-weight:700; color:var(--brown); }
     .produk-stok { font-size:11px; color:var(--text2); margin-top:2px; }
+
+    /* ✅ BARU: grid 2 kolom di HP agar produk tidak terlalu besar */
+    @media (max-width: 768px) {
+      .hero-mkt { padding: 2rem 0 1.5rem; }
+      .hero-mkt h1 { font-size: 1.5rem; }
+      .produk-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .produk-foto { height: 140px; font-size: 40px; }
+      .produk-nama { font-size: 0.85rem; }
+      .produk-harga { font-size: 0.95rem; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .search-wrap { min-width: unset; }
+    }
+    @media (max-width: 360px) {
+      .produk-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -55,6 +85,14 @@
   </nav>
   <div class="batik-strip"></div>
 
+  <!-- ✅ BARU: Search bar khusus HP -->
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari produk atau IKM...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
   <div class="hero-mkt">
     <div class="container">
       <h1>🛍️ Pasar Digital Mabar</h1>
@@ -68,45 +106,51 @@
         <span class="search-icon">🔍</span>
         <input type="text" class="search-input" id="searchInput" placeholder="Cari produk atau nama IKM...">
       </div>
-      <select class="form-select" id="filterHarga" style="width:auto;min-width:150px;margin-bottom:0;" onchange="render()">
-        <option value="">Semua Harga</option>
-        <option value="0-50000">Di bawah Rp 50.000</option>
-        <option value="50000-150000">Rp 50.000 – 150.000</option>
-        <option value="150000-500000">Rp 150.000 – 500.000</option>
-        <option value="500000-99999999">Di atas Rp 500.000</option>
-      </select>
-      <select class="form-select" id="sortBy" style="width:auto;min-width:150px;margin-bottom:0;" onchange="render()">
-        <option value="terbaru">Terbaru</option>
-        <option value="termurah">Harga Termurah</option>
-        <option value="termahal">Harga Termahal</option>
-        <option value="nama">Nama A–Z</option>
-      </select>
-      <select class="form-select" id="filterKec" style="width:auto;min-width:150px;margin-bottom:0;">
-        <option value="">Semua Kecamatan</option>
-        <option value="Komodo">Komodo</option>
-        <option value="Boleng">Boleng</option>
-        <option value="Sano Nggoang">Sano Nggoang</option>
-        <option value="Mbeliling">Mbeliling</option>
-        <option value="Lembor">Lembor</option>
-        <option value="Lembor Selatan">Lembor Selatan</option>
-        <option value="Welak">Welak</option>
-        <option value="Kuwus">Kuwus</option>
-        <option value="Kuwus Barat">Kuwus Barat</option>
-        <option value="Pacar">Pacar</option>
-        <option value="Mancang Pacar">Mancang Pacar</option>
-        <option value="Ndoso">Ndoso</option>
-      </select>
+      <!-- ✅ BARU: filter dalam 1 baris di desktop, stack di HP -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;width:100%;">
+        <select class="form-select" id="filterHarga" style="flex:1;min-width:140px;margin-bottom:0;" onchange="render()">
+          <option value="">Semua Harga</option>
+          <option value="0-50000">Di bawah Rp 50.000</option>
+          <option value="50000-150000">Rp 50.000 – 150.000</option>
+          <option value="150000-500000">Rp 150.000 – 500.000</option>
+          <option value="500000-99999999">Di atas Rp 500.000</option>
+        </select>
+        <select class="form-select" id="sortBy" style="flex:1;min-width:140px;margin-bottom:0;" onchange="render()">
+          <option value="terbaru">Terbaru</option>
+          <option value="termurah">Harga Termurah</option>
+          <option value="termahal">Harga Termahal</option>
+          <option value="nama">Nama A–Z</option>
+        </select>
+        <select class="form-select" id="filterKec" style="flex:1;min-width:140px;margin-bottom:0;">
+          <option value="">Semua Kecamatan</option>
+          <option value="Komodo">Komodo</option>
+          <option value="Boleng">Boleng</option>
+          <option value="Sano Nggoang">Sano Nggoang</option>
+          <option value="Mbeliling">Mbeliling</option>
+          <option value="Lembor">Lembor</option>
+          <option value="Lembor Selatan">Lembor Selatan</option>
+          <option value="Welak">Welak</option>
+          <option value="Kuwus">Kuwus</option>
+          <option value="Kuwus Barat">Kuwus Barat</option>
+          <option value="Pacar">Pacar</option>
+          <option value="Mancang Pacar">Mancang Pacar</option>
+          <option value="Ndoso">Ndoso</option>
+        </select>
+      </div>
     </div>
 
-    <div class="chips" id="chips">
-      <span class="chip active" onclick="filterKat('')">Semua</span>
-      <span class="chip" onclick="filterKat('Anyaman & Kerajinan')">🧺 Anyaman</span>
-      <span class="chip" onclick="filterKat('Tenun Tradisional')">🧵 Tenun</span>
-      <span class="chip" onclick="filterKat('Makanan & Minuman')">🍽️ Makanan</span>
-      <span class="chip" onclick="filterKat('Kopi & Minuman Herbal')">☕ Kopi</span>
-      <span class="chip" onclick="filterKat('Fashion & Konveksi')">👗 Fashion</span>
-      <span class="chip" onclick="filterKat('Furniture & Kayu')">🪵 Furniture</span>
-      <span class="chip" onclick="filterKat('Perbengkelan')">🔧 Bengkel</span>
+    <!-- ✅ BARU: chips dibungkus .chips-wrap agar bisa scroll horizontal di HP -->
+    <div class="chips-wrap">
+      <div class="chips" id="chips">
+        <span class="chip active" onclick="filterKat('')">Semua</span>
+        <span class="chip" onclick="filterKat('Anyaman & Kerajinan')">🧺 Anyaman</span>
+        <span class="chip" onclick="filterKat('Tenun Tradisional')">🧵 Tenun</span>
+        <span class="chip" onclick="filterKat('Makanan & Minuman')">🍽️ Makanan</span>
+        <span class="chip" onclick="filterKat('Kopi & Minuman Herbal')">☕ Kopi</span>
+        <span class="chip" onclick="filterKat('Fashion & Konveksi')">👗 Fashion</span>
+        <span class="chip" onclick="filterKat('Furniture & Kayu')">🪵 Furniture</span>
+        <span class="chip" onclick="filterKat('Perbengkelan')">🔧 Bengkel</span>
+      </div>
     </div>
 
     <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">
@@ -129,13 +173,17 @@
   <script src="../js/ikm.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
 
     const ikonKategori = {
       'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
       'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
       'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
     };
-
     function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
 
     let semuaProduk = [];
@@ -168,7 +216,6 @@
         return cocokKat && cocokKec && cocokCari && cocokHarga;
       });
 
-      // Sort
       if (sort === 'termurah') hasil.sort((a,b) => a.harga - b.harga);
       else if (sort === 'termahal') hasil.sort((a,b) => b.harga - a.harga);
       else if (sort === 'nama') hasil.sort((a,b) => a.nama_produk.localeCompare(b.nama_produk));
@@ -193,7 +240,7 @@
             <div class="produk-nama">${p.nama_produk}</div>
             <div class="produk-ikm">🏭 ${p.ikm?.nama_usaha || '-'}</div>
             <div class="produk-ikm">📍 ${p.ikm?.kecamatan || '-'}</div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:4px;">
               <div class="produk-harga">${rupiah(p.harga)}</div>
               <span class="badge badge-kategori">${p.kategori}</span>
             </div>
@@ -204,13 +251,11 @@
     }
 
     async function init() {
-      // Cek login untuk update nav
       try {
         const user = await getUser();
         if (user) document.getElementById('navLogin').style.display = 'none';
       } catch(e) {}
 
-      // Load produk + data IKM sekaligus
       const { data, error } = await db
         .from('produk')
         .select('*, ikm:ikm_id(nama_usaha, kecamatan, no_telp)')
@@ -229,17 +274,13 @@
 
     document.getElementById('searchInput').addEventListener('input', render);
     document.getElementById('filterKec').addEventListener('change', render);
-
     init();
   </script>
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('marketplace');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('marketplace');
     });
   </script>
 </body>
