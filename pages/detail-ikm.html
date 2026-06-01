@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,8 +9,7 @@
   <style>
     .detail-hero {
       width: 100%;
-      aspect-ratio: 16 / 9;
-      max-height: 480px;
+      aspect-ratio: 16 / 7;
       background: linear-gradient(135deg, var(--brown), var(--gold));
       display: flex;
       align-items: center;
@@ -25,24 +25,34 @@
       object-position: center;
     }
     .detail-body { max-width: 800px; margin: 0 auto; padding: 0 1.5rem 3rem; }
-    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--cream2); font-size: 14px; }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--cream2);
+      font-size: 14px;
+      gap: 8px;
+    }
     .info-row:last-child { border-bottom: none; }
-    .info-key { color: var(--text2); font-weight: 500; flex-shrink: 0; width: 180px; }
-    .info-val { color: var(--text); font-weight: 600; text-align: right; }
+    .info-key { color: var(--text2); font-weight: 500; flex-shrink: 0; min-width: 140px; }
+    .info-val { color: var(--text); font-weight: 600; text-align: right; word-break: break-word; }
     .produk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-top: 1rem; }
-    .produk-card { background: var(--cream2); border-radius: var(--radius); padding: 1rem; text-align: center; }
-    .produk-card .nama { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-    .produk-card .harga { font-size: 14px; font-weight: 700; color: var(--brown); }
-
-    /* SHARE BAR */
     .share-bar { display:flex; align-items:center; gap:8px; padding:12px 0; margin-top:0.5rem; flex-wrap:wrap; }
-    .share-label { font-size:12px; color:var(--text2); font-weight:600; margin-right:4px; }
+    .share-label { font-size:12px; color:var(--text2); font-weight:600; }
     .share-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:none; text-decoration:none; transition:opacity 0.2s; }
     .share-btn:hover { opacity:0.85; }
     .share-btn.wa { background:#25D366; color:white; }
     .share-btn.copy { background:var(--cream2); color:var(--brown); border:1.5px solid rgba(61,31,13,0.15); }
     .share-btn.copy.copied { background:var(--green-light); color:var(--green); border-color:var(--green); }
-
+    @media (max-width: 480px) {
+      .detail-body { padding: 0 1rem 2rem; }
+      .detail-hero { aspect-ratio: 16 / 9; font-size: 56px; }
+      .info-row { flex-direction: column; gap: 2px; }
+      .info-key { min-width: unset; }
+      .info-val { text-align: left; }
+      .produk-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .share-btn { padding: 8px 12px; font-size: 11px; }
+    }
   </style>
 </head>
 <body>
@@ -69,6 +79,13 @@
   </nav>
   <div class="batik-strip"></div>
 
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
   <!-- HERO FOTO -->
   <div class="detail-hero" id="heroSection">
     <span id="heroIcon">🏭</span>
@@ -77,63 +94,94 @@
   <div class="detail-body">
 
     <!-- BREADCRUMB -->
-    <div style="display:flex;align-items:center;gap:8px;margin:1.2rem 0;font-size:13px;color:var(--text2);">
+    <div style="display:flex;align-items:center;gap:8px;margin:1.2rem 0;font-size:13px;color:var(--text2);flex-wrap:wrap;">
       <a href="data-ikm.html">← Data IKM</a>
       <span>/</span>
       <span id="breadNama">Detail IKM</span>
     </div>
 
-    <!-- HEADER IKM -->
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem;">
-      <div>
-        <h1 style="font-size:1.8rem;margin-bottom:6px;" id="namaUsaha">Memuat...</h1>
-        <p style="color:var(--text2);font-size:14px;" id="subHeader"></p>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="tombolAksi">
-        <!-- tombol edit muncul jika admin/pemilik -->
-      </div>
-    </div>
-
-    <!-- INFO UTAMA -->
-    <div class="card" style="margin-bottom:1.2rem;">
-      <h3 style="margin-bottom:1rem;">📋 Informasi Usaha</h3>
-      <div id="infoUsaha">
-        <div class="spinner"></div>
+    <!-- ✅ BARU: area error — tersembunyi dulu, tampil kalau ada masalah -->
+    <div id="errorArea" style="display:none;">
+      <div class="card" style="text-align:center;padding:3rem 2rem;">
+        <div style="font-size:56px;margin-bottom:1rem;">😕</div>
+        <h3 id="errorJudul">IKM tidak ditemukan</h3>
+        <p id="errorPesan" style="color:var(--text2);font-size:14px;margin:0.8rem 0 1.5rem;">
+          Data IKM yang Anda cari tidak tersedia atau sudah dihapus.
+        </p>
+        <a href="data-ikm.html" class="btn btn-primary">← Kembali ke Data IKM</a>
       </div>
     </div>
 
-    <!-- LOKASI -->
-    <div class="card" style="margin-bottom:1.2rem;">
-      <h3 style="margin-bottom:1rem;">📍 Lokasi Usaha</h3>
-      <div id="infoLokasi"></div>
-      <div id="mapKecil" style="height:200px;border-radius:var(--radius);margin-top:1rem;background:var(--cream2);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:13px;">
-        Koordinat GPS belum diisi
+    <!-- KONTEN UTAMA — tersembunyi dulu sampai data berhasil dimuat -->
+    <div id="kontenUtama" style="display:none;">
+
+      <!-- HEADER IKM -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:1.2rem;">
+        <div style="flex:1;min-width:0;">
+          <h1 style="font-size:1.6rem;margin-bottom:6px;word-break:break-word;" id="namaUsaha"></h1>
+          <p style="color:var(--text2);font-size:13px;" id="subHeader"></p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="tombolAksi"></div>
       </div>
-    </div>
 
-    <!-- DESKRIPSI -->
-    <div class="card" id="cardDeskripsi" style="margin-bottom:1.2rem;display:none;">
-      <h3 style="margin-bottom:0.8rem;">📝 Deskripsi Usaha</h3>
-      <p id="deskripsiUsaha" style="font-size:14px;color:var(--text2);line-height:1.8;"></p>
-    </div>
-
-    <!-- KONTAK -->
-    <div class="card" style="margin-bottom:1.2rem;">
-      <h3 style="margin-bottom:1rem;">📞 Kontak</h3>
-      <div id="infoKontak"></div>
-    </div>
-
-    <!-- PRODUK IKM INI -->
-    <div class="card" style="margin:0 1.5rem 1.5rem;" id="cardProduk">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-        <h3 style="margin:0;">📦 Produk Unggulan</h3>
-        <a id="linkSemuaProduk" href="#" style="font-size:13px;font-weight:600;">Lihat Semua →</a>
+      <!-- SHARE BAR -->
+      <div class="share-bar">
+        <span class="share-label">Bagikan:</span>
+        <a id="shareIKMWA" href="#" target="_blank" class="share-btn wa">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <button id="copyLinkIKMBtn" class="share-btn copy" onclick="copyLinkIKM(this)">
+          📋 Salin Link
+        </button>
       </div>
-      <div id="gridProdukIKM" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
-        <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text2);">
-          <div class="spinner"></div>
+
+      <!-- INFO UTAMA -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <h3 style="margin-bottom:1rem;">📋 Informasi Usaha</h3>
+        <div id="infoUsaha"></div>
+      </div>
+
+      <!-- LOKASI -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <h3 style="margin-bottom:1rem;">📍 Lokasi Usaha</h3>
+        <div id="infoLokasi"></div>
+        <div id="mapKecil" style="height:200px;border-radius:var(--radius);margin-top:1rem;background:var(--cream2);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:13px;">
+          Koordinat GPS belum diisi
         </div>
       </div>
+
+      <!-- DESKRIPSI -->
+      <div class="card" id="cardDeskripsi" style="margin-bottom:1.2rem;display:none;">
+        <h3 style="margin-bottom:0.8rem;">📝 Deskripsi Usaha</h3>
+        <p id="deskripsiUsaha" style="font-size:14px;color:var(--text2);line-height:1.8;"></p>
+      </div>
+
+      <!-- KONTAK -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <h3 style="margin-bottom:1rem;">📞 Kontak</h3>
+        <div id="infoKontak"></div>
+      </div>
+
+      <!-- PRODUK -->
+      <div class="card" id="cardProduk">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+          <h3 style="margin:0;">📦 Produk Unggulan</h3>
+          <a id="linkSemuaProduk" href="#" style="font-size:13px;font-weight:600;">Lihat Semua →</a>
+        </div>
+        <div id="gridProdukIKM" class="produk-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text2);">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end kontenUtama -->
+
+    <!-- LOADING STATE -->
+    <div id="loadingArea" style="text-align:center;padding:4rem 2rem;">
+      <div class="spinner"></div>
+      <p style="color:var(--text2);margin-top:1rem;font-size:14px;">Memuat data IKM...</p>
     </div>
 
   </div>
@@ -150,39 +198,65 @@
   <script src="../js/ikm.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
 
     const ikonKategori = {
-      'Anyaman & Kerajinan': '🧺',
-      'Tenun Tradisional': '🧵',
-      'Makanan & Minuman': '🍽️',
-      'Kopi & Minuman Herbal': '☕',
-      'Fashion & Konveksi': '👗',
-      'Furniture & Kayu': '🪵',
-      'Perbengkelan': '🔧',
-      'Jasa & Lainnya': '🏢'
+      'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
+      'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
+      'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
     };
 
-    function rupiah(angka) {
-      return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    // ✅ PERBAIKAN: fungsi tampilError — tidak redirect, tampilkan pesan di halaman
+    function tampilError(judul, pesan) {
+      document.getElementById('loadingArea').style.display = 'none';
+      document.getElementById('kontenUtama').style.display = 'none';
+      document.getElementById('heroSection').style.display = 'none';
+      document.getElementById('errorJudul').textContent = judul;
+      document.getElementById('errorPesan').textContent = pesan;
+      document.getElementById('errorArea').style.display = 'block';
     }
 
     async function init() {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
-      if (!id) { window.location.href = 'data-ikm.html'; return; }
+
+      // ✅ PERBAIKAN: kalau tidak ada ID, tampilkan error di halaman — BUKAN redirect
+      if (!id) {
+        tampilError(
+          'ID IKM tidak ditemukan',
+          'Halaman ini membutuhkan ID IKM yang valid. Silakan kembali ke halaman Data IKM dan pilih IKM yang ingin dilihat.'
+        );
+        return;
+      }
 
       try {
         const { data: ikm, error } = await db.from('ikm').select('*').eq('id', id).single();
-        if (error || !ikm) throw new Error('IKM tidak ditemukan');
 
-        // Hero
+        // ✅ PERBAIKAN: kalau query error atau data kosong, tampilkan error — BUKAN redirect
+        if (error || !ikm) {
+          tampilError(
+            'IKM tidak ditemukan',
+            'Data IKM yang Anda cari tidak tersedia atau sudah dihapus dari sistem.'
+          );
+          return;
+        }
+
+        // Data berhasil dimuat — sembunyikan loading, tampilkan konten
+        document.getElementById('loadingArea').style.display = 'none';
+        document.getElementById('kontenUtama').style.display = 'block';
+
+        // Isi hero
         const ikon = ikonKategori[ikm.kategori] || '🏭';
         document.getElementById('heroIcon').textContent = ikon;
         if (ikm.foto_url) {
           document.getElementById('heroSection').innerHTML = `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">`;
         }
 
-        // Judul
+        // Isi judul & breadcrumb
         document.title = ikm.nama_usaha + ' — SIKAMBA MABAR';
         document.getElementById('namaUsaha').textContent = ikm.nama_usaha;
         document.getElementById('breadNama').textContent = ikm.nama_usaha;
@@ -192,26 +266,37 @@
           &nbsp;<span class="badge badge-kategori">${ikm.kategori}</span>
         `;
 
-        // Tombol aksi berdasarkan peran
-        const user = await getUser();
-        if (user) {
-          const profil = await getProfil(user.id);
-          const peran = profil?.peran || 'konsumen';
-          const bolehEdit =
-            peran === 'admin' ||
-            (peran === 'ikm' && profil?.ikm_id === ikm.id);
+        // Share WA
+        const sharePesan = encodeURIComponent(
+          `🏭 *${ikm.nama_usaha}*\n` +
+          `📦 ${ikm.kategori}\n` +
+          `📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}\n` +
+          (ikm.no_telp ? `📞 ${ikm.no_telp}\n` : '') +
+          `\nLihat selengkapnya: ${window.location.href}\n\n` +
+          `_Produk asli Manggarai Barat — SIKAMBA MABAR_`
+        );
+        const shareEl = document.getElementById('shareIKMWA');
+        if (shareEl) shareEl.href = `https://wa.me/?text=${sharePesan}`;
 
-          if (bolehEdit) {
-            const tombolHapus = peran === 'admin'
-              ? `<button class="btn btn-danger" onclick="hapusIKM('${ikm.id}', '${ikm.nama_usaha}')">🗑️ Hapus</button>`
-              : '';
-            document.getElementById('tombolAksi').innerHTML = `
-              <a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold">✏️ Edit IKM</a>
-              ${tombolHapus}
-            `;
+        // Tombol aksi (edit/hapus) — hanya untuk admin/pemilik IKM
+        try {
+          const user = await getUser();
+          if (user) {
+            const profil = await getProfil(user.id);
+            const peran = profil?.peran || 'konsumen';
+            const bolehEdit = peran === 'admin' || (peran === 'ikm' && profil?.ikm_id === ikm.id);
+            if (bolehEdit) {
+              const tombolHapus = peran === 'admin'
+                ? `<button class="btn btn-danger" onclick="hapusIKM('${ikm.id}', '${ikm.nama_usaha.replace(/'/g, "\\'")}')">🗑️ Hapus</button>`
+                : '';
+              document.getElementById('tombolAksi').innerHTML = `
+                <a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold">✏️ Edit IKM</a>
+                ${tombolHapus}
+              `;
+            }
           }
-
-
+        } catch(e) {
+          // Gagal cek user — tidak apa-apa, tombol aksi tidak tampil
         }
 
         // Info usaha
@@ -232,7 +317,7 @@
           <div class="info-row"><span class="info-key">Koordinat GPS</span><span class="info-val">${ikm.latitude && ikm.longitude ? ikm.latitude + ', ' + ikm.longitude : 'Belum diisi'}</span></div>
         `;
 
-        // Mini map jika ada GPS
+        // Mini map
         if (ikm.latitude && ikm.longitude) {
           document.getElementById('mapKecil').innerHTML = '';
           const miniMap = L.map('mapKecil').setView([ikm.latitude, ikm.longitude], 14);
@@ -249,23 +334,6 @@
           document.getElementById('deskripsiUsaha').textContent = ikm.deskripsi;
         }
 
-        // Load produk IKM
-        loadProdukIKM(ikm.id);
-
-        // Set share link (setelah semua data dimuat, elemen sudah pasti ada)
-        setTimeout(() => {
-          const sharePesanFinal = encodeURIComponent(
-            `🏭 *${ikm.nama_usaha}*\n` +
-            `📦 ${ikm.kategori}\n` +
-            `📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}\n` +
-            (ikm.no_telp ? `📞 ${ikm.no_telp}\n` : '') +
-            `\nLihat selengkapnya: ${window.location.href}\n\n` +
-            `_Produk asli Manggarai Barat — SIKAMBA MABAR_`
-          );
-          const shareElFinal = document.getElementById('shareIKMWA');
-          if (shareElFinal) shareElFinal.href = `https://wa.me/?text=${sharePesanFinal}`;
-        }, 500);
-
         // Kontak
         document.getElementById('infoKontak').innerHTML = `
           <div class="info-row"><span class="info-key">No. Telepon/WA</span><span class="info-val">
@@ -276,16 +344,16 @@
           <div class="info-row"><span class="info-key">Email</span><span class="info-val">${ikm.email || '-'}</span></div>
         `;
 
+        // Produk IKM
+        loadProdukIKM(ikm.id);
+
       } catch(e) {
+        // ✅ PERBAIKAN: error apapun tampil di halaman, tidak redirect
         console.error('Detail IKM error:', e);
-        // Hanya tampilkan error jika IKM memang tidak ditemukan
-        if (e.message && e.message.includes('tidak ditemukan')) {
-          document.getElementById('namaUsaha').textContent = 'IKM tidak ditemukan';
-        }
-        const infoEl = document.getElementById('infoUsaha');
-        if (infoEl && infoEl.querySelector('.spinner')) {
-          infoEl.innerHTML = `<p style="color:var(--red);">Gagal memuat data: ${e.message}</p>`;
-        }
+        tampilError(
+          'Gagal memuat data',
+          'Terjadi kesalahan saat memuat data IKM. Periksa koneksi internet Anda dan coba lagi. (' + e.message + ')'
+        );
       }
     }
 
@@ -297,26 +365,16 @@
       }).catch(() => {
         const el = document.createElement('input');
         el.value = window.location.href;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        btn.textContent = '✅ Link Disalin!';
+        document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+        btn.textContent = '✅ Disalin!';
         btn.classList.add('copied');
         setTimeout(() => { btn.textContent = '📋 Salin Link'; btn.classList.remove('copied'); }, 2500);
       });
     }
 
     async function hapusIKM(id, nama) {
-      const konfirmasi = confirm(
-        `⚠️ Hapus IKM "${nama}"?\n\nSemua data produk terkait juga akan terhapus.\nTindakan ini TIDAK bisa dibatalkan.`
-      );
-      if (!konfirmasi) return;
-
-      // Konfirmasi kedua untuk keamanan
-      const konfirmasi2 = confirm(`Ketik OK untuk konfirmasi hapus "${nama}" secara permanen.`);
-      if (!konfirmasi2) return;
-
+      if (!confirm(`⚠️ Hapus IKM "${nama}"?\n\nSemua data produk terkait juga akan terhapus.\nTindakan ini TIDAK bisa dibatalkan.`)) return;
+      if (!confirm(`Konfirmasi: hapus "${nama}" secara permanen?`)) return;
       try {
         const { error } = await db.from('ikm').delete().eq('id', id);
         if (error) throw error;
@@ -338,7 +396,7 @@
       }
       grid.innerHTML = data.map(p => `
         <div onclick="window.location.href='detail-produk.html?id=${p.id}'" style="background:var(--cream2);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
-          <div style="height:100px;background:linear-gradient(135deg,var(--brown),var(--gold));display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;">
+          <div style="height:90px;background:linear-gradient(135deg,var(--brown),var(--gold));display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;">
             ${p.foto_url ? `<img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover;">` : (ikonKat[p.kategori]||'📦')}
           </div>
           <div style="padding:8px;">
@@ -349,16 +407,16 @@
       `).join('');
     }
 
-    init();
+    // ✅ PERBAIKAN: pakai DOMContentLoaded agar semua script sudah siap sebelum init dijalankan
+    document.addEventListener('DOMContentLoaded', function() {
+      init();
+    });
   </script>
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('detail-ikm');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('detail-ikm');
     });
   </script>
 </body>
