@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6,10 +7,64 @@
   <title>Daftar Akun — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
+    /* ✅ BARU: password toggle area sentuh lebih besar */
     .pass-wrap { position: relative; margin-bottom: 0; }
-    .pass-wrap .form-input { padding-right: 44px; margin-bottom: 0; }
-    .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text2); font-size: 18px; padding: 4px; display: flex; align-items: center; }
+    .pass-wrap .form-input { padding-right: 52px; margin-bottom: 0; }
+    .pass-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 20px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      min-width: 40px;
+      min-height: 40px;
+      justify-content: center;
+    }
     .pass-toggle:hover { color: var(--brown); }
+
+    /* ✅ BARU: pilihan peran lebih visual dan mudah disentuh di HP */
+    .peran-pilihan {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.2rem;
+    }
+    .peran-option-card {
+      border: 2px solid rgba(61,31,13,0.15);
+      border-radius: var(--radius);
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--cream);
+      /* ✅ area sentuh cukup besar */
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .peran-option-card:hover { border-color: var(--gold); background: white; }
+    .peran-option-card.selected { border-color: var(--brown); background: var(--cream2); }
+    .peran-option-card .ikon { font-size: 26px; }
+    .peran-option-card .label { font-size: 12px; font-weight: 700; color: var(--text); }
+    .peran-option-card .desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+    /* hidden select tetap ada untuk submit form */
+    #peran { display: none; }
+
+    @media (max-width: 480px) {
+      .auth-card { border-radius: 16px; padding: 1.5rem 1.2rem; }
+      /* form-row jadi 1 kolom di HP kecil */
+      .form-row { grid-template-columns: 1fr !important; }
+    }
   </style>
 </head>
 <body>
@@ -24,37 +79,68 @@
 
       <div id="alertBox"></div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nama Lengkap</label>
-          <input type="text" id="nama" class="form-input" placeholder="Nama lengkap Anda">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Peran</label>
-          <select id="peran" class="form-select">
-            <option value="">-- Pilih Peran --</option>
-            <option value="ikm">Pelaku IKM</option>
-            <option value="konsumen">Konsumen / Pembeli</option>
-          </select>
-        </div>
-      </div>
+      <!-- Nama & Peran -->
       <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" id="email" class="form-input" placeholder="Masukkan email aktif">
+        <label class="form-label">Nama Lengkap *</label>
+        <input type="text" id="nama" class="form-input"
+          placeholder="Nama lengkap Anda"
+          autocomplete="name">
       </div>
+
+      <!-- ✅ BARU: pilihan peran pakai kartu visual, lebih mudah di HP -->
+      <div class="form-group">
+        <label class="form-label">Pilih Peran *</label>
+        <div class="peran-pilihan">
+          <div class="peran-option-card" id="cardIKM" onclick="pilihPeran('ikm')">
+            <span class="ikon">🏭</span>
+            <span class="label">Pelaku IKM</span>
+            <span class="desc">Daftarkan usaha & jual produk</span>
+          </div>
+          <div class="peran-option-card" id="cardKonsumen" onclick="pilihPeran('konsumen')">
+            <span class="ikon">🛍️</span>
+            <span class="label">Konsumen</span>
+            <span class="desc">Cari & beli produk lokal</span>
+          </div>
+        </div>
+        <!-- select tersembunyi untuk nilai form -->
+        <select id="peran">
+          <option value="">-- Pilih Peran --</option>
+          <option value="ikm">Pelaku IKM</option>
+          <option value="konsumen">Konsumen</option>
+        </select>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input type="email" id="email" class="form-input"
+          placeholder="Masukkan email aktif"
+          autocomplete="email"
+          inputmode="email">
+      </div>
+
+      <!-- Password -->
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Password</label>
+          <label class="form-label">Password *</label>
           <div class="pass-wrap">
-            <input type="password" id="password" class="form-input" placeholder="Min. 6 karakter">
-            <button class="pass-toggle" type="button" onclick="togglePass('password', this)" aria-label="Lihat password">👁️</button>
+            <input type="password" id="password" class="form-input"
+              placeholder="Min. 6 karakter"
+              autocomplete="new-password">
+            <button class="pass-toggle" type="button"
+              onclick="togglePass('password', this)"
+              aria-label="Lihat password">👁️</button>
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Konfirmasi Password</label>
+          <label class="form-label">Konfirmasi Password *</label>
           <div class="pass-wrap">
-            <input type="password" id="konfirmasi" class="form-input" placeholder="Ulangi password">
-            <button class="pass-toggle" type="button" onclick="togglePass('konfirmasi', this)" aria-label="Lihat konfirmasi password">👁️</button>
+            <input type="password" id="konfirmasi" class="form-input"
+              placeholder="Ulangi password"
+              autocomplete="new-password">
+            <button class="pass-toggle" type="button"
+              onclick="togglePass('konfirmasi', this)"
+              aria-label="Lihat konfirmasi">👁️</button>
           </div>
         </div>
       </div>
@@ -82,6 +168,13 @@
       const el = document.getElementById(id);
       if (el.type === 'password') { el.type = 'text'; btn.textContent = '🙈'; }
       else { el.type = 'password'; btn.textContent = '👁️'; }
+    }
+
+    // ✅ BARU: fungsi pilih peran pakai kartu visual
+    function pilihPeran(nilai) {
+      document.getElementById('peran').value = nilai;
+      document.getElementById('cardIKM').classList.toggle('selected', nilai === 'ikm');
+      document.getElementById('cardKonsumen').classList.toggle('selected', nilai === 'konsumen');
     }
 
     async function doDaftar() {
