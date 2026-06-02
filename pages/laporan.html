@@ -6,6 +6,8 @@
   <title>Laporan & Statistik — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="../css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Library SheetJS untuk ekspor Excel .xlsx -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     .stat-hero { background: var(--brown); padding: 1.8rem 0 2.5rem; }
 
@@ -104,7 +106,7 @@
         <h3 style="margin:0;">📋 Ringkasan per Kecamatan</h3>
         <!-- ✅ BARU: tombol ekspor dibungkus div untuk resize di HP -->
         <div class="ekspor-btn-wrap">
-          <button class="btn btn-secondary" onclick="eksporCSV()">⬇️ Ekspor CSV</button>
+          <button class="btn btn-secondary" onclick="eksporExcel()">⬇️ Ekspor Excel (.xlsx)</button>
         </div>
       </div>
       <!-- ✅ KUNCI: tabel dibungkus .table-wrap agar bisa scroll horizontal di HP -->
@@ -224,19 +226,120 @@
       `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text2);">Belum ada data</td></tr>';
     }
 
-    function eksporCSV() {
+    function eksporExcel() {
       if (!ikmData.length) { alert('Tidak ada data untuk diekspor.'); return; }
-      const header = ['Nama Usaha','Pemilik','Kategori','Kecamatan','Desa','Status','Tahun Berdiri','Tenaga Kerja','No. Telp'];
-      const rows = ikmData.map(i => [
-        i.nama_usaha, i.pemilik, i.kategori, i.kecamatan, i.desa,
-        i.status, i.tahun_berdiri||'', i.jumlah_tenaga_kerja||'', i.no_telp||''
-      ].map(v => `"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
-      const csv = [header.join(','), ...rows].join('\n');
-      const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `Data_IKM_SIKAMBA_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
+
+      // =============================================
+      // SHEET 1: Data IKM Lengkap
+      // Setiap baris = 1 IKM, kolom = detail IKM
+      // =============================================
+      const headerIKM = [
+        'No', 'Nama Usaha', 'Nama Pemilik', 'Kategori',
+        'Kecamatan', 'Desa/Kelurahan', 'Alamat Lengkap',
+        'Status', 'Tahun Berdiri', 'Tenaga Kerja',
+        'No. Telp / WhatsApp', 'Email'
+      ];
+
+      const rowsIKM = ikmData.map((ikm, idx) => [
+        idx + 1,
+        ikm.nama_usaha   || '-',
+        ikm.pemilik      || '-',
+        ikm.kategori     || '-',
+        ikm.kecamatan    || '-',
+        ikm.desa         || '-',
+        ikm.alamat       || '-',
+        ikm.status       || '-',
+        ikm.tahun_berdiri        || '-',
+        ikm.jumlah_tenaga_kerja  || '-',
+        ikm.no_telp      || '-',
+        ikm.email        || '-',
+      ]);
+
+      // Gabungkan header + rows jadi array 2 dimensi
+      const dataSheet1 = [headerIKM, ...rowsIKM];
+
+      // =============================================
+      // SHEET 2: Ringkasan per Kecamatan
+      // =============================================
+      const KECAMATAN_LIST = [
+        'Komodo','Boleng','Sano Nggoang','Mbeliling','Lembor',
+        'Lembor Selatan','Welak','Kuwus','Kuwus Barat',
+        'Pacar','Mancang Pacar','Ndoso'
+      ];
+
+      const headerRingkasan = [
+        'Kecamatan', 'Total IKM', 'IKM Aktif',
+        'IKM Menunggu', 'IKM Nonaktif', 'Total Produk'
+      ];
+
+      const rowsRingkasan = KECAMATAN_LIST.map(kec => {
+        const ikmKec    = ikmData.filter(i => i.kecamatan === kec);
+        const produkKec = produkData.filter(p => ikmKec.some(i => i.id === p.ikm_id));
+        return [
+          kec,
+          ikmKec.length,
+          ikmKec.filter(i => i.status === 'aktif').length,
+          ikmKec.filter(i => i.status === 'menunggu').length,
+          ikmKec.filter(i => i.status === 'nonaktif').length,
+          produkKec.length,
+        ];
+      }).filter(r => r[1] > 0); // Hanya tampilkan kecamatan yang ada IKM-nya
+
+      // Tambah baris total di akhir
+      rowsRingkasan.push([
+        'TOTAL',
+        ikmData.length,
+        ikmData.filter(i => i.status === 'aktif').length,
+        ikmData.filter(i => i.status === 'menunggu').length,
+        ikmData.filter(i => i.status === 'nonaktif').length,
+        produkData.length,
+      ]);
+
+      const dataSheet2 = [headerRingkasan, ...rowsRingkasan];
+
+      // =============================================
+      // BUAT FILE EXCEL pakai SheetJS
+      // =============================================
+      const wb = XLSX.utils.book_new(); // Buat workbook baru (= file Excel)
+
+      // Sheet 1 — Data IKM
+      const ws1 = XLSX.utils.aoa_to_sheet(dataSheet1);
+
+      // Atur lebar kolom Sheet 1 agar tidak terlalu sempit
+      ws1['!cols'] = [
+        { wch: 4  },  // No
+        { wch: 28 },  // Nama Usaha
+        { wch: 20 },  // Nama Pemilik
+        { wch: 22 },  // Kategori
+        { wch: 16 },  // Kecamatan
+        { wch: 20 },  // Desa
+        { wch: 30 },  // Alamat
+        { wch: 12 },  // Status
+        { wch: 13 },  // Tahun Berdiri
+        { wch: 14 },  // Tenaga Kerja
+        { wch: 18 },  // No. Telp
+        { wch: 24 },  // Email
+      ];
+
+      // Sheet 2 — Ringkasan
+      const ws2 = XLSX.utils.aoa_to_sheet(dataSheet2);
+
+      ws2['!cols'] = [
+        { wch: 18 },  // Kecamatan
+        { wch: 12 },  // Total IKM
+        { wch: 12 },  // Aktif
+        { wch: 16 },  // Menunggu
+        { wch: 14 },  // Nonaktif
+        { wch: 13 },  // Total Produk
+      ];
+
+      // Tambahkan kedua sheet ke workbook
+      XLSX.utils.book_append_sheet(wb, ws1, 'Data IKM');
+      XLSX.utils.book_append_sheet(wb, ws2, 'Ringkasan Kecamatan');
+
+      // Nama file pakai tanggal hari ini
+      const tgl = new Date().toISOString().slice(0, 10); // format: 2024-06-01
+      XLSX.writeFile(wb, `Data_IKM_SIKAMBA_MABAR_${tgl}.xlsx`);
     }
 
     async function init() {
