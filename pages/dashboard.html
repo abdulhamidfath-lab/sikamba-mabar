@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,98 +6,58 @@
   <title>Dashboard — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    body { background: var(--cream); display: flex; min-height: 100vh; flex-direction: column; }
+    /* =============================================
+       HANYA style khusus dashboard — bukan sidebar.
+       Sidebar sepenuhnya dihandle oleh sidebar.js
+       ============================================= */
 
-    /* === LAYOUT DENGAN SIDEBAR (khusus admin, desktop) === */
-    .app-layout { display: flex; flex: 1; }
-
-    /* === SIDEBAR (hanya admin, hanya desktop) === */
-    .sidebar {
-      width: 240px;
-      background: var(--brown);
-      min-height: 100vh;
-      flex-shrink: 0;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      z-index: 50;
-    }
-    .sidebar-logo {
-      padding: 1.5rem 1.2rem 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .sidebar-logo-icon { font-size: 24px; }
-    .sidebar-logo-text { color: white; font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; line-height: 1.3; }
-    .sidebar-logo-sub { color: rgba(255,255,255,0.55); font-size: 10px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 400; }
-    .sidebar-section { padding: 1rem 0.8rem 0.5rem; }
-    .sidebar-section-label { color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0 0.6rem; margin-bottom: 4px; }
-    .sidebar-link {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px; border-radius: 10px;
-      color: rgba(255,255,255,0.72); font-size: 13px; font-weight: 500;
-      text-decoration: none; transition: all 0.15s; margin-bottom: 2px; cursor: pointer;
-    }
-    .sidebar-link:hover { background: rgba(255,255,255,0.1); color: white; }
-    .sidebar-link.active { background: rgba(255,255,255,0.15); color: white; }
-    .sidebar-link .sicon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
-    .sidebar-link .sbadge {
-      margin-left: auto; background: var(--gold); color: white;
-      font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;
-    }
-    .sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 1rem; }
-    .sidebar-bottom { margin-top: auto; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
-    .sidebar-user { display: flex; align-items: center; gap: 10px; }
-    .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold-light); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .sidebar-user-name { color: white; font-size: 12px; font-weight: 600; }
-    .sidebar-user-role { color: rgba(255,255,255,0.5); font-size: 11px; }
-
-    /* === MAIN CONTENT === */
-    .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-
-    /* === HERO === */
+    /* HERO */
     .hero { background: linear-gradient(135deg, #2C1508, var(--brown-mid)); padding: 1.5rem 1.8rem 2rem; }
     .hero-greet { color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 3px; }
-    .hero-name { color: white; font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; }
+    .hero-name  { color: white; font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; }
 
-    /* === STATS === */
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; padding: 0 1.2rem; margin-top: -1rem; }
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      padding: 0 1.2rem;
+      margin-top: -1rem;
+    }
     .stat { background: white; border-radius: 14px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(61,31,13,0.08); }
     .stat-label { font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
-    .stat-num { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .stat-num   { font-size: 2rem; font-weight: 700; line-height: 1; }
 
-    /* === SLIDER PRODUK === */
+    /* SLIDER PRODUK */
     .section { padding: 1.2rem 1.2rem 0; }
-    .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .section-head  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .section-title { font-size: 15px; font-weight: 700; color: var(--text); }
-    .section-link { font-size: 12px; color: var(--gold); font-weight: 600; cursor: pointer; text-decoration: none; }
-    .slider-outer { overflow: hidden; border-radius: 14px; }
-    .slider-track { display: flex; gap: 10px; transition: transform 0.45s cubic-bezier(.4,0,.2,1); }
+    .section-link  { font-size: 12px; color: var(--gold); font-weight: 600; cursor: pointer; text-decoration: none; }
+    .slider-outer  { overflow: hidden; border-radius: 14px; }
+    .slider-track  { display: flex; gap: 10px; transition: transform 0.45s cubic-bezier(.4,0,.2,1); }
+
     .produk-slide { flex: 0 0 168px; background: white; border-radius: 14px; overflow: hidden; border: 1px solid rgba(61,31,13,0.07); cursor: pointer; }
-    .produk-foto { height: 118px; background: linear-gradient(135deg, var(--brown), var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 40px; overflow: hidden; }
+    .produk-foto  { height: 118px; background: linear-gradient(135deg, var(--brown), var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 40px; overflow: hidden; }
     .produk-foto img { width: 100%; height: 100%; object-fit: cover; }
-    .produk-body { padding: 10px; }
-    .produk-nama { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .produk-ikm  { font-size: 11px; color: var(--text2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .produk-body  { padding: 10px; }
+    .produk-nama  { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .produk-ikm   { font-size: 11px; color: var(--text2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .produk-harga { font-size: 13px; font-weight: 700; color: var(--brown); margin-top: 4px; }
+
+    /* DOTS */
     .dots { display: flex; justify-content: center; gap: 5px; margin-top: 8px; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(61,31,13,0.15); cursor: pointer; transition: all 0.2s; }
+    .dot  { width: 6px; height: 6px; border-radius: 50%; background: rgba(61,31,13,0.15); cursor: pointer; transition: all 0.2s; }
     .dot.active { background: var(--gold); width: 16px; border-radius: 3px; }
     .slide-nav { display: flex; gap: 6px; align-items: center; }
-    .slide-btn { width: 28px; height: 28px; border-radius: 50%; background: rgba(61,31,13,0.08); border: none; cursor: pointer; font-size: 15px; color: var(--brown); display: flex; align-items: center; justify-content: center; }
+    .slide-btn  { width: 28px; height: 28px; border-radius: 50%; background: rgba(61,31,13,0.08); border: none; cursor: pointer; font-size: 15px; color: var(--brown); display: flex; align-items: center; justify-content: center; }
     .slide-btn:hover { background: rgba(61,31,13,0.15); }
 
-    /* === IKM LIST === */
+    /* IKM LIST */
     .ikm-slide { background: white; border-radius: 14px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid rgba(61,31,13,0.07); cursor: pointer; margin-bottom: 8px; transition: box-shadow 0.2s; }
     .ikm-slide:hover { box-shadow: 0 2px 12px rgba(61,31,13,0.1); }
     .ikm-icon { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, var(--brown), var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 
-    /* === PANEL VERIFIKASI ADMIN === */
+    /* PANEL VERIFIKASI ADMIN */
     .panel-verif { background: white; border-radius: 14px; border: 2px solid var(--gold); overflow: hidden; }
     .panel-verif-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--cream2); }
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -109,34 +68,25 @@
     tbody tr:hover { background: var(--cream); }
     tbody td { padding: 10px 14px; font-size: 12px; }
 
-    /* === MENU CEPAT === */
+    /* MENU CEPAT */
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; padding: 1.2rem 1.2rem 0; }
     .menu-item { background: white; border-radius: 14px; padding: 14px 8px; text-align: center; cursor: pointer; border: 1px solid rgba(61,31,13,0.07); transition: box-shadow 0.2s; text-decoration: none; display: block; }
     .menu-item:hover { box-shadow: 0 2px 10px rgba(61,31,13,0.1); }
-    .menu-icon { font-size: 24px; margin-bottom: 5px; }
+    .menu-icon  { font-size: 24px; margin-bottom: 5px; }
     .menu-label { font-size: 11px; color: var(--text2); font-weight: 600; line-height: 1.3; }
-
-    /* === MOBILE SIDEBAR OVERLAY === */
-    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; }
-    .sidebar-overlay.open { display: block; }
-
-    @media (max-width: 768px) {
-      /* Sidebar admin di mobile jadi drawer dari kiri */
-      .sidebar {
-        display: none;
-        position: fixed;
-        left: 0; top: 0; bottom: 0;
-        z-index: 200;
-      }
-      .sidebar.open { display: flex; }
-    }
   </style>
 </head>
 <body>
 
-  <!-- ✅ BARU: Navbar standar — sama seperti halaman lain, bersih di mobile -->
+  <!-- =============================================
+       NAVBAR — sama seperti halaman lain
+       Sidebar admin diinject otomatis oleh sidebar.js
+       ============================================= -->
   <nav class="navbar">
-    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;"><img src="../images/logo-mabar.png" alt="Logo Mabar" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;"> <span>SIKAMBA MABAR</span></a>
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">
+      <img src="../images/logo-mabar.png" alt="Logo Mabar" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+      <span>SIKAMBA MABAR</span>
+    </a>
     <form class="navbar-search" onsubmit="goSearch(event)">
       <input type="text" class="navbar-search-input" placeholder="🔍 Cari IKM atau produk..." id="navSearch">
       <button type="submit" class="navbar-search-btn">Cari</button>
@@ -155,7 +105,7 @@
   </nav>
   <div class="batik-strip"></div>
 
-  <!-- ✅ BARU: Mobile search bar di bawah navbar -->
+  <!-- Search bar khusus HP -->
   <div class="mobile-search-bar">
     <form onsubmit="goMobileSearch(event)">
       <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
@@ -163,157 +113,124 @@
     </form>
   </div>
 
-  <!-- Sidebar overlay untuk mobile (admin) -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <!-- =============================================
+       KONTEN UTAMA DASHBOARD
+       ============================================= -->
 
-  <div class="app-layout">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-greet">Selamat datang,</div>
+    <div class="hero-name" id="namaUser">Memuat...</div>
+    <div id="peranUser" style="margin-top:6px;"></div>
+  </div>
 
-    <!-- ===== SIDEBAR ADMIN (desktop) ===== -->
-    <aside class="sidebar" id="sidebar" style="display:none;">
-      <div class="sidebar-logo">
-        <img src="../images/logo-mabar.png" alt="Logo" style="width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0;">
-        <div>
-          <div class="sidebar-logo-text">SIKAMBA MABAR</div>
-          <div class="sidebar-logo-sub">Dinas Perindustrian & Perdagangan</div>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">🏭 IKM Terdaftar</div>
+      <div class="stat-num" style="color:var(--blue);" id="statIKM">–</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">📦 Produk Lokal</div>
+      <div class="stat-num" style="color:var(--green);" id="statProduk">–</div>
+    </div>
+    <div class="stat" id="stat3" style="display:none;">
+      <div class="stat-label" id="statLabel3">⏳ Menunggu</div>
+      <div class="stat-num" style="color:var(--orange);" id="statNum3">–</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">📍 Kecamatan</div>
+      <div class="stat-num" style="color:#7B5EA7;">12</div>
+    </div>
+  </div>
+
+  <!-- PANEL VERIFIKASI (khusus admin) -->
+  <div class="section" id="panelVerifikasiWrap" style="display:none;">
+    <div class="panel-verif" id="panelVerif">
+      <div class="panel-verif-head">
+        <span style="font-size:14px;font-weight:700;color:var(--text);">⏳ IKM Menunggu Verifikasi</span>
+        <span class="badge badge-menunggu" id="jumlahMenunggu" style="font-size:12px;padding:4px 10px;">0 IKM</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Usaha</th>
+              <th>Kategori</th>
+              <th>Kecamatan</th>
+              <th>Tanggal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tabelMenunggu">
+            <tr><td colspan="5" style="text-align:center;padding:1.5rem;"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDER PRODUK UNGGULAN -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-title">🛍️ Produk Unggulan</span>
+      <div class="slide-nav">
+        <button class="slide-btn" onclick="slideProduk(-1)">‹</button>
+        <button class="slide-btn" onclick="slideProduk(1)">›</button>
+        <a href="marketplace.html" class="section-link">Lihat semua</a>
+      </div>
+    </div>
+    <div class="slider-outer">
+      <div class="slider-track" id="trackProduk">
+        <div style="padding:2rem;text-align:center;color:var(--text2);font-size:13px;width:100%;">
+          <div class="spinner"></div>
         </div>
       </div>
-      <div class="sidebar-section">
-        <div class="sidebar-section-label">Utama</div>
-        <a href="dashboard.html" class="sidebar-link active"><span class="sicon">🏠</span>Dashboard</a>
-        <a href="data-ikm.html" class="sidebar-link"><span class="sicon">🏭</span>Data IKM</a>
-        <a href="peta.html" class="sidebar-link"><span class="sicon">🗺️</span>Peta Industri</a>
-        <a href="marketplace.html" class="sidebar-link"><span class="sicon">🛍️</span>Marketplace</a>
-        <a href="cari.html" class="sidebar-link"><span class="sicon">🔍</span>Pencarian</a>
-      </div>
-      <hr class="sidebar-divider">
-      <div class="sidebar-section">
-        <div class="sidebar-section-label">Administrasi</div>
-        <a href="laporan.html" class="sidebar-link"><span class="sicon">📊</span>Laporan & Statistik</a>
-        <a href="manajemen-pengguna.html" class="sidebar-link"><span class="sicon">👥</span>Manajemen Pengguna</a>
-        <a id="sidebarVerifLink" href="#" class="sidebar-link" onclick="scrollToVerif()">
-          <span class="sicon">⏳</span>Verifikasi IKM
-          <span class="sbadge" id="sidebarBadge" style="display:none;">0</span>
-        </a>
-      </div>
-      <hr class="sidebar-divider">
-      <div class="sidebar-section">
-        <div class="sidebar-section-label">Akun</div>
-        <a href="profil.html" class="sidebar-link"><span class="sicon">👤</span>Profil Saya</a>
-        <a href="tentang.html" class="sidebar-link"><span class="sicon">ℹ️</span>Tentang SIKAMBA</a>
-        <a href="#" class="sidebar-link" onclick="logout()"><span class="sicon">🚪</span>Keluar</a>
-      </div>
-      <div class="sidebar-bottom">
-        <div class="sidebar-user">
-          <div class="sidebar-avatar">👑</div>
-          <div>
-            <div class="sidebar-user-name" id="sidebarNama">Admin</div>
-            <div class="sidebar-user-role">Administrator</div>
-          </div>
-        </div>
-      </div>
-    </aside>
+    </div>
+    <div class="dots" id="dotsProduk"></div>
+  </div>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <div class="main-content">
+  <!-- IKM TERBARU -->
+  <div class="section" style="margin-top:0.5rem;">
+    <div class="section-head">
+      <span class="section-title">🏭 IKM Terbaru</span>
+      <a href="data-ikm.html" class="section-link">Lihat semua</a>
+    </div>
+    <div id="listIKM">
+      <div style="text-align:center;padding:2rem;"><div class="spinner"></div></div>
+    </div>
+  </div>
 
-      <!-- HERO -->
-      <div class="hero">
-        <div class="hero-greet">Selamat datang,</div>
-        <div class="hero-name" id="namaUser">Memuat...</div>
-        <div id="peranUser" style="margin-top:6px;"></div>
-      </div>
+  <!-- MENU CEPAT -->
+  <div class="menu-grid" id="menuGrid">
+    <a href="data-ikm.html"   class="menu-item"><div class="menu-icon">📊</div><div class="menu-label">Data IKM</div></a>
+    <a href="peta.html"       class="menu-item"><div class="menu-icon">🗺️</div><div class="menu-label">Peta Industri</div></a>
+    <a href="marketplace.html" class="menu-item"><div class="menu-icon">🛍️</div><div class="menu-label">Marketplace</div></a>
+    <a href="profil.html"     class="menu-item"><div class="menu-icon">👤</div><div class="menu-label">Profil Saya</div></a>
+  </div>
 
-      <!-- STATS -->
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">🏭 IKM Terdaftar</div>
-          <div class="stat-num" style="color:var(--blue);" id="statIKM">–</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">📦 Produk Lokal</div>
-          <div class="stat-num" style="color:var(--green);" id="statProduk">–</div>
-        </div>
-        <div class="stat" id="stat3" style="display:none;">
-          <div class="stat-label" id="statLabel3">⏳ Menunggu</div>
-          <div class="stat-num" style="color:var(--orange);" id="statNum3">–</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">📍 Kecamatan</div>
-          <div class="stat-num" style="color:#7B5EA7;">12</div>
-        </div>
-      </div>
+  <div style="height:2rem;"></div>
 
-      <!-- PANEL VERIFIKASI ADMIN -->
-      <div class="section" id="panelVerifikasiWrap" style="display:none;">
-        <div class="panel-verif" id="panelVerif">
-          <div class="panel-verif-head">
-            <span style="font-size:14px;font-weight:700;color:var(--text);">⏳ IKM Menunggu Verifikasi</span>
-            <span class="badge badge-menunggu" id="jumlahMenunggu" style="font-size:12px;padding:4px 10px;">0 IKM</span>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Nama Usaha</th><th>Kategori</th><th>Kecamatan</th><th>Tanggal</th><th>Aksi</th></tr></thead>
-              <tbody id="tabelMenunggu">
-                <tr><td colspan="5" style="text-align:center;padding:1.5rem;"><div class="spinner"></div></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+  <footer style="background:var(--brown);color:rgba(255,255,255,0.7);text-align:center;padding:1.2rem;font-size:12px;margin-top:auto;">
+    <strong style="color:white;">SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2026
+  </footer>
 
-      <!-- SLIDER PRODUK -->
-      <div class="section">
-        <div class="section-head">
-          <span class="section-title">🛍️ Produk Unggulan</span>
-          <div class="slide-nav">
-            <button class="slide-btn" onclick="slideProduk(-1)">‹</button>
-            <button class="slide-btn" onclick="slideProduk(1)">›</button>
-            <a href="marketplace.html" class="section-link">Lihat semua</a>
-          </div>
-        </div>
-        <div class="slider-outer">
-          <div class="slider-track" id="trackProduk">
-            <div style="padding:2rem;text-align:center;color:var(--text2);font-size:13px;width:100%;"><div class="spinner"></div></div>
-          </div>
-        </div>
-        <div class="dots" id="dotsProduk"></div>
-      </div>
-
-      <!-- IKM TERBARU -->
-      <div class="section" style="margin-top:0.5rem;">
-        <div class="section-head">
-          <span class="section-title">🏭 IKM Terbaru</span>
-          <a href="data-ikm.html" class="section-link">Lihat semua</a>
-        </div>
-        <div id="listIKM"><div style="text-align:center;padding:2rem;"><div class="spinner"></div></div></div>
-      </div>
-
-      <!-- MENU CEPAT -->
-      <div class="menu-grid" id="menuGrid">
-        <a href="data-ikm.html" class="menu-item"><div class="menu-icon">📊</div><div class="menu-label">Data IKM</div></a>
-        <a href="peta.html" class="menu-item"><div class="menu-icon">🗺️</div><div class="menu-label">Peta Industri</div></a>
-        <a href="marketplace.html" class="menu-item"><div class="menu-icon">🛍️</div><div class="menu-label">Marketplace</div></a>
-        <a href="profil.html" class="menu-item"><div class="menu-icon">👤</div><div class="menu-label">Profil Saya</div></a>
-      </div>
-
-      <div style="height:2rem;"></div>
-      <footer style="background:var(--brown);color:rgba(255,255,255,0.7);text-align:center;padding:1.2rem;font-size:12px;margin-top:auto;">
-        <strong style="color:white;">SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2026
-      </footer>
-
-    </div><!-- end main-content -->
-  </div><!-- end app-layout -->
-
+  <!-- =============================================
+       SCRIPTS
+       ============================================= -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
   <script>
-    const ikonKat = {'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️','Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵','Perbengkelan':'🔧','Jasa & Lainnya':'🏢'};
+    /* ---- Helper ---- */
+    const ikonKat = {
+      'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
+      'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
+      'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
+    };
     function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
-
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
-
     function goSearch(e) {
       e.preventDefault();
       const q = document.getElementById('navSearch').value.trim();
@@ -325,21 +242,7 @@
       if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
     }
 
-    // Sidebar admin mobile
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('open');
-      document.getElementById('sidebarOverlay').classList.toggle('open');
-    }
-    function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('sidebarOverlay').classList.remove('open');
-    }
-    function scrollToVerif() {
-      closeSidebar();
-      document.getElementById('panelVerif')?.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Slider produk
+    /* ---- Slider produk ---- */
     let produkList = [], produkIdx = 0;
     const CARD_W = 178;
     let autoTimer;
@@ -347,20 +250,23 @@
     function renderProdukSlider(data) {
       produkList = data;
       const track = document.getElementById('trackProduk');
-      const dots = document.getElementById('dotsProduk');
+      const dots  = document.getElementById('dotsProduk');
       if (!data.length) {
         track.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text2);font-size:13px;width:100%;">Belum ada produk.</div>';
         return;
       }
       track.innerHTML = data.map(p => `
         <div class="produk-slide" onclick="window.location.href='detail-produk.html?id=${p.id}'">
-          <div class="produk-foto">${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}">` : (ikonKat[p.kategori]||'📦')}</div>
+          <div class="produk-foto">
+            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}">` : (ikonKat[p.kategori]||'📦')}
+          </div>
           <div class="produk-body">
             <div class="produk-nama">${p.nama_produk}</div>
             <div class="produk-ikm">${p.ikm?.nama_usaha||''}</div>
             <div class="produk-harga">${rupiah(p.harga)}</div>
           </div>
         </div>`).join('');
+
       const maxDots = Math.max(1, data.length - 2);
       dots.innerHTML = Array.from({length: maxDots}, (_, i) =>
         `<div class="dot ${i===0?'active':''}" onclick="goToProduk(${i})"></div>`).join('');
@@ -385,10 +291,13 @@
       autoTimer = setInterval(() => slideProduk(1), 3500);
     }
 
-    // IKM list
+    /* ---- IKM list ---- */
     function renderIKMList(data) {
       const el = document.getElementById('listIKM');
-      if (!data.length) { el.innerHTML = '<div style="text-align:center;color:var(--text2);padding:1.5rem;font-size:13px;">Belum ada IKM terdaftar.</div>'; return; }
+      if (!data.length) {
+        el.innerHTML = '<div style="text-align:center;color:var(--text2);padding:1.5rem;font-size:13px;">Belum ada IKM terdaftar.</div>';
+        return;
+      }
       el.innerHTML = data.slice(0,5).map(ikm => `
         <div class="ikm-slide" onclick="window.location.href='detail-ikm.html?id=${ikm.id}'">
           <div class="ikm-icon">${ikonKat[ikm.kategori]||'🏭'}</div>
@@ -400,17 +309,19 @@
         </div>`).join('');
     }
 
-    // Verifikasi admin
+    /* ---- Verifikasi admin ---- */
     async function loadMenunggu() {
       document.getElementById('panelVerifikasiWrap').style.display = 'block';
       const { data } = await db.from('ikm').select('*').eq('status','menunggu').order('created_at',{ascending:false});
       const jumlah = data?.length || 0;
       document.getElementById('jumlahMenunggu').textContent = jumlah + ' IKM';
       document.getElementById('statNum3').textContent = jumlah;
-      const badge = document.getElementById('sidebarBadge');
-      if (jumlah > 0) { badge.textContent = jumlah; badge.style.display = 'inline'; }
+
       const tbody = document.getElementById('tabelMenunggu');
-      if (!jumlah) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:1.5rem;">✅ Tidak ada yang menunggu</td></tr>'; return; }
+      if (!jumlah) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:1.5rem;">✅ Tidak ada yang menunggu</td></tr>';
+        return;
+      }
       tbody.innerHTML = data.map(ikm => {
         const tgl = new Date(ikm.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
         return `<tr id="row-${ikm.id}">
@@ -420,7 +331,7 @@
           <td style="font-size:11px;color:var(--text2);">${tgl}</td>
           <td><div style="display:flex;gap:5px;">
             <button class="btn btn-primary" style="padding:4px 10px;font-size:11px;" onclick="verifikasi('${ikm.id}','aktif')">✅ Approve</button>
-            <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="verifikasi('${ikm.id}','nonaktif')">❌ Tolak</button>
+            <button class="btn btn-danger"  style="padding:4px 10px;font-size:11px;" onclick="verifikasi('${ikm.id}','nonaktif')">❌ Tolak</button>
           </div></td>
         </tr>`;
       }).join('');
@@ -434,8 +345,6 @@
       const sisa = document.querySelectorAll('#tabelMenunggu tr[id]').length;
       document.getElementById('jumlahMenunggu').textContent = sisa + ' IKM';
       document.getElementById('statNum3').textContent = sisa;
-      const badge = document.getElementById('sidebarBadge');
-      if (sisa > 0) badge.textContent = sisa; else badge.style.display = 'none';
       loadStatistik();
       alert(status==='aktif'?'✅ IKM di-approve!':'❌ IKM ditolak.');
     }
@@ -448,11 +357,12 @@
       } catch(e) {}
     }
 
+    /* ---- Init utama ---- */
     async function init() {
-      const user = await requireLogin();
+      const user   = await requireLogin();
       const profil = await getProfil(user.id);
-      const peran = profil?.peran || 'konsumen';
-      const nama = profil?.nama_lengkap || user.email;
+      const peran  = profil?.peran || 'konsumen';
+      const nama   = profil?.nama_lengkap || user.email;
 
       document.getElementById('namaUser').textContent = nama;
       const warna = {admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu'};
@@ -461,41 +371,38 @@
 
       loadStatistik();
 
-      // Load produk
+      /* Load produk slider */
       try {
-        const { data: produk } = await db.from('produk').select('*, ikm:ikm_id(nama_usaha)').eq('aktif',true).order('created_at',{ascending:false}).limit(10);
+        const { data: produk } = await db.from('produk')
+          .select('*, ikm:ikm_id(nama_usaha)')
+          .eq('aktif',true)
+          .order('created_at',{ascending:false})
+          .limit(10);
         renderProdukSlider(produk||[]);
       } catch(e) {}
 
-      // Load IKM
+      /* Load IKM list */
       try {
         const { data: ikm } = await db.from('ikm').select('*').order('created_at',{ascending:false}).limit(5);
         renderIKMList(ikm||[]);
       } catch(e) {}
 
-      // Tampilkan menu admin di navbar
-      if (peran === 'admin' || peran === 'ikm') {
-        document.getElementById('navLaporan').style.display = peran === 'admin' ? 'block' : 'none';
-        document.getElementById('navPengguna').style.display = peran === 'admin' ? 'block' : 'none';
+      /* Tampilkan menu admin di navbar */
+      if (peran === 'admin') {
+        document.getElementById('navLaporan').style.display = 'block';
+        document.getElementById('navPengguna').style.display = 'block';
       }
 
-      // ===== SETUP PER PERAN =====
+      /* Setup tambahan per peran */
       if (peran === 'admin') {
-        // Aktifkan sidebar admin (desktop)
-        const sidebar = document.getElementById('sidebar');
-        sidebar.style.display = 'flex';
-        document.getElementById('sidebarNama').textContent = nama;
-        // Stat menunggu
         document.getElementById('stat3').style.display = 'block';
         document.getElementById('statLabel3').textContent = '⏳ Menunggu';
-        // Load verifikasi
         loadMenunggu();
-        // Menu cepat admin
         document.getElementById('menuGrid').innerHTML += `
-          <a href="form-ikm.html" class="menu-item"><div class="menu-icon">➕</div><div class="menu-label">Tambah IKM</div></a>
-          <a href="produk-saya.html" class="menu-item"><div class="menu-icon">📦</div><div class="menu-label">Produk</div></a>
-          <a href="laporan.html" class="menu-item"><div class="menu-icon">📊</div><div class="menu-label">Laporan</div></a>
-          <a href="manajemen-pengguna.html" class="menu-item"><div class="menu-icon">👥</div><div class="menu-label">Pengguna</div></a>`;
+          <a href="form-ikm.html"             class="menu-item"><div class="menu-icon">➕</div><div class="menu-label">Tambah IKM</div></a>
+          <a href="produk-saya.html"          class="menu-item"><div class="menu-icon">📦</div><div class="menu-label">Produk</div></a>
+          <a href="laporan.html"              class="menu-item"><div class="menu-icon">📊</div><div class="menu-label">Laporan</div></a>
+          <a href="manajemen-pengguna.html"   class="menu-item"><div class="menu-icon">👥</div><div class="menu-label">Pengguna</div></a>`;
 
       } else if (peran === 'ikm') {
         document.getElementById('stat3').style.display = 'block';
@@ -505,12 +412,27 @@
           document.getElementById('statNum3').textContent = stats.totalProduk;
         } catch(e) {}
         document.getElementById('menuGrid').innerHTML += `
-          <a href="form-ikm.html" class="menu-item"><div class="menu-icon">➕</div><div class="menu-label">Tambah IKM</div></a>
+          <a href="form-ikm.html"    class="menu-item"><div class="menu-icon">➕</div><div class="menu-label">Tambah IKM</div></a>
           <a href="produk-saya.html" class="menu-item"><div class="menu-icon">📦</div><div class="menu-label">Produk Saya</div></a>`;
       }
     }
 
     init();
   </script>
+
+  <!-- =============================================
+       SIDEBAR ADMIN — diinject otomatis oleh sidebar.js
+       Hanya muncul kalau peran = admin
+       ============================================= -->
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initAdminSidebar === 'function') {
+        initAdminSidebar('dashboard');
+      }
+    });
+  </script>
+
 </body>
 </html>
+ENDOFFILE
