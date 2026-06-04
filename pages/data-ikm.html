@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -23,18 +22,13 @@
     .ikm-lokasi { font-size:12px; color:var(--text2); }
     .empty-state { text-align:center; padding:4rem 2rem; color:var(--text2); }
     .empty-state div { font-size:48px; margin-bottom:1rem; }
-
-    /* ✅ BARU: tombol aksi card — jadi full-width di HP */
     .ikm-actions { display:flex; gap:8px; margin-top:12px; }
     .ikm-actions .btn { flex:1; font-size:12px; padding:8px 10px; min-height:40px; }
-    /* Tombol hapus tidak ikut flex:1 agar tidak terlalu lebar */
     .ikm-actions .btn-hapus { flex:0 0 auto; padding:8px 12px; }
 
-    /* ✅ BARU: grid 1 kolom di HP agar kartu tidak terlalu sempit */
     @media (max-width: 640px) {
       .ikm-grid { grid-template-columns: 1fr; }
       .ikm-foto { height: 160px; }
-      /* filter jadi vertikal di HP */
       .filter-bar { flex-direction: column; align-items: stretch; }
       .search-input { min-width: unset; font-size: 16px; }
     }
@@ -68,7 +62,6 @@
   </nav>
   <div class="batik-strip"></div>
 
-  <!-- ✅ BARU: Search bar khusus HP -->
   <div class="mobile-search-bar">
     <form onsubmit="goMobileSearch(event)">
       <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
@@ -82,10 +75,11 @@
       <div id="tombolTambah"></div>
     </div>
 
-    <!-- Filter -->
+    <!-- Alert box untuk notifikasi -->
+    <div id="alertBox"></div>
+
     <div class="filter-bar">
       <input type="text" class="search-input" id="searchInput" placeholder="🔍 Cari nama usaha, pemilik, atau desa...">
-      <!-- ✅ BARU: filter select dalam baris sendiri agar rapi di HP -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%;">
         <select class="form-select" id="filterKategori" style="flex:1;min-width:140px;margin-bottom:0;">
           <option value="">Semua Kategori</option>
@@ -136,6 +130,7 @@
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
+  <script src="../js/utils.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
     function goMobileSearch(e) {
@@ -192,7 +187,6 @@
             </div>
             <div class="ikm-lokasi">📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}</div>
             ${ikm.no_telp ? `<div class="ikm-lokasi" style="margin-top:4px;">📞 ${ikm.no_telp}</div>` : ''}
-            <!-- ✅ BARU: tombol pakai class ikm-actions agar responsive -->
             <div class="ikm-actions">
               <a href="detail-ikm.html?id=${ikm.id}" class="btn btn-secondary">Lihat Detail</a>
               ${bisaEdit(ikm) ? `<a href="form-ikm.html?id=${ikm.id}" class="btn btn-gold">✏️ Edit</a>` : ''}
@@ -249,17 +243,24 @@
       }
     }
 
+    // ✅ DIPERBARUI: pakai showConfirm() dan showAlert() — tidak lagi pakai confirm() dan alert()
     async function hapusIKM(id, nama) {
-      const konfirmasi = confirm(`⚠️ Hapus IKM "${nama}"?\n\nTindakan ini TIDAK bisa dibatalkan.`);
-      if (!konfirmasi) return;
+      const yakin = await showConfirm({
+        judul: 'Hapus IKM?',
+        pesan: `Data IKM <strong>"${nama}"</strong> akan dihapus permanen dan tidak bisa dikembalikan.`,
+        tipe: 'danger',
+        labelYa: '🗑️ Ya, Hapus'
+      });
+      if (!yakin) return;
+
       try {
         const { error } = await db.from('ikm').delete().eq('id', id);
         if (error) throw error;
         semuaIKM = semuaIKM.filter(i => i.id !== id);
         filter();
-        alert('✅ Data IKM berhasil dihapus.');
+        showAlert('Data IKM berhasil dihapus.', 'success');
       } catch(e) {
-        alert('Gagal menghapus: ' + e.message);
+        showAlert('Gagal menghapus: ' + e.message, 'error');
       }
     }
 
