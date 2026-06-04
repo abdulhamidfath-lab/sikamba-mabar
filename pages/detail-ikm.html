@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -100,7 +99,10 @@
       <span id="breadNama">Detail IKM</span>
     </div>
 
-    <!-- ✅ BARU: area error — tersembunyi dulu, tampil kalau ada masalah -->
+    <!-- Alert box — untuk pesan sukses/error hapus -->
+    <div id="alertBox"></div>
+
+    <!-- Area error -->
     <div id="errorArea" style="display:none;">
       <div class="card" style="text-align:center;padding:3rem 2rem;">
         <div style="font-size:56px;margin-bottom:1rem;">😕</div>
@@ -112,7 +114,7 @@
       </div>
     </div>
 
-    <!-- KONTEN UTAMA — tersembunyi dulu sampai data berhasil dimuat -->
+    <!-- KONTEN UTAMA -->
     <div id="kontenUtama" style="display:none;">
 
       <!-- HEADER IKM -->
@@ -196,6 +198,7 @@
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
+  <script src="../js/utils.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
     function goMobileSearch(e) {
@@ -210,7 +213,6 @@
       'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
     };
 
-    // ✅ PERBAIKAN: fungsi tampilError — tidak redirect, tampilkan pesan di halaman
     function tampilError(judul, pesan) {
       document.getElementById('loadingArea').style.display = 'none';
       document.getElementById('kontenUtama').style.display = 'none';
@@ -224,7 +226,6 @@
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
 
-      // ✅ PERBAIKAN: kalau tidak ada ID, tampilkan error di halaman — BUKAN redirect
       if (!id) {
         tampilError(
           'ID IKM tidak ditemukan',
@@ -236,7 +237,6 @@
       try {
         const { data: ikm, error } = await db.from('ikm').select('*').eq('id', id).single();
 
-        // ✅ PERBAIKAN: kalau query error atau data kosong, tampilkan error — BUKAN redirect
         if (error || !ikm) {
           tampilError(
             'IKM tidak ditemukan',
@@ -245,18 +245,15 @@
           return;
         }
 
-        // Data berhasil dimuat — sembunyikan loading, tampilkan konten
         document.getElementById('loadingArea').style.display = 'none';
         document.getElementById('kontenUtama').style.display = 'block';
 
-        // Isi hero
         const ikon = ikonKategori[ikm.kategori] || '🏭';
         document.getElementById('heroIcon').textContent = ikon;
         if (ikm.foto_url) {
           document.getElementById('heroSection').innerHTML = `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">`;
         }
 
-        // Isi judul & breadcrumb
         document.title = ikm.nama_usaha + ' — SIKAMBA MABAR';
         document.getElementById('namaUsaha').textContent = ikm.nama_usaha;
         document.getElementById('breadNama').textContent = ikm.nama_usaha;
@@ -278,7 +275,7 @@
         const shareEl = document.getElementById('shareIKMWA');
         if (shareEl) shareEl.href = `https://wa.me/?text=${sharePesan}`;
 
-        // Tombol aksi (edit/hapus) — hanya untuk admin/pemilik IKM
+        // Tombol aksi edit/hapus
         try {
           const user = await getUser();
           if (user) {
@@ -295,9 +292,7 @@
               `;
             }
           }
-        } catch(e) {
-          // Gagal cek user — tidak apa-apa, tombol aksi tidak tampil
-        }
+        } catch(e) {}
 
         // Info usaha
         document.getElementById('infoUsaha').innerHTML = `
@@ -348,7 +343,6 @@
         loadProdukIKM(ikm.id);
 
       } catch(e) {
-        // ✅ PERBAIKAN: error apapun tampil di halaman, tidak redirect
         console.error('Detail IKM error:', e);
         tampilError(
           'Gagal memuat data',
@@ -372,16 +366,23 @@
       });
     }
 
+    // ✅ DIPERBARUI: pakai showConfirm() dan showAlert() — tidak lagi dobel confirm()
     async function hapusIKM(id, nama) {
-      if (!confirm(`⚠️ Hapus IKM "${nama}"?\n\nSemua data produk terkait juga akan terhapus.\nTindakan ini TIDAK bisa dibatalkan.`)) return;
-      if (!confirm(`Konfirmasi: hapus "${nama}" secara permanen?`)) return;
+      const yakin = await showConfirm({
+        judul: 'Hapus IKM?',
+        pesan: `Data IKM <strong>"${nama}"</strong> dan semua produk terkait akan dihapus permanen dan tidak bisa dikembalikan.`,
+        tipe: 'danger',
+        labelYa: '🗑️ Ya, Hapus Permanen'
+      });
+      if (!yakin) return;
+
       try {
         const { error } = await db.from('ikm').delete().eq('id', id);
         if (error) throw error;
-        alert('✅ Data IKM berhasil dihapus.');
-        window.location.href = 'data-ikm.html';
+        showAlert('Data IKM berhasil dihapus. Mengalihkan...', 'success', 'alertBox', 2000);
+        setTimeout(() => window.location.href = 'data-ikm.html', 2000);
       } catch(e) {
-        alert('Gagal menghapus: ' + e.message);
+        showAlert('Gagal menghapus: ' + e.message, 'error');
       }
     }
 
@@ -407,7 +408,6 @@
       `).join('');
     }
 
-    // ✅ PERBAIKAN: pakai DOMContentLoaded agar semua script sudah siap sebelum init dijalankan
     document.addEventListener('DOMContentLoaded', function() {
       init();
     });
