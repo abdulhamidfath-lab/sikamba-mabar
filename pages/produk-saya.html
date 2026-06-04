@@ -54,6 +54,9 @@
       <a href="form-produk.html" class="btn btn-primary">➕ Tambah Produk</a>
     </div>
 
+    <!-- Alert box untuk notifikasi -->
+    <div id="alertBox"></div>
+
     <div class="produk-grid" id="produkGrid">
       <div style="grid-column:1/-1;text-align:center;padding:3rem;">
         <div class="spinner"></div>
@@ -70,6 +73,7 @@
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
+  <script src="../js/utils.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
@@ -81,12 +85,23 @@
 
     function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
 
+    // ✅ DIPERBARUI: pakai showConfirm() dan showAlert()
     async function hapusProduk(id, nama) {
-      if (!confirm(`Hapus produk "${nama}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+      const yakin = await showConfirm({
+        judul: 'Hapus Produk?',
+        pesan: `Produk <strong>"${nama}"</strong> akan dihapus permanen dan tidak bisa dikembalikan.`,
+        tipe: 'danger',
+        labelYa: '🗑️ Ya, Hapus'
+      });
+      if (!yakin) return;
+
       const { error } = await db.from('produk').delete().eq('id', id);
-      if (error) { alert('Gagal: ' + error.message); return; }
+      if (error) {
+        showAlert('Gagal menghapus: ' + error.message, 'error');
+        return;
+      }
       document.getElementById('card-' + id)?.remove();
-      alert('✅ Produk berhasil dihapus.');
+      showAlert('Produk berhasil dihapus.', 'success');
     }
 
     async function init() {
@@ -100,12 +115,10 @@
 
       let ikmIdFilter = profil?.ikm_id;
 
-      // Admin bisa lihat semua produk, atau filter per IKM via URL
       const params = new URLSearchParams(window.location.search);
       const ikmParam = params.get('ikm');
       if (ikmParam) ikmIdFilter = ikmParam;
 
-      // Tampilkan nama IKM
       if (ikmIdFilter) {
         const { data: ikm } = await db.from('ikm').select('nama_usaha').eq('id', ikmIdFilter).single();
         document.getElementById('namaIKM').textContent = ikm?.nama_usaha || '';
@@ -113,7 +126,6 @@
         document.getElementById('namaIKM').textContent = 'Semua produk (Admin)';
       }
 
-      // Query produk
       let query = db.from('produk').select('*').order('created_at', { ascending: false });
       if (ikmIdFilter) query = query.eq('ikm_id', ikmIdFilter);
 
@@ -157,7 +169,6 @@
   </script>
 
   <script>
-    // Tampilkan menu admin di navbar jika peran = admin
     (async function tampilkanNavAdmin() {
       try {
         const user = await getUser();
@@ -175,11 +186,8 @@
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('produk-saya');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('produk-saya');
     });
   </script>
 </body>
