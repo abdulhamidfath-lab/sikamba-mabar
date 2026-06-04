@@ -6,17 +6,10 @@
   <title>Dashboard — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    /* =============================================
-       HANYA style khusus dashboard — bukan sidebar.
-       Sidebar sepenuhnya dihandle oleh sidebar.js
-       ============================================= */
-
-    /* HERO */
     .hero { background: linear-gradient(135deg, #2C1508, var(--brown-mid)); padding: 1.5rem 1.8rem 2rem; }
     .hero-greet { color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 3px; }
     .hero-name  { color: white; font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; }
 
-    /* STATS */
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -28,7 +21,6 @@
     .stat-label { font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
     .stat-num   { font-size: 2rem; font-weight: 700; line-height: 1; }
 
-    /* SLIDER PRODUK */
     .section { padding: 1.2rem 1.2rem 0; }
     .section-head  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .section-title { font-size: 15px; font-weight: 700; color: var(--text); }
@@ -44,7 +36,6 @@
     .produk-ikm   { font-size: 11px; color: var(--text2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .produk-harga { font-size: 13px; font-weight: 700; color: var(--brown); margin-top: 4px; }
 
-    /* DOTS */
     .dots { display: flex; justify-content: center; gap: 5px; margin-top: 8px; }
     .dot  { width: 6px; height: 6px; border-radius: 50%; background: rgba(61,31,13,0.15); cursor: pointer; transition: all 0.2s; }
     .dot.active { background: var(--gold); width: 16px; border-radius: 3px; }
@@ -52,12 +43,10 @@
     .slide-btn  { width: 28px; height: 28px; border-radius: 50%; background: rgba(61,31,13,0.08); border: none; cursor: pointer; font-size: 15px; color: var(--brown); display: flex; align-items: center; justify-content: center; }
     .slide-btn:hover { background: rgba(61,31,13,0.15); }
 
-    /* IKM LIST */
     .ikm-slide { background: white; border-radius: 14px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid rgba(61,31,13,0.07); cursor: pointer; margin-bottom: 8px; transition: box-shadow 0.2s; }
     .ikm-slide:hover { box-shadow: 0 2px 12px rgba(61,31,13,0.1); }
     .ikm-icon { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, var(--brown), var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 
-    /* PANEL VERIFIKASI ADMIN */
     .panel-verif { background: white; border-radius: 14px; border: 2px solid var(--gold); overflow: hidden; }
     .panel-verif-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--cream2); }
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -68,7 +57,6 @@
     tbody tr:hover { background: var(--cream); }
     tbody td { padding: 10px 14px; font-size: 12px; }
 
-    /* MENU CEPAT */
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; padding: 1.2rem 1.2rem 0; }
     .menu-item { background: white; border-radius: 14px; padding: 14px 8px; text-align: center; cursor: pointer; border: 1px solid rgba(61,31,13,0.07); transition: box-shadow 0.2s; text-decoration: none; display: block; }
     .menu-item:hover { box-shadow: 0 2px 10px rgba(61,31,13,0.1); }
@@ -77,11 +65,6 @@
   </style>
 </head>
 <body>
-
-  <!-- =============================================
-       NAVBAR — sama seperti halaman lain
-       Sidebar admin diinject otomatis oleh sidebar.js
-       ============================================= -->
   <nav class="navbar">
     <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">
       <img src="../images/logo-mabar.png" alt="Logo Mabar" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;">
@@ -105,7 +88,6 @@
   </nav>
   <div class="batik-strip"></div>
 
-  <!-- Search bar khusus HP -->
   <div class="mobile-search-bar">
     <form onsubmit="goMobileSearch(event)">
       <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
@@ -113,18 +95,17 @@
     </form>
   </div>
 
-  <!-- =============================================
-       KONTEN UTAMA DASHBOARD
-       ============================================= -->
-
-  <!-- HERO -->
   <div class="hero">
     <div class="hero-greet">Selamat datang,</div>
     <div class="hero-name" id="namaUser">Memuat...</div>
     <div id="peranUser" style="margin-top:6px;"></div>
   </div>
 
-  <!-- STATS -->
+  <!-- Alert box untuk notifikasi verifikasi -->
+  <div style="padding:0 1.2rem;" id="alertWrap">
+    <div id="alertBox"></div>
+  </div>
+
   <div class="stats">
     <div class="stat">
       <div class="stat-label">🏭 IKM Terdaftar</div>
@@ -144,7 +125,6 @@
     </div>
   </div>
 
-  <!-- PANEL VERIFIKASI (khusus admin) -->
   <div class="section" id="panelVerifikasiWrap" style="display:none;">
     <div class="panel-verif" id="panelVerif">
       <div class="panel-verif-head">
@@ -170,7 +150,6 @@
     </div>
   </div>
 
-  <!-- SLIDER PRODUK UNGGULAN -->
   <div class="section">
     <div class="section-head">
       <span class="section-title">🛍️ Produk Unggulan</span>
@@ -190,7 +169,6 @@
     <div class="dots" id="dotsProduk"></div>
   </div>
 
-  <!-- IKM TERBARU -->
   <div class="section" style="margin-top:0.5rem;">
     <div class="section-head">
       <span class="section-title">🏭 IKM Terbaru</span>
@@ -201,12 +179,11 @@
     </div>
   </div>
 
-  <!-- MENU CEPAT -->
   <div class="menu-grid" id="menuGrid">
-    <a href="data-ikm.html"   class="menu-item"><div class="menu-icon">📊</div><div class="menu-label">Data IKM</div></a>
-    <a href="peta.html"       class="menu-item"><div class="menu-icon">🗺️</div><div class="menu-label">Peta Industri</div></a>
+    <a href="data-ikm.html"    class="menu-item"><div class="menu-icon">📊</div><div class="menu-label">Data IKM</div></a>
+    <a href="peta.html"        class="menu-item"><div class="menu-icon">🗺️</div><div class="menu-label">Peta Industri</div></a>
     <a href="marketplace.html" class="menu-item"><div class="menu-icon">🛍️</div><div class="menu-label">Marketplace</div></a>
-    <a href="profil.html"     class="menu-item"><div class="menu-icon">👤</div><div class="menu-label">Profil Saya</div></a>
+    <a href="profil.html"      class="menu-item"><div class="menu-icon">👤</div><div class="menu-label">Profil Saya</div></a>
   </div>
 
   <div style="height:2rem;"></div>
@@ -215,15 +192,12 @@
     <strong style="color:white;">SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2026
   </footer>
 
-  <!-- =============================================
-       SCRIPTS
-       ============================================= -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
+  <script src="../js/utils.js"></script>
   <script>
-    /* ---- Helper ---- */
     const ikonKat = {
       'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
       'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
@@ -242,7 +216,6 @@
       if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
     }
 
-    /* ---- Slider produk ---- */
     let produkList = [], produkIdx = 0;
     const CARD_W = 178;
     let autoTimer;
@@ -291,7 +264,6 @@
       autoTimer = setInterval(() => slideProduk(1), 3500);
     }
 
-    /* ---- IKM list ---- */
     function renderIKMList(data) {
       const el = document.getElementById('listIKM');
       if (!data.length) {
@@ -309,7 +281,6 @@
         </div>`).join('');
     }
 
-    /* ---- Verifikasi admin ---- */
     async function loadMenunggu() {
       document.getElementById('panelVerifikasiWrap').style.display = 'block';
       const { data } = await db.from('ikm').select('*').eq('status','menunggu').order('created_at',{ascending:false});
@@ -330,23 +301,39 @@
           <td style="font-size:11px;">${ikm.kecamatan||'-'}</td>
           <td style="font-size:11px;color:var(--text2);">${tgl}</td>
           <td><div style="display:flex;gap:5px;">
-            <button class="btn btn-primary" style="padding:4px 10px;font-size:11px;" onclick="verifikasi('${ikm.id}','aktif')">✅ Approve</button>
-            <button class="btn btn-danger"  style="padding:4px 10px;font-size:11px;" onclick="verifikasi('${ikm.id}','nonaktif')">❌ Tolak</button>
+            <button class="btn btn-primary" style="padding:4px 10px;font-size:11px;" onclick="verifikasi('${ikm.id}','aktif','${ikm.nama_usaha.replace(/'/g,"\\'")}')">✅ Approve</button>
+            <button class="btn btn-danger"  style="padding:4px 10px;font-size:11px;" onclick="verifikasi('${ikm.id}','nonaktif','${ikm.nama_usaha.replace(/'/g,"\\'")}')">❌ Tolak</button>
           </div></td>
         </tr>`;
       }).join('');
     }
 
-    async function verifikasi(id, status) {
-      if (!confirm(status==='aktif'?'✅ Approve IKM ini?':'❌ Tolak IKM ini?')) return;
+    // ✅ DIPERBARUI: pakai showConfirm() dan showAlert()
+    async function verifikasi(id, status, nama) {
+      const yakin = await showConfirm({
+        judul: status === 'aktif' ? 'Approve IKM?' : 'Tolak IKM?',
+        pesan: status === 'aktif'
+          ? `IKM <strong>"${nama}"</strong> akan disetujui dan tampil di peta & marketplace.`
+          : `IKM <strong>"${nama}"</strong> akan ditolak dan tidak tampil di sistem.`,
+        tipe: status === 'aktif' ? 'info' : 'danger',
+        labelYa: status === 'aktif' ? '✅ Ya, Approve' : '❌ Ya, Tolak'
+      });
+      if (!yakin) return;
+
       const { error } = await db.from('ikm').update({status}).eq('id', id);
-      if (error) { alert('Gagal: ' + error.message); return; }
+      if (error) {
+        showAlert('Gagal: ' + error.message, 'error');
+        return;
+      }
       document.getElementById('row-'+id)?.remove();
       const sisa = document.querySelectorAll('#tabelMenunggu tr[id]').length;
       document.getElementById('jumlahMenunggu').textContent = sisa + ' IKM';
       document.getElementById('statNum3').textContent = sisa;
       loadStatistik();
-      alert(status==='aktif'?'✅ IKM di-approve!':'❌ IKM ditolak.');
+      showAlert(
+        status === 'aktif' ? 'IKM berhasil di-approve!' : 'IKM berhasil ditolak.',
+        status === 'aktif' ? 'success' : 'warning'
+      );
     }
 
     async function loadStatistik() {
@@ -357,7 +344,6 @@
       } catch(e) {}
     }
 
-    /* ---- Init utama ---- */
     async function init() {
       const user   = await requireLogin();
       const profil = await getProfil(user.id);
@@ -371,7 +357,6 @@
 
       loadStatistik();
 
-      /* Load produk slider */
       try {
         const { data: produk } = await db.from('produk')
           .select('*, ikm:ikm_id(nama_usaha)')
@@ -381,19 +366,16 @@
         renderProdukSlider(produk||[]);
       } catch(e) {}
 
-      /* Load IKM list */
       try {
         const { data: ikm } = await db.from('ikm').select('*').order('created_at',{ascending:false}).limit(5);
         renderIKMList(ikm||[]);
       } catch(e) {}
 
-      /* Tampilkan menu admin di navbar */
       if (peran === 'admin') {
         document.getElementById('navLaporan').style.display = 'block';
         document.getElementById('navPengguna').style.display = 'block';
       }
 
-      /* Setup tambahan per peran */
       if (peran === 'admin') {
         document.getElementById('stat3').style.display = 'block';
         document.getElementById('statLabel3').textContent = '⏳ Menunggu';
@@ -403,7 +385,6 @@
           <a href="produk-saya.html"          class="menu-item"><div class="menu-icon">📦</div><div class="menu-label">Produk</div></a>
           <a href="laporan.html"              class="menu-item"><div class="menu-icon">📊</div><div class="menu-label">Laporan</div></a>
           <a href="manajemen-pengguna.html"   class="menu-item"><div class="menu-icon">👥</div><div class="menu-label">Pengguna</div></a>`;
-
       } else if (peran === 'ikm') {
         document.getElementById('stat3').style.display = 'block';
         document.getElementById('statLabel3').textContent = '📦 Produk Saya';
@@ -420,19 +401,11 @@
     init();
   </script>
 
-  <!-- =============================================
-       SIDEBAR ADMIN — diinject otomatis oleh sidebar.js
-       Hanya muncul kalau peran = admin
-       ============================================= -->
   <script src="../js/sidebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('dashboard');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('dashboard');
     });
   </script>
-
 </body>
 </html>
-ENDOFFILE
