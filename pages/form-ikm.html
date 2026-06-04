@@ -5,6 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Form IKM — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* =============================================
+       STICKY ACTION BAR
+       Di HP: tombol simpan menempel di bawah layar
+       Di desktop: tampil biasa di dalam card
+       ============================================= */
+    .form-action-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .form-action-bar {
+        /* Sticky di HP */
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        padding: 12px 16px;
+        background: white;
+        box-shadow: 0 -2px 16px rgba(61,31,13,0.12);
+        z-index: 50;
+        border-top: 1px solid var(--cream2);
+        flex-wrap: nowrap;
+      }
+      .form-action-bar .btn {
+        flex: 1;
+        justify-content: center;
+      }
+      /* Tambah padding bawah di card agar konten
+         tidak tertutup sticky bar */
+      .card { padding-bottom: 5rem !important; }
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -74,7 +111,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Tahun Berdiri</label>
-          <input type="number" id="tahun_berdiri" class="form-input" placeholder="Contoh: 2015" min="1900" max="2025">
+          <input type="number" id="tahun_berdiri" class="form-input" placeholder="Contoh: 2015" min="1900" max="2026">
         </div>
       </div>
 
@@ -138,20 +175,20 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">No. Telepon / WhatsApp</label>
-          <input type="text" id="no_telp" class="form-input" placeholder="08xx-xxxx-xxxx">
+          <input type="text" id="no_telp" class="form-input" placeholder="08xx-xxxx-xxxx" inputmode="tel">
         </div>
         <div class="form-group">
           <label class="form-label">Email Usaha</label>
-          <input type="email" id="email_usaha" class="form-input" placeholder="email@usaha.com">
+          <input type="email" id="email_usaha" class="form-input" placeholder="email@usaha.com" inputmode="email">
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Jumlah Tenaga Kerja</label>
-        <input type="number" id="jumlah_tenaga_kerja" class="form-input" placeholder="Contoh: 5" min="1">
+        <input type="number" id="jumlah_tenaga_kerja" class="form-input" placeholder="Contoh: 5" min="1" inputmode="numeric">
       </div>
 
-      <!-- Status hanya muncul untuk admin -->
+      <!-- Status — hanya untuk admin -->
       <div class="form-group" id="groupStatus" style="display:none;">
         <label class="form-label">Status IKM</label>
         <select id="status" class="form-select">
@@ -160,13 +197,11 @@
           <option value="nonaktif">Nonaktif</option>
         </select>
       </div>
-      <!-- Status tersembunyi untuk non-admin -->
       <input type="hidden" id="statusHidden" value="menunggu">
 
       <div class="form-group">
         <label class="form-label">Foto Usaha</label>
 
-        <!-- Panduan ukuran -->
         <div style="background:var(--blue-light);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--blue);line-height:1.7;">
           📐 <strong>Panduan foto terbaik:</strong><br>
           • Rasio ideal: <strong>16:9</strong> (landscape/horizontal)<br>
@@ -175,39 +210,25 @@
           • Tips: Foto yang terlalu portrait/vertikal akan terpotong di bagian atas dan bawah
         </div>
 
-        <!-- Preview kotak 16:9 -->
-        <div id="previewKotak" style="
-          width:100%;
-          aspect-ratio:16/9;
-          background:var(--cream2);
-          border:2px dashed rgba(61,31,13,0.2);
-          border-radius:var(--radius);
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          overflow:hidden;
-          margin-bottom:10px;
-          position:relative;
-        ">
+        <div id="previewKotak" style="width:100%;aspect-ratio:16/9;background:var(--cream2);border:2px dashed rgba(61,31,13,0.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;position:relative;">
           <div id="previewPlaceholder" style="text-align:center;color:var(--text2);">
             <div style="font-size:36px;margin-bottom:8px;">🖼️</div>
             <div style="font-size:13px;">Preview foto akan muncul di sini</div>
             <div style="font-size:11px;margin-top:4px;opacity:0.7;">Rasio 16:9 — seperti tampilan di halaman detail</div>
           </div>
-          <img id="previewImg" src="" alt="Preview" style="
-            display:none;
-            width:100%;
-            height:100%;
-            object-fit:cover;
-            object-position:center;
-          ">
+          <img id="previewImg" src="" alt="Preview" style="display:none;width:100%;height:100%;object-fit:cover;object-position:center;">
         </div>
 
         <input type="file" id="foto" class="form-input" accept="image/jpeg,image/png,image/webp" style="padding:8px;">
         <div id="infoFoto" style="font-size:12px;color:var(--text2);margin-top:6px;"></div>
       </div>
 
-      <div style="display:flex;gap:12px;margin-top:1.5rem;flex-wrap:wrap;">
+      <!-- =============================================
+           STICKY ACTION BAR
+           Di HP: menempel di bawah layar
+           Di desktop: tampil di dalam card seperti biasa
+           ============================================= -->
+      <div class="form-action-bar">
         <button class="btn btn-primary btn-lg" id="btnSimpan" onclick="simpan()">
           💾 Simpan Data IKM
         </button>
@@ -224,52 +245,46 @@
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
+  <script src="../js/utils.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
-    let editId = null;   // kalau ada ID = mode edit
+    let editId = null;
     let isAdmin = false;
 
-    function showAlert(pesan, tipe = 'error') {
+    function showAlertForm(pesan, tipe = 'error') {
       const el = document.getElementById('alertBox');
       el.innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function getGPS() {
-      if (!navigator.geolocation) { showAlert('Browser tidak mendukung GPS.'); return; }
+      if (!navigator.geolocation) { showAlertForm('Browser tidak mendukung GPS.'); return; }
       navigator.geolocation.getCurrentPosition(
         pos => {
-          document.getElementById('latitude').value = pos.coords.latitude.toFixed(6);
+          document.getElementById('latitude').value  = pos.coords.latitude.toFixed(6);
           document.getElementById('longitude').value = pos.coords.longitude.toFixed(6);
-          showAlert('✅ Koordinat GPS berhasil diambil!', 'success');
+          showAlertForm('✅ Koordinat GPS berhasil diambil!', 'success');
         },
-        () => showAlert('Gagal mengambil lokasi. Pastikan izin lokasi diaktifkan.')
+        () => showAlertForm('Gagal mengambil lokasi. Pastikan izin lokasi diaktifkan.')
       );
     }
 
-    // Preview foto 16:9 sebelum upload
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('foto').addEventListener('change', function() {
         const file = this.files[0];
         if (!file) return;
-
-        // Validasi ukuran file
-        const maxMB = 5;
-        if (file.size > maxMB * 1024 * 1024) {
-          showAlert(`Ukuran foto terlalu besar (${(file.size/1024/1024).toFixed(1)} MB). Maksimal ${maxMB} MB.`);
+        if (file.size > 5 * 1024 * 1024) {
+          showAlertForm(`Ukuran foto terlalu besar (${(file.size/1024/1024).toFixed(1)} MB). Maksimal 5 MB.`);
           this.value = '';
           return;
         }
-
         const reader = new FileReader();
         reader.onload = e => {
           const img = document.getElementById('previewImg');
           img.src = e.target.result;
           img.style.display = 'block';
           document.getElementById('previewPlaceholder').style.display = 'none';
-
-          // Info file
           const kb = (file.size / 1024).toFixed(0);
           const mb = (file.size / 1024 / 1024).toFixed(2);
           document.getElementById('infoFoto').innerHTML =
@@ -280,35 +295,32 @@
     });
 
     function isiForm(ikm) {
-      document.getElementById('nama_usaha').value        = ikm.nama_usaha || '';
-      document.getElementById('pemilik').value           = ikm.pemilik || '';
-      document.getElementById('kategori').value          = ikm.kategori || '';
-      document.getElementById('tahun_berdiri').value     = ikm.tahun_berdiri || '';
-      document.getElementById('deskripsi').value         = ikm.deskripsi || '';
-      document.getElementById('kecamatan').value         = ikm.kecamatan || '';
-      document.getElementById('desa').value              = ikm.desa || '';
-      document.getElementById('alamat').value            = ikm.alamat || '';
-      document.getElementById('latitude').value          = ikm.latitude || '';
-      document.getElementById('longitude').value         = ikm.longitude || '';
-      document.getElementById('no_telp').value           = ikm.no_telp || '';
-      document.getElementById('email_usaha').value       = ikm.email || '';
-      document.getElementById('jumlah_tenaga_kerja').value = ikm.jumlah_tenaga_kerja || '';
-      if (isAdmin) {
-        document.getElementById('status').value = ikm.status || 'menunggu';
-      }
+      document.getElementById('nama_usaha').value           = ikm.nama_usaha || '';
+      document.getElementById('pemilik').value              = ikm.pemilik || '';
+      document.getElementById('kategori').value             = ikm.kategori || '';
+      document.getElementById('tahun_berdiri').value        = ikm.tahun_berdiri || '';
+      document.getElementById('deskripsi').value            = ikm.deskripsi || '';
+      document.getElementById('kecamatan').value            = ikm.kecamatan || '';
+      document.getElementById('desa').value                 = ikm.desa || '';
+      document.getElementById('alamat').value               = ikm.alamat || '';
+      document.getElementById('latitude').value             = ikm.latitude || '';
+      document.getElementById('longitude').value            = ikm.longitude || '';
+      document.getElementById('no_telp').value              = ikm.no_telp || '';
+      document.getElementById('email_usaha').value          = ikm.email || '';
+      document.getElementById('jumlah_tenaga_kerja').value  = ikm.jumlah_tenaga_kerja || '';
+      if (isAdmin) document.getElementById('status').value  = ikm.status || 'menunggu';
       if (ikm.foto_url) {
         const img = document.getElementById('previewImg');
         img.src = ikm.foto_url;
         img.style.display = 'block';
         document.getElementById('previewPlaceholder').style.display = 'none';
-        document.getElementById('infoFoto').innerHTML =
-          '📷 Foto saat ini. Upload foto baru untuk mengganti.';
+        document.getElementById('infoFoto').innerHTML = '📷 Foto saat ini. Upload foto baru untuk mengganti.';
       }
     }
 
     async function simpan() {
       const user = await requireLogin();
-      const btn = document.getElementById('btnSimpan');
+      const btn  = document.getElementById('btnSimpan');
 
       const statusVal = isAdmin
         ? document.getElementById('status').value
@@ -332,130 +344,95 @@
       };
 
       if (!data.nama_usaha || !data.pemilik || !data.kategori) {
-        showAlert('Nama usaha, pemilik, dan kategori wajib diisi.'); return;
+        showAlertForm('Nama usaha, pemilik, dan kategori wajib diisi.'); return;
       }
 
-      btn.textContent = 'Menyimpan...';
+      btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;"></span> Menyimpan...';
       btn.disabled = true;
 
       try {
         let ikmId = editId;
 
         if (editId) {
-          // MODE EDIT — update data yang ada
           await updateIKM(editId, data);
         } else {
-          // MODE TAMBAH — buat data baru
           const ikm = await simpanIKM(data);
           ikmId = ikm.id;
         }
 
-        // Upload foto baru jika ada
         const fotoFile = document.getElementById('foto').files[0];
         if (fotoFile && ikmId) {
           const fotoUrl = await uploadFotoIKM(fotoFile, ikmId);
           await updateIKM(ikmId, { foto_url: fotoUrl });
         }
 
-        showAlert(editId ? '✅ Data IKM berhasil diperbarui!' : '✅ Data IKM berhasil disimpan! Menunggu verifikasi admin.', 'success');
+        showAlertForm(
+          editId ? '✅ Data IKM berhasil diperbarui!' : '✅ Data IKM berhasil disimpan! Menunggu verifikasi admin.',
+          'success'
+        );
         setTimeout(() => window.location.href = editId ? `detail-ikm.html?id=${editId}` : 'data-ikm.html', 1800);
 
       } catch(e) {
-        showAlert('Gagal menyimpan: ' + e.message);
+        showAlertForm('Gagal menyimpan: ' + e.message);
         btn.textContent = '💾 Simpan Data IKM';
         btn.disabled = false;
       }
     }
 
     async function init() {
-      const user = await requireLogin();
+      const user   = await requireLogin();
       const profil = await getProfil(user.id);
-      const peran = profil?.peran || 'konsumen';
+      const peran  = profil?.peran || 'konsumen';
       isAdmin = peran === 'admin';
 
-      // =============================================
-      // CEK HAK AKSES BERDASARKAN PERAN
-      // =============================================
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
 
-      // Konsumen tidak boleh akses form sama sekali
       if (peran === 'konsumen') {
         document.getElementById('alertBox').innerHTML =
-          `<div class="alert alert-error">
-            ⛔ Anda tidak memiliki akses untuk menambah atau mengedit data IKM.
-            <br><a href="data-ikm.html" style="font-weight:600;">← Kembali ke Data IKM</a>
-          </div>`;
+          `<div class="alert alert-error">⛔ Anda tidak memiliki akses ke halaman ini.<br><a href="data-ikm.html" style="font-weight:600;">← Kembali ke Data IKM</a></div>`;
         document.getElementById('btnSimpan').style.display = 'none';
         document.querySelector('.card').style.opacity = '0.4';
         document.querySelector('.card').style.pointerEvents = 'none';
-        return; // Hentikan eksekusi
+        return;
       }
 
-      // Pelaku IKM di mode EDIT — cek apakah IKM ini miliknya
       if (id && peran === 'ikm') {
-        const ikmIdMilik = profil?.ikm_id;
-        if (ikmIdMilik !== id) {
+        if (profil?.ikm_id !== id) {
           document.getElementById('alertBox').innerHTML =
-            `<div class="alert alert-error">
-              ⛔ Anda hanya dapat mengedit data IKM milik Anda sendiri.
-              <br><a href="data-ikm.html" style="font-weight:600;">← Kembali ke Data IKM</a>
-            </div>`;
+            `<div class="alert alert-error">⛔ Anda hanya dapat mengedit IKM milik sendiri.<br><a href="data-ikm.html" style="font-weight:600;">← Kembali</a></div>`;
           document.getElementById('btnSimpan').style.display = 'none';
           document.querySelector('.card').style.opacity = '0.4';
           document.querySelector('.card').style.pointerEvents = 'none';
-          return; // Hentikan eksekusi
+          return;
         }
       }
 
-      // Tampilkan pilihan status hanya untuk admin
-      if (isAdmin) {
-        document.getElementById('groupStatus').style.display = 'block';
-      }
+      if (isAdmin) document.getElementById('groupStatus').style.display = 'block';
 
-      // Mode edit — isi form dengan data lama
       if (id) {
         editId = id;
-        document.getElementById('pageTitle').textContent = 'Edit Data IKM';
-        document.getElementById('btnSimpan').textContent = '💾 Simpan Perubahan';
+        document.getElementById('pageTitle').textContent  = 'Edit Data IKM';
+        document.getElementById('btnSimpan').textContent  = '💾 Simpan Perubahan';
         try {
           const { data: ikm, error } = await db.from('ikm').select('*').eq('id', id).single();
           if (error) throw error;
           isiForm(ikm);
         } catch(e) {
-          showAlert('Gagal memuat data IKM: ' + e.message);
+          showAlertForm('Gagal memuat data IKM: ' + e.message);
         }
       }
-      // Tidak ada ?id= = mode tambah baru (form kosong)
     }
 
+    // ✅ REFACTOR: cukup satu baris ini, tidak perlu blok IIFE panjang
+    setupNavAdmin();
     init();
-  </script>
-
-  <script>
-    // Tampilkan menu admin di navbar jika peran = admin
-    (async function tampilkanNavAdmin() {
-      try {
-        const user = await getUser();
-        if (!user) return;
-        const profil = await getProfil(user.id);
-        if (profil?.peran === 'admin') {
-          const nl = document.getElementById('navLaporan');
-          const np = document.getElementById('navPengguna');
-          if (nl) nl.style.display = 'block';
-          if (np) np.style.display = 'block';
-        }
-      } catch(e) {}
-    })();
   </script>
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('form-ikm');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('form-ikm');
     });
   </script>
 </body>
