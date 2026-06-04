@@ -1,5 +1,5 @@
 // ============================================
-// SIKAMBA MABAR - Fungsi Login & Daftar (Fixed)
+// SIKAMBA MABAR - Fungsi Login & Daftar
 // ============================================
 
 // LOGIN
@@ -46,4 +46,32 @@ async function lupaPassword(email) {
     redirectTo: window.location.origin + '/pages/reset-password.html'
   });
   if (error) throw error;
+}
+
+// ============================================
+// SETUP NAV ADMIN
+//
+// Fungsi ini menampilkan menu Laporan & Pengguna
+// di navbar kalau user yang login adalah admin.
+//
+// Cara pakai — cukup panggil 1 baris di tiap halaman:
+//   setupNavAdmin();
+//
+// Tidak perlu lagi copy-paste blok IIFE di setiap halaman.
+// ============================================
+async function setupNavAdmin() {
+  try {
+    const user = await getUser();
+    if (!user) return;
+    const profil = await getProfil(user.id);
+    if (profil?.peran !== 'admin') return;
+
+    // Tampilkan link Laporan & Pengguna kalau ada di navbar
+    const navLaporan  = document.getElementById('navLaporan');
+    const navPengguna = document.getElementById('navPengguna');
+    if (navLaporan)  navLaporan.style.display  = 'block';
+    if (navPengguna) navPengguna.style.display = 'block';
+  } catch(e) {
+    // Gagal cek user — tidak apa-apa, menu admin tidak ditampilkan
+  }
 }
