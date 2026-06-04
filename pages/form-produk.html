@@ -5,6 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Form Produk — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* =============================================
+       STICKY ACTION BAR
+       Di HP: tombol simpan menempel di bawah layar
+       Di desktop: tampil biasa di dalam card
+       ============================================= */
+    .form-action-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .form-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        padding: 12px 16px;
+        background: white;
+        box-shadow: 0 -2px 16px rgba(61,31,13,0.12);
+        z-index: 50;
+        border-top: 1px solid var(--cream2);
+        flex-wrap: nowrap;
+      }
+      .form-action-bar .btn {
+        flex: 1;
+        justify-content: center;
+      }
+      .card { padding-bottom: 5rem !important; }
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -75,11 +109,11 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Harga (Rp) *</label>
-          <input type="number" id="harga" class="form-input" placeholder="Contoh: 150000" min="0">
+          <input type="number" id="harga" class="form-input" placeholder="Contoh: 150000" min="0" inputmode="numeric">
         </div>
         <div class="form-group">
           <label class="form-label">Stok Tersedia</label>
-          <input type="number" id="stok" class="form-input" placeholder="Contoh: 10" min="0">
+          <input type="number" id="stok" class="form-input" placeholder="Contoh: 10" min="0" inputmode="numeric">
         </div>
       </div>
 
@@ -115,7 +149,10 @@
         <div id="infoFoto" style="font-size:12px;color:var(--text2);margin-top:6px;"></div>
       </div>
 
-      <div style="display:flex;gap:12px;margin-top:1.5rem;flex-wrap:wrap;">
+      <!-- =============================================
+           STICKY ACTION BAR
+           ============================================= -->
+      <div class="form-action-bar">
         <button class="btn btn-primary btn-lg" id="btnSimpan" onclick="simpan()">💾 Simpan Produk</button>
         <a href="produk-saya.html" class="btn btn-secondary btn-lg">Batal</a>
       </div>
@@ -131,27 +168,24 @@
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/ikm.js"></script>
+  <script src="../js/utils.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
     let editId = null;
-    let ikmId = null;
+    let ikmId  = null;
 
-    function showAlert(pesan, tipe = 'error') {
+    function showAlertForm(pesan, tipe = 'error') {
       const el = document.getElementById('alertBox');
       el.innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function formatRupiah(angka) {
-      return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
     }
 
     document.getElementById('foto').addEventListener('change', function() {
       const file = this.files[0];
       if (!file) return;
       if (file.size > 5 * 1024 * 1024) {
-        showAlert('Ukuran foto terlalu besar. Maksimal 5 MB.');
+        showAlertForm('Ukuran foto terlalu besar. Maksimal 5 MB.');
         this.value = ''; return;
       }
       const reader = new FileReader();
@@ -174,28 +208,28 @@
     }
 
     async function simpan() {
-      const btn = document.getElementById('btnSimpan');
-      const nama = document.getElementById('nama_produk').value.trim();
+      const btn      = document.getElementById('btnSimpan');
+      const nama     = document.getElementById('nama_produk').value.trim();
       const kategori = document.getElementById('kategori').value;
-      const harga = parseInt(document.getElementById('harga').value);
+      const harga    = parseInt(document.getElementById('harga').value);
 
       if (!nama || !kategori || !harga) {
-        showAlert('Nama produk, kategori, dan harga wajib diisi.'); return;
+        showAlertForm('Nama produk, kategori, dan harga wajib diisi.'); return;
       }
 
-      btn.textContent = 'Menyimpan...';
+      btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;"></span> Menyimpan...';
       btn.disabled = true;
 
       try {
         const data = {
-          ikm_id:     ikmId,
+          ikm_id:      ikmId,
           nama_produk: nama,
-          kategori:   kategori,
-          deskripsi:  document.getElementById('deskripsi').value.trim(),
-          harga:      harga,
-          stok:       parseInt(document.getElementById('stok').value) || 0,
-          bahan_baku: document.getElementById('bahan_baku').value.trim(),
-          aktif:      document.getElementById('aktif').value === 'true',
+          kategori:    kategori,
+          deskripsi:   document.getElementById('deskripsi').value.trim(),
+          harga:       harga,
+          stok:        parseInt(document.getElementById('stok').value) || 0,
+          bahan_baku:  document.getElementById('bahan_baku').value.trim(),
+          aktif:       document.getElementById('aktif').value === 'true',
         };
 
         let produkId = editId;
@@ -209,14 +243,14 @@
         }
 
         // Generate QR code
-        const qrUrl = window.location.origin + `/pages/qr-produk.html?id=${produkId}`;
+        const qrUrl  = window.location.origin + `/pages/qr-produk.html?id=${produkId}`;
         const qrData = await generateQR(qrUrl);
         await db.from('produk').update({ qr_code: qrData }).eq('id', produkId);
 
         // Upload foto jika ada
         const fotoFile = document.getElementById('foto').files[0];
         if (fotoFile && produkId) {
-          const ext = fotoFile.name.split('.').pop();
+          const ext  = fotoFile.name.split('.').pop();
           const path = `${produkId}/foto.${ext}`;
           const { error: upErr } = await db.storage.from('foto-produk').upload(path, fotoFile, { upsert: true });
           if (!upErr) {
@@ -225,28 +259,34 @@
           }
         }
 
-        showAlert(editId ? '✅ Produk berhasil diperbarui!' : '✅ Produk berhasil disimpan! QR code sudah digenerate.', 'success');
+        showAlertForm(
+          editId ? '✅ Produk berhasil diperbarui!' : '✅ Produk berhasil disimpan! QR code sudah digenerate.',
+          'success'
+        );
         setTimeout(() => window.location.href = 'produk-saya.html', 1500);
+
       } catch(e) {
-        showAlert('Gagal menyimpan: ' + e.message);
+        showAlertForm('Gagal menyimpan: ' + e.message);
         btn.textContent = '💾 Simpan Produk';
         btn.disabled = false;
       }
     }
 
     async function init() {
-      const user = await requireLogin();
+      const user   = await requireLogin();
       const profil = await getProfil(user.id);
-      const peran = profil?.peran || 'konsumen';
+      const peran  = profil?.peran || 'konsumen';
 
       if (peran === 'konsumen') {
-        showAlert('⛔ Anda tidak memiliki akses ke halaman ini.');
+        showAlertForm('⛔ Anda tidak memiliki akses ke halaman ini.');
+        document.getElementById('btnSimpan').style.display = 'none';
         return;
       }
 
       ikmId = profil?.ikm_id;
       if (!ikmId && peran !== 'admin') {
-        showAlert('⛔ Anda belum memiliki IKM terdaftar. Daftarkan IKM Anda terlebih dahulu.');
+        showAlertForm('⛔ Anda belum memiliki IKM terdaftar. Daftarkan IKM Anda terlebih dahulu.');
+        document.getElementById('btnSimpan').style.display = 'none';
         return;
       }
 
@@ -254,54 +294,36 @@
       const id = params.get('id');
       if (id) {
         editId = id;
-        document.getElementById('pageTitle').textContent = 'Edit Produk';
-        document.getElementById('btnSimpan').textContent = '💾 Simpan Perubahan';
+        document.getElementById('pageTitle').textContent   = 'Edit Produk';
+        document.getElementById('btnSimpan').textContent   = '💾 Simpan Perubahan';
         const { data: p } = await db.from('produk').select('*').eq('id', id).single();
         if (p) {
           document.getElementById('nama_produk').value = p.nama_produk || '';
-          document.getElementById('kategori').value = p.kategori || '';
-          document.getElementById('deskripsi').value = p.deskripsi || '';
-          document.getElementById('harga').value = p.harga || '';
-          document.getElementById('stok').value = p.stok || '';
-          document.getElementById('bahan_baku').value = p.bahan_baku || '';
-          document.getElementById('aktif').value = p.aktif ? 'true' : 'false';
+          document.getElementById('kategori').value    = p.kategori    || '';
+          document.getElementById('deskripsi').value   = p.deskripsi   || '';
+          document.getElementById('harga').value       = p.harga       || '';
+          document.getElementById('stok').value        = p.stok        || '';
+          document.getElementById('bahan_baku').value  = p.bahan_baku  || '';
+          document.getElementById('aktif').value       = p.aktif ? 'true' : 'false';
           if (p.foto_url) {
-            document.getElementById('previewImg').src = p.foto_url;
-            document.getElementById('previewImg').style.display = 'block';
+            document.getElementById('previewImg').src               = p.foto_url;
+            document.getElementById('previewImg').style.display     = 'block';
             document.getElementById('previewPlaceholder').style.display = 'none';
-            document.getElementById('infoFoto').textContent = '📷 Foto saat ini. Upload baru untuk mengganti.';
+            document.getElementById('infoFoto').textContent         = '📷 Foto saat ini. Upload baru untuk mengganti.';
           }
         }
       }
     }
 
+    // ✅ REFACTOR: cukup satu baris ini
+    setupNavAdmin();
     init();
-  </script>
-
-  <script>
-    // Tampilkan menu admin di navbar jika peran = admin
-    (async function tampilkanNavAdmin() {
-      try {
-        const user = await getUser();
-        if (!user) return;
-        const profil = await getProfil(user.id);
-        if (profil?.peran === 'admin') {
-          const nl = document.getElementById('navLaporan');
-          const np = document.getElementById('navPengguna');
-          if (nl) nl.style.display = 'block';
-          if (np) np.style.display = 'block';
-        }
-      } catch(e) {}
-    })();
   </script>
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('form-produk');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('form-produk');
     });
   </script>
 </body>
