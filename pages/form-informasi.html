@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Informasi — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- Quill rich text editor -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+  <style>
+    /* =============================================
+       STICKY ACTION BAR — tombol simpan di HP
+       ============================================= */
+    .form-action-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 768px) {
+      .form-action-bar {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        margin: 0;
+        padding: 12px 16px;
+        background: white;
+        box-shadow: 0 -2px 16px rgba(61,31,13,0.12);
+        z-index: 50;
+        border-top: 1px solid var(--cream2);
+        flex-wrap: nowrap;
+      }
+      .form-action-bar .btn { flex: 1; justify-content: center; }
+      .card { padding-bottom: 5rem !important; }
+    }
+
+    /* Quill editor styling agar sesuai tema */
+    .ql-toolbar.ql-snow {
+      border-radius: var(--radius) var(--radius) 0 0;
+      border-color: rgba(61,31,13,0.15);
+      background: var(--cream2);
+      flex-wrap: wrap;
+    }
+    .ql-container.ql-snow {
+      border-radius: 0 0 var(--radius) var(--radius);
+      border-color: rgba(61,31,13,0.15);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      min-height: 320px;
+    }
+    .ql-editor { min-height: 320px; line-height: 1.8; }
+    .ql-editor:focus { outline: none; }
+    .ql-snow .ql-picker { color: var(--text); }
+    .ql-snow .ql-stroke { stroke: var(--text); }
+    .ql-snow .ql-fill { fill: var(--text); }
+
+    /* Preview foto */
+    #previewFoto {
+      width: 100%;
+      aspect-ratio: 16/7;
+      background: var(--cream2);
+      border: 2px dashed rgba(61,31,13,0.2);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    #previewFoto img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Status toggle */
+    .status-toggle {
+      display: flex;
+      gap: 8px;
+    }
+    .status-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: var(--radius);
+      border: 2px solid rgba(61,31,13,0.15);
+      background: var(--cream);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .status-btn.active-draft     { border-color: var(--orange); background: var(--orange-light); color: var(--orange); }
+    .status-btn.active-published { border-color: var(--green);  background: var(--green-light);  color: var(--green);  }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="informasi.html">Informasi</a>
+      <a href="profil.html">Profil Saya</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;">
+      <a href="informasi.html" class="btn btn-secondary" style="padding:8px 14px;">← Kembali</a>
+      <h2 style="margin:0;" id="pageTitle">Tambah Informasi</h2>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <div class="card">
+
+      <!-- ---- INFORMASI DASAR ---- -->
+      <h3 style="margin-bottom:1.2rem;padding-bottom:0.8rem;border-bottom:1px solid var(--cream2);">
+        📝 Informasi Dasar
+      </h3>
+
+      <div class="form-group">
+        <label class="form-label">Judul Artikel *</label>
+        <input type="text" id="judul" class="form-input" placeholder="Tulis judul yang menarik...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ringkasan
+          <span style="font-weight:400;color:var(--text2);font-size:11px;"> — 1–2 kalimat, tampil di halaman daftar</span>
+        </label>
+        <textarea id="ringkasan" class="form-textarea" rows="2"
+          placeholder="Tulis ringkasan singkat artikel ini..." style="min-height:70px;resize:none;"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Kategori *</label>
+          <select id="kategori_id" class="form-select">
+            <option value="">-- Pilih Kategori --</option>
+            <!-- Diisi dari database -->
+          </select>
+          <div style="margin-top:6px;">
+            <button type="button" class="btn btn-secondary" style="font-size:12px;padding:6px 12px;min-height:36px;"
+              onclick="toggleFormKatBaru()">+ Tambah Kategori Baru</button>
+          </div>
+          <!-- Form tambah kategori baru -->
+          <div id="formKatBaru" style="display:none;margin-top:10px;padding:12px;background:var(--cream2);border-radius:var(--radius);">
+            <label class="form-label">Nama Kategori Baru</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <input type="text" id="namaKatBaru" class="form-input" placeholder="Contoh: Bantuan Modal" style="flex:1;min-width:150px;">
+              <input type="color" id="warnaKatBaru" value="#C8862B" title="Pilih warna badge"
+                style="width:44px;height:44px;border:1.5px solid rgba(61,31,13,0.15);border-radius:var(--radius);cursor:pointer;padding:2px;">
+              <button type="button" class="btn btn-primary" style="font-size:13px;padding:8px 16px;" onclick="simpanKategoriBaru()">Simpan</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sasaran Pembaca</label>
+          <select id="sasaran" class="form-select">
+            <option value="semua">👥 Semua Orang</option>
+            <option value="ikm">🏭 Khusus Pelaku IKM</option>
+            <option value="umum">🌐 Umum / Masyarakat</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ---- ISI ARTIKEL ---- -->
+      <h3 style="margin:1.5rem 0 1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--cream2);">
+        📄 Isi Artikel
+      </h3>
+
+      <div class="form-group">
+        <label class="form-label">Konten Artikel *</label>
+        <!-- Quill Editor akan diinject di sini -->
+        <div id="quillEditor"></div>
+        <div class="form-hint" style="margin-top:6px;">
+          💡 Gunakan toolbar di atas untuk format teks — heading, bold, list, link, dan sisipkan gambar via URL.
+        </div>
+      </div>
+
+      <!-- ---- FOTO SAMPUL ---- -->
+      <h3 style="margin:1.5rem 0 1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--cream2);">
+        🖼️ Foto Sampul
+      </h3>
+
+      <div class="form-group">
+        <div style="background:var(--blue-light);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--blue);line-height:1.7;">
+          📐 Rasio ideal <strong>16:7</strong> atau <strong>16:9</strong> — landscape/horizontal. Maks 5 MB.
+        </div>
+        <div id="previewFoto">
+          <div style="text-align:center;color:var(--text2);">
+            <div style="font-size:36px;margin-bottom:8px;">🖼️</div>
+            <div style="font-size:13px;">Preview foto sampul</div>
+          </div>
+        </div>
+        <input type="file" id="foto" class="form-input" accept="image/jpeg,image/png,image/webp" style="padding:8px;">
+        <div id="infoFoto" style="font-size:12px;color:var(--text2);margin-top:6px;"></div>
+      </div>
+
+      <!-- ---- STATUS ---- -->
+      <h3 style="margin:1.5rem 0 1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--cream2);">
+        📡 Status Publikasi
+      </h3>
+
+      <div class="form-group">
+        <input type="hidden" id="status" value="draft">
+        <div class="status-toggle">
+          <button type="button" class="status-btn active-draft" id="btnDraft"
+            onclick="setStatus('draft')">
+            📝 Simpan sebagai Draft
+          </button>
+          <button type="button" class="status-btn" id="btnPublish"
+            onclick="setStatus('published')">
+            🚀 Publikasikan Sekarang
+          </button>
+        </div>
+        <p class="form-hint" style="margin-top:8px;" id="statusHint">
+          Draft tidak tampil ke publik. Kamu bisa publikasikan kapan saja.
+        </p>
+      </div>
+
+      <!-- STICKY ACTION BAR -->
+      <div class="form-action-bar">
+        <button class="btn btn-primary btn-lg" id="btnSimpan" onclick="simpan()">
+          💾 Simpan Informasi
+        </button>
+        <a href="informasi.html" class="btn btn-secondary btn-lg">Batal</a>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2026
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    let editId   = null;
+    let quill    = null;
+
+    function showAlertForm(pesan, tipe = 'error') {
+      const el = document.getElementById('alertBox');
+      el.innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    /* ---- Status toggle ---- */
+    function setStatus(val) {
+      document.getElementById('status').value = val;
+      document.getElementById('btnDraft').className   = 'status-btn' + (val === 'draft'     ? ' active-draft'     : '');
+      document.getElementById('btnPublish').className = 'status-btn' + (val === 'published' ? ' active-published' : '');
+      document.getElementById('statusHint').textContent = val === 'published'
+        ? '🚀 Artikel akan langsung tampil ke publik setelah disimpan.'
+        : '📝 Draft tidak tampil ke publik. Kamu bisa publikasikan kapan saja.';
+    }
+
+    /* ---- Form kategori baru ---- */
+    function toggleFormKatBaru() {
+      const el = document.getElementById('formKatBaru');
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function simpanKategoriBaru() {
+      const nama  = document.getElementById('namaKatBaru').value.trim();
+      const warna = document.getElementById('warnaKatBaru').value;
+      if (!nama) { showAlertForm('Nama kategori tidak boleh kosong.'); return; }
+
+      const { data, error } = await db
+        .from('kategori_informasi').insert({ nama, warna }).select().single();
+
+      if (error) {
+        showAlertForm('Gagal menyimpan kategori: ' + error.message); return;
+      }
+
+      // Tambah ke dropdown
+      const opt = document.createElement('option');
+      opt.value = data.id;
+      opt.textContent = data.nama;
+      document.getElementById('kategori_id').appendChild(opt);
+      document.getElementById('kategori_id').value = data.id;
+
+      // Reset form
+      document.getElementById('namaKatBaru').value = '';
+      document.getElementById('formKatBaru').style.display = 'none';
+      showAlertForm('✅ Kategori "' + data.nama + '" berhasil ditambahkan!', 'success');
+    }
+
+    /* ---- Preview foto ---- */
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('foto').addEventListener('change', function() {
+        const file = this.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          showAlertForm('Ukuran foto terlalu besar. Maksimal 5 MB.');
+          this.value = ''; return;
+        }
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById('previewFoto').innerHTML =
+            `<img src="${e.target.result}" alt="Preview">`;
+          const kb = (file.size / 1024).toFixed(0);
+          document.getElementById('infoFoto').textContent =
+            `✅ ${file.name} — ${kb > 1024 ? (kb/1024).toFixed(1) + ' MB' : kb + ' KB'}`;
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    /* ---- Simpan artikel ---- */
+    async function simpan() {
+      const btn     = document.getElementById('btnSimpan');
+      const judul   = document.getElementById('judul').value.trim();
+      const isi     = quill.root.innerHTML.trim();
+      const katId   = document.getElementById('kategori_id').value;
+      const status  = document.getElementById('status').value;
+
+      if (!judul)       { showAlertForm('Judul artikel wajib diisi.'); return; }
+      if (!katId)       { showAlertForm('Pilih kategori terlebih dahulu.'); return; }
+      if (isi === '<p><br></p>' || !isi) {
+        showAlertForm('Isi artikel tidak boleh kosong.'); return;
+      }
+
+      btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;"></span> Menyimpan...';
+      btn.disabled = true;
+
+      try {
+        const user = await getUser();
+        const data = {
+          judul,
+          ringkasan:    document.getElementById('ringkasan').value.trim() || null,
+          isi,
+          kategori_id:  katId,
+          sasaran:      document.getElementById('sasaran').value,
+          status,
+          created_by:   user.id,
+          published_at: status === 'published' ? new Date().toISOString() : null,
+        };
+
+        let infoId = editId;
+
+        if (editId) {
+          const { error } = await db.from('informasi').update(data).eq('id', editId);
+          if (error) throw error;
+        } else {
+          const { data: info, error } = await db.from('informasi').insert(data).select().single();
+          if (error) throw error;
+          infoId = info.id;
+        }
+
+        // Upload foto kalau ada
+        const fotoFile = document.getElementById('foto').files[0];
+        if (fotoFile && infoId) {
+          const ext  = fotoFile.name.split('.').pop();
+          const path = `${infoId}/sampul.${ext}`;
+          const { error: upErr } = await db.storage
+            .from('foto-informasi').upload(path, fotoFile, { upsert: true });
+          if (!upErr) {
+            const { data: urlData } = db.storage.from('foto-informasi').getPublicUrl(path);
+            await db.from('informasi').update({ foto_url: urlData.publicUrl }).eq('id', infoId);
+          }
+        }
+
+        showAlertForm(
+          status === 'published'
+            ? '✅ Artikel berhasil dipublikasikan!'
+            : '✅ Artikel disimpan sebagai draft.',
+          'success'
+        );
+        setTimeout(() => window.location.href = 'informasi.html', 1500);
+
+      } catch(e) {
+        showAlertForm('Gagal menyimpan: ' + e.message);
+        btn.textContent = '💾 Simpan Informasi';
+        btn.disabled = false;
+      }
+    }
+
+    /* ---- Init ---- */
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      if (profil?.peran !== 'admin') {
+        showAlertForm('⛔ Halaman ini hanya untuk admin.');
+        document.getElementById('btnSimpan').style.display = 'none';
+        return;
+      }
+
+      // Inisialisasi Quill rich text editor
+      quill = new Quill('#quillEditor', {
+        theme: 'snow',
+        placeholder: 'Tulis isi artikel di sini...',
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }],
+            ['link', 'image'],
+            ['blockquote', 'code-block'],
+            ['clean']
+          ]
+        }
+      });
+
+      // Load kategori
+      const { data: kats } = await db.from('kategori_informasi').select('*').order('nama');
+      const sel = document.getElementById('kategori_id');
+      kats?.forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k.id;
+        opt.textContent = k.nama;
+        sel.appendChild(opt);
+      });
+
+      // Mode edit — kalau ada ?id= di URL
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (id) {
+        editId = id;
+        document.getElementById('pageTitle').textContent  = 'Edit Informasi';
+        document.getElementById('btnSimpan').textContent  = '💾 Simpan Perubahan';
+
+        const { data: info } = await db.from('informasi').select('*').eq('id', id).single();
+        if (info) {
+          document.getElementById('judul').value     = info.judul || '';
+          document.getElementById('ringkasan').value = info.ringkasan || '';
+          document.getElementById('kategori_id').value = info.kategori_id || '';
+          document.getElementById('sasaran').value   = info.sasaran || 'semua';
+          quill.root.innerHTML                       = info.isi || '';
+          setStatus(info.status || 'draft');
+          if (info.foto_url) {
+            document.getElementById('previewFoto').innerHTML =
+              `<img src="${info.foto_url}" alt="Foto saat ini">`;
+            document.getElementById('infoFoto').textContent = '📷 Foto saat ini. Upload baru untuk mengganti.';
+          }
+        }
+      }
+    }
+
+    setupNavAdmin();
+    init();
+  </script>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('form-informasi');
+    });
+  </script>
+</body>
+</html>

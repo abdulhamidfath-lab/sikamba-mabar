@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informasi — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .info-hero {
+      background: linear-gradient(135deg, var(--brown), var(--brown-mid));
+      padding: 3rem 0 2.5rem;
+      color: white;
+      text-align: center;
+    }
+    .info-hero h1 { color: white; font-size: 2rem; margin-bottom: 0.5rem; }
+    .info-hero p  { color: rgba(255,255,255,0.75); font-size: 14px; }
+
+    /* Filter chips — bisa scroll horizontal di HP */
+    .chips-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+      margin-bottom: 1.2rem;
+    }
+    .chips-wrap::-webkit-scrollbar { display: none; }
+    .chips {
+      display: flex;
+      gap: 8px;
+      width: max-content;
+    }
+    .chip {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .chip.active { background: var(--brown); color: white; }
+    .chip:not(.active) { background: var(--cream2); color: var(--text2); }
+
+    /* Grid artikel */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
+    }
+    .info-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(61,31,13,0.07);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .info-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .info-foto {
+      height: 180px;
+      background: linear-gradient(135deg, var(--brown), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .info-foto img { width: 100%; height: 100%; object-fit: cover; }
+    .info-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+    .info-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .info-kat {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+    }
+    .info-tgl { font-size: 11px; color: var(--text2); }
+    .info-judul {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .info-ringkasan {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.7;
+      flex: 1;
+      /* Batasi 3 baris */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .info-footer {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--cream2);
+      font-size: 12px;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .info-hero { padding: 2rem 0 1.5rem; }
+      .info-hero h1 { font-size: 1.5rem; }
+      .info-grid { grid-template-columns: 1fr; }
+      .info-foto { height: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-brand" style="text-decoration:none;">
+      <img src="../images/logo-mabar.png" alt="Logo" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+      <span>SIKAMBA MABAR</span>
+    </a>
+    <form class="navbar-search" onsubmit="goSearch(event)">
+      <input type="text" class="navbar-search-input" placeholder="🔍 Cari IKM atau produk..." id="navSearch">
+      <button type="submit" class="navbar-search-btn">Cari</button>
+    </form>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="../index.html">Beranda</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="peta.html">Peta Industri</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="informasi.html" class="active">Informasi</a>
+      <a href="../login.html" id="navLogin">Masuk</a>
+      <a href="dashboard.html" id="navDashboard" style="display:none;">Dashboard</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
+  <div class="info-hero">
+    <div class="container">
+      <h1>📢 Informasi Dinas</h1>
+      <p>Pelatihan, sertifikasi, kegiatan, dan pengumuman dari Dinas Perdagangan dan Perindustrian Manggarai Barat</p>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:1.5rem;padding-bottom:3rem;">
+
+    <!-- Filter kategori -->
+    <div class="chips-wrap">
+      <div class="chips" id="chipsKategori">
+        <span class="chip active" onclick="filterKat(null, this)">Semua</span>
+        <!-- Diisi otomatis dari database -->
+      </div>
+    </div>
+
+    <!-- Jumlah artikel -->
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">
+      Menampilkan <strong id="jumlahTampil">0</strong> informasi
+    </p>
+
+    <!-- Grid artikel -->
+    <div class="info-grid" id="infoGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:3rem;">
+        <div class="spinner"></div>
+        <p style="color:var(--text2);margin-top:1rem;">Memuat informasi...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2026
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function goSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('navSearch').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
+
+    // Ikon default per kategori
+    const ikonKat = {
+      'Pelatihan':   '🎓',
+      'Sertifikasi': '📜',
+      'Kegiatan':    '📅',
+      'Pengumuman':  '📢'
+    };
+
+    function formatTanggal(tgl) {
+      return new Date(tgl).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+    }
+
+    let semuaInfo = [];
+    let katAktif  = null;
+
+    // ---- Render grid ----
+    function renderGrid(list) {
+      const grid = document.getElementById('infoGrid');
+      document.getElementById('jumlahTampil').textContent = list.length;
+
+      if (!list.length) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--text2);">
+            <div style="font-size:48px;margin-bottom:1rem;">📭</div>
+            <p>Belum ada informasi untuk kategori ini.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(info => {
+        const kat   = info.kategori_informasi;
+        const warna = kat?.warna || '#C8862B';
+        const ikon  = ikonKat[kat?.nama] || '📢';
+        const tgl   = info.published_at ? formatTanggal(info.published_at) : '';
+        return `
+          <div class="info-card" onclick="window.location.href='detail-informasi.html?id=${info.id}'">
+            <div class="info-foto">
+              ${info.foto_url
+                ? `<img src="${info.foto_url}" alt="${info.judul}">`
+                : `<span>${ikon}</span>`}
+            </div>
+            <div class="info-body">
+              <div class="info-meta">
+                ${kat ? `<span class="info-kat" style="background:${warna};">${kat.nama}</span>` : ''}
+                ${tgl ? `<span class="info-tgl">📅 ${tgl}</span>` : ''}
+              </div>
+              <div class="info-judul">${info.judul}</div>
+              <div class="info-ringkasan">${info.ringkasan || ''}</div>
+              <div class="info-footer">Baca selengkapnya →</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ---- Filter kategori ----
+    function filterKat(katId, elChip) {
+      katAktif = katId;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      elChip.classList.add('active');
+      const hasil = katId
+        ? semuaInfo.filter(i => i.kategori_id === katId)
+        : semuaInfo;
+      renderGrid(hasil);
+    }
+
+    // ---- Load kategori untuk chips ----
+    async function loadKategori() {
+      const { data } = await db.from('kategori_informasi').select('*').order('nama');
+      if (!data?.length) return;
+      const chips = document.getElementById('chipsKategori');
+      data.forEach(kat => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.textContent = kat.nama;
+        chip.onclick = () => filterKat(kat.id, chip);
+        chips.appendChild(chip);
+      });
+    }
+
+    // ---- Init ----
+    async function init() {
+      // Cek login untuk tampil/sembunyikan tombol
+      try {
+        const user = await getUser();
+        if (user) {
+          document.getElementById('navLogin').style.display    = 'none';
+          document.getElementById('navDashboard').style.display = 'inline-flex';
+        }
+      } catch(e) {}
+
+      await loadKategori();
+
+      const { data, error } = await db
+        .from('informasi')
+        .select('*, kategori_informasi(id, nama, warna)')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('infoGrid').innerHTML =
+          `<div style="grid-column:1/-1;text-align:center;color:var(--red);padding:2rem;">Gagal memuat informasi.</div>`;
+        return;
+      }
+
+      semuaInfo = data || [];
+      renderGrid(semuaInfo);
+    }
+
+    init();
+  </script>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('informasi');
+    });
+  </script>
+</body>
+</html>
