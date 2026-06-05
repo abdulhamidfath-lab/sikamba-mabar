@@ -98,12 +98,6 @@ const SIDEBAR_CSS = `
     }
     .admin-topbar-brand img { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; }
 
-    /* =============================================
-       SEARCH BAR DI TOPBAR ADMIN
-       Di desktop: tampil normal
-       Di HP (max 900px): DISEMBUNYIKAN
-       karena sudah ada mobile-search-bar di bawah
-       ============================================= */
     .admin-topbar-search {
       flex: 1;
       max-width: 360px;
@@ -167,9 +161,7 @@ const SIDEBAR_CSS = `
     body.has-sidebar .filter-bar { width: 100% !important; box-sizing: border-box !important; }
     body.has-sidebar #map { width: 100% !important; }
 
-    /* =============================================
-       RESPONSIVE — HP (max 900px)
-       ============================================= */
+    /* RESPONSIVE — HP (max 900px) */
     @media (max-width: 900px) {
       .admin-sidebar {
         position: fixed;
@@ -180,18 +172,12 @@ const SIDEBAR_CSS = `
       .admin-sidebar-overlay.open { display: block; }
       .admin-topbar-toggle { display: block; }
       .admin-topbar-brand { display: flex; }
-
-      /* ✅ PERBAIKAN UTAMA:
-         Sembunyikan search bar di topbar saat HP
-         karena sudah ada mobile-search-bar di bawah navbar.
-         Ini menghilangkan double search bar. */
+      /* Sembunyikan search bar di topbar HP — sudah ada mobile-search-bar */
       .admin-topbar-search { display: none; }
     }
   </style>
 `;
 
-// Fungsi untuk mendapatkan path logo yang benar
-// berdasarkan posisi file (root atau /pages/)
 function _getLogoPath() {
   const path = window.location.pathname;
   return path.includes('/pages/') ? '../images/logo-mabar.png' : 'images/logo-mabar.png';
@@ -239,6 +225,7 @@ async function initAdminSidebar(pageName) {
         <a href="data-ikm.html"    class="admin-sidebar-link" data-page="data-ikm"><span class="si">🏭</span>Data IKM</a>
         <a href="peta.html"        class="admin-sidebar-link" data-page="peta"><span class="si">🗺️</span>Peta Industri</a>
         <a href="marketplace.html" class="admin-sidebar-link" data-page="marketplace"><span class="si">🛍️</span>Marketplace</a>
+        <a href="informasi.html"   class="admin-sidebar-link" data-page="informasi"><span class="si">📢</span>Informasi</a>
         <a href="cari.html"        class="admin-sidebar-link" data-page="cari"><span class="si">🔍</span>Pencarian</a>
       </div>
       <hr class="admin-sidebar-divider">
@@ -247,6 +234,7 @@ async function initAdminSidebar(pageName) {
         <a href="laporan.html"            class="admin-sidebar-link" data-page="laporan"><span class="si">📊</span>Laporan & Statistik</a>
         <a href="manajemen-pengguna.html" class="admin-sidebar-link" data-page="manajemen-pengguna"><span class="si">👥</span>Manajemen Pengguna</a>
         <a href="form-ikm.html"           class="admin-sidebar-link" data-page="form-ikm"><span class="si">➕</span>Tambah IKM</a>
+        <a href="form-informasi.html"     class="admin-sidebar-link" data-page="form-informasi"><span class="si">📝</span>Tulis Informasi</a>
       </div>
       <hr class="admin-sidebar-divider">
       <div class="admin-sidebar-section">
@@ -298,26 +286,29 @@ async function initAdminSidebar(pageName) {
     const elNama = document.getElementById('sidebarNamaAdmin');
     if (elNama) elNama.textContent = nama;
 
-    // Tandai menu yang sedang aktif
+    // Tandai menu aktif
     document.querySelectorAll('.admin-sidebar-link[data-page]').forEach(link => {
       if (link.dataset.page === pageName) link.classList.add('active');
     });
 
-    // Tampilkan nama halaman di topbar
+    // Nama halaman di topbar
     const pageLabels = {
-      'dashboard'           : 'Dashboard',
-      'data-ikm'            : 'Data IKM',
-      'peta'                : 'Peta Industri',
-      'marketplace'         : 'Marketplace',
-      'cari'                : 'Pencarian',
-      'laporan'             : 'Laporan & Statistik',
-      'manajemen-pengguna'  : 'Manajemen Pengguna',
-      'form-ikm'            : 'Tambah IKM',
-      'detail-ikm'          : 'Detail IKM',
-      'form-produk'         : 'Tambah Produk',
-      'produk-saya'         : 'Produk Saya',
-      'profil'              : 'Profil Saya',
-      'tentang'             : 'Tentang',
+      'dashboard'          : 'Dashboard',
+      'data-ikm'           : 'Data IKM',
+      'peta'               : 'Peta Industri',
+      'marketplace'        : 'Marketplace',
+      'informasi'          : 'Informasi Dinas',
+      'detail-informasi'   : 'Detail Informasi',
+      'form-informasi'     : 'Tulis Informasi',
+      'cari'               : 'Pencarian',
+      'laporan'            : 'Laporan & Statistik',
+      'manajemen-pengguna' : 'Manajemen Pengguna',
+      'form-ikm'           : 'Tambah IKM',
+      'detail-ikm'         : 'Detail IKM',
+      'form-produk'        : 'Tambah Produk',
+      'produk-saya'        : 'Produk Saya',
+      'profil'             : 'Profil Saya',
+      'tentang'            : 'Tentang',
     };
     const topbarPage = document.getElementById('adminTopbarPage');
     if (topbarPage) topbarPage.textContent = pageLabels[pageName] || '';
