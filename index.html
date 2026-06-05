@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -86,6 +85,54 @@
     .ikm-nama { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--brown); margin-bottom: 4px; }
     .ikm-meta { font-size: 12px; color: var(--text2); }
 
+    /* INFORMASI TERBARU */
+    .info-card-beranda {
+      background: white;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(61,31,13,0.07);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .info-card-beranda:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .info-foto-beranda {
+      height: 160px;
+      background: linear-gradient(135deg, var(--brown), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .info-foto-beranda img { width: 100%; height: 100%; object-fit: cover; }
+    .info-body-beranda { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+    .info-judul-beranda {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 6px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .info-ringkasan-beranda {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
     /* CTA */
     .cta-section { background: var(--brown); padding: 4rem 0; text-align: center; position: relative; overflow: hidden; }
     .cta-section::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E"); }
@@ -93,38 +140,26 @@
     .cta-section p { color: rgba(255,255,255,0.72); margin-bottom: 2rem; position: relative; }
     .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
 
-    /* =============================================
-       MOBILE OVERRIDES khusus index.html
-       ============================================= */
+    /* MOBILE OVERRIDES */
     @media (max-width: 768px) {
-      /* Hero lebih kompak di HP */
       .hero { padding: 3rem 0 3rem; }
       .hero h1 { font-size: 2rem; }
       .hero p { font-size: 0.95rem; margin-bottom: 1.8rem; }
       .hero-badge { font-size: 11px; padding: 6px 14px; }
-
-      /* Tombol hero jadi full-width di HP kecil */
       .hero-btns { flex-direction: column; align-items: center; padding: 0 2rem; }
       .hero-btns .btn { width: 100%; max-width: 320px; }
-
-      /* Stat banner margin lebih kecil di HP */
       .stat-banner { margin: -1rem 1rem 0; padding: 1rem; }
-
-      /* Slider: slide lebih kecil di HP */
       .produk-slide { flex: 0 0 160px; }
       .produk-foto { height: 110px; font-size: 36px; }
-
-      /* Tombol navigasi slider lebih kecil */
       .slide-nav { gap: 4px; }
       .slide-btn { width: 28px; height: 28px; font-size: 14px; }
-
-      /* Section padding lebih kecil */
       section { padding-top: 2.5rem !important; padding-bottom: 2rem !important; }
-
-      /* CTA tombol jadi full-width */
       .cta-section { padding: 2.5rem 0; }
       .cta-btns { flex-direction: column; align-items: center; padding: 0 2rem; }
       .cta-btns .btn { width: 100%; max-width: 320px; }
+      /* Informasi di beranda: 1 kolom di HP */
+      #infoBerandaGrid { grid-template-columns: 1fr !important; }
+      .info-foto-beranda { height: 180px; }
     }
 
     @media (max-width: 480px) {
@@ -139,7 +174,10 @@
 
   <!-- NAVBAR -->
   <nav class="navbar">
-    <a href="index.html" class="navbar-brand" style="text-decoration:none;"><img src="images/logo-mabar.png" alt="Logo Mabar" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;"> <span>SIKAMBA MABAR</span></a>
+    <a href="index.html" class="navbar-brand" style="text-decoration:none;">
+      <img src="images/logo-mabar.png" alt="Logo Mabar" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+      <span>SIKAMBA MABAR</span>
+    </a>
     <form class="navbar-search" onsubmit="goSearch(event)">
       <input type="text" class="navbar-search-input" placeholder="🔍  Cari IKM atau produk..." id="navSearch">
       <button type="submit" class="navbar-search-btn">Cari</button>
@@ -157,6 +195,7 @@
       <a href="pages/data-ikm.html">Data IKM</a>
       <a href="pages/peta.html">Peta Industri</a>
       <a href="pages/marketplace.html">Marketplace</a>
+      <a href="pages/informasi.html">Informasi</a>
       <a href="pages/tentang.html">Tentang</a>
       <a href="login.html" id="navLogin" class="btn btn-gold" style="padding:7px 16px;">Masuk</a>
       <a href="pages/dashboard.html" id="navDashboard" style="display:none;" class="btn btn-gold" style="padding:7px 16px;">Dashboard</a>
@@ -164,7 +203,7 @@
   </nav>
   <div class="batik-strip"></div>
 
-  <!-- ✅ BARU: Search bar khusus HP, muncul di bawah navbar -->
+  <!-- Search bar khusus HP -->
   <div class="mobile-search-bar">
     <form onsubmit="goMobileSearch(event)">
       <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
@@ -227,7 +266,7 @@
     </div>
   </section>
 
-  <!-- FITUR -->
+  <!-- FITUR UTAMA -->
   <section style="padding: 0 0 4rem; background: var(--cream2);">
     <div class="container" style="padding-top:3rem;">
       <div style="text-align:center;margin-bottom:2.5rem;">
@@ -255,11 +294,16 @@
           <h3>QR Produk Asli</h3>
           <p>Setiap produk mendapat QR code sebagai bukti keaslian produk Manggarai Barat.</p>
         </div>
+        <div class="feature-card">
+          <div class="feature-icon">📢</div>
+          <h3>Informasi Dinas</h3>
+          <p>Info pelatihan, sertifikasi, dan kegiatan dari Dinas langsung ke pelaku IKM dan masyarakat.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- IKM SPOTLIGHT -->
+  <!-- IKM UNGGULAN -->
   <section style="padding: 4rem 0;">
     <div class="container">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;">
@@ -271,6 +315,24 @@
       </div>
       <div class="ikm-grid" id="ikmGrid">
         <div style="grid-column:1/-1;text-align:center;padding:3rem;"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ BARU: INFORMASI TERBARU -->
+  <section style="padding: 4rem 0; background: var(--cream2);">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h2 style="margin-bottom:4px;">📢 Informasi Terbaru</h2>
+          <p style="color:var(--text2);font-size:14px;">Pelatihan, sertifikasi, dan kegiatan dari Dinas Perindag Manggarai Barat</p>
+        </div>
+        <a href="pages/informasi.html" class="btn btn-secondary">Lihat Semua →</a>
+      </div>
+      <div id="infoBerandaGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.2rem;">
+        <div style="grid-column:1/-1;text-align:center;padding:2rem;">
+          <div class="spinner"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -299,7 +361,6 @@
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
-    // ✅ BARU: fungsi search untuk search bar HP
     function goMobileSearch(e) {
       e.preventDefault();
       const q = document.getElementById('mobileSearchInput').value.trim();
@@ -311,9 +372,12 @@
       'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
       'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
     };
+    const ikonKatInfo = {
+      'Pelatihan':'🎓','Sertifikasi':'📜','Kegiatan':'📅','Pengumuman':'📢'
+    };
     function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
 
-    // Slider produk
+    /* ---- Slider produk ---- */
     let produkList = [], produkIdx = 0;
     const CARD_W = 212;
     let autoTimer;
@@ -321,7 +385,7 @@
     function renderProdukSlider(data) {
       produkList = data;
       const track = document.getElementById('trackProduk');
-      const dots = document.getElementById('dotsProduk');
+      const dots  = document.getElementById('dotsProduk');
       if (!data.length) {
         track.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--text2);">Belum ada produk.</div>';
         return;
@@ -343,7 +407,6 @@
       dots.innerHTML = Array.from({length: maxDots}, (_, i) =>
         `<div class="dot ${i===0?'active':''}" onclick="goToProduk(${i})"></div>`
       ).join('');
-
       autoTimer = setInterval(() => slideProduk(1), 3500);
     }
 
@@ -370,21 +433,25 @@
       document.querySelectorAll('#dotsProduk .dot').forEach((d, i) => d.classList.toggle('active', i === dotIdx));
     }
 
+    /* ---- Init ---- */
     async function init() {
+      // Cek status login
       try {
         const user = await getUser();
         if (user) {
-          document.getElementById('navLogin').style.display = 'none';
+          document.getElementById('navLogin').style.display    = 'none';
           document.getElementById('navDashboard').style.display = 'inline-flex';
         }
       } catch(e) {}
 
+      // Load statistik
       try {
         const stats = await getStatistik();
-        document.getElementById('statIKM').textContent = stats.totalIKM;
+        document.getElementById('statIKM').textContent    = stats.totalIKM;
         document.getElementById('statProduk').textContent = stats.totalProduk;
       } catch(e) {}
 
+      // Load slider produk
       try {
         const { data } = await db.from('produk')
           .select('*, ikm:ikm_id(nama_usaha)')
@@ -394,33 +461,81 @@
         renderProdukSlider(data || []);
       } catch(e) {}
 
+      // Load IKM unggulan
       try {
         const { data } = await db.from('ikm').select('*').eq('status','aktif')
           .order('created_at', { ascending: false }).limit(4);
         const grid = document.getElementById('ikmGrid');
         if (!data || !data.length) {
           grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text2);padding:2rem;">Belum ada IKM terdaftar.</div>';
-          return;
-        }
-        grid.innerHTML = data.map(ikm => `
-          <div class="ikm-card" onclick="window.location.href='pages/detail-ikm.html?id=${ikm.id}'">
-            <div class="ikm-foto">
-              ${ikm.foto_url ? `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">` : (ikonKategori[ikm.kategori]||'🏭')}
-            </div>
-            <div class="ikm-body">
-              <div class="ikm-nama">${ikm.nama_usaha}</div>
-              <div class="ikm-meta">📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ')||'-'}</div>
-              <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
-                <span class="badge badge-kategori" style="font-size:10px;">${ikm.kategori}</span>
-                <span class="badge badge-aktif" style="font-size:10px;">Aktif</span>
+        } else {
+          grid.innerHTML = data.map(ikm => `
+            <div class="ikm-card" onclick="window.location.href='pages/detail-ikm.html?id=${ikm.id}'">
+              <div class="ikm-foto">
+                ${ikm.foto_url ? `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">` : (ikonKategori[ikm.kategori]||'🏭')}
+              </div>
+              <div class="ikm-body">
+                <div class="ikm-nama">${ikm.nama_usaha}</div>
+                <div class="ikm-meta">📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ')||'-'}</div>
+                <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+                  <span class="badge badge-kategori" style="font-size:10px;">${ikm.kategori}</span>
+                  <span class="badge badge-aktif" style="font-size:10px;">Aktif</span>
+                </div>
               </div>
             </div>
-          </div>
-        `).join('');
+          `).join('');
+        }
       } catch(e) {}
+
+      // ✅ BARU: Load 3 informasi terbaru
+      try {
+        const { data: infoData } = await db
+          .from('informasi')
+          .select('id, judul, ringkasan, foto_url, published_at, kategori_informasi(nama, warna)')
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+          .limit(3);
+
+        const grid = document.getElementById('infoBerandaGrid');
+
+        if (!infoData || !infoData.length) {
+          // Sembunyikan section kalau belum ada informasi
+          grid.closest('section').style.display = 'none';
+        } else {
+          grid.innerHTML = infoData.map(info => {
+            const kat   = info.kategori_informasi;
+            const warna = kat?.warna || '#C8862B';
+            const ikon  = ikonKatInfo[kat?.nama] || '📢';
+            const tgl   = info.published_at
+              ? new Date(info.published_at).toLocaleDateString('id-ID', {
+                  day: 'numeric', month: 'short', year: 'numeric'
+                })
+              : '';
+            return `
+              <div class="info-card-beranda" onclick="window.location.href='pages/detail-informasi.html?id=${info.id}'">
+                <div class="info-foto-beranda">
+                  ${info.foto_url ? `<img src="${info.foto_url}" alt="${info.judul}">` : `<span>${ikon}</span>`}
+                </div>
+                <div class="info-body-beranda">
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+                    ${kat ? `<span style="background:${warna};color:white;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;">${kat.nama}</span>` : ''}
+                    ${tgl ? `<span style="font-size:11px;color:var(--text2);">📅 ${tgl}</span>` : ''}
+                  </div>
+                  <div class="info-judul-beranda">${info.judul}</div>
+                  ${info.ringkasan ? `<div class="info-ringkasan-beranda">${info.ringkasan}</div>` : ''}
+                </div>
+              </div>`;
+          }).join('');
+        }
+      } catch(e) {
+        // Kalau gagal load, sembunyikan section
+        const grid = document.getElementById('infoBerandaGrid');
+        if (grid) grid.closest('section').style.display = 'none';
+      }
     }
 
     init();
   </script>
+
 </body>
 </html>
