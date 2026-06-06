@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Informasi — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .info-hero { background: var(--brown); padding: 1.8rem 0 2.5rem; }
+
+    /* Tab filter draft/published */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--cream2);
+      margin-bottom: 1.2rem;
+    }
+    .tab-btn {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text2);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .tab-btn.active { color: var(--brown); border-bottom-color: var(--brown); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    /* Kartu artikel di kelola */
+    .artikel-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(61,31,13,0.08);
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 0;
+      overflow: hidden;
+      margin-bottom: 10px;
+      transition: box-shadow 0.2s;
+    }
+    .artikel-card:hover { box-shadow: var(--shadow-md); }
+
+    /* Foto thumbnail di kiri */
+    .artikel-thumb {
+      width: 120px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--brown), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      overflow: hidden;
+    }
+    .artikel-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .artikel-body {
+      flex: 1;
+      padding: 14px 16px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .artikel-judul {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .artikel-meta {
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .artikel-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .artikel-actions .btn {
+      font-size: 12px;
+      padding: 6px 12px;
+      min-height: 34px;
+    }
+
+    .badge-draft     { background: var(--orange-light); color: var(--orange); }
+    .badge-published { background: var(--green-light);  color: var(--green);  }
+
+    @media (max-width: 600px) {
+      .artikel-thumb { width: 80px; font-size: 28px; }
+      .artikel-judul { font-size: 0.9rem; }
+      .artikel-actions .btn { font-size: 11px; padding: 5px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">
+      <img src="../images/logo-mabar.png" alt="Logo" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+      <span>SIKAMBA MABAR</span>
+    </a>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="kelola-informasi.html" class="active">Kelola Informasi</a>
+      <a href="informasi.html">Lihat Publik</a>
+      <a href="profil.html">Profil Saya</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
+  <!-- HERO -->
+  <div class="info-hero">
+    <div class="container">
+      <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-bottom:3px;">Kelola semua artikel informasi Dinas</p>
+      <h2 style="color:white;font-family:'Playfair Display',serif;margin-bottom:0;">📢 Kelola Informasi</h2>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:1.5rem;padding-bottom:3rem;">
+
+    <!-- Alert box -->
+    <div id="alertBox"></div>
+
+    <!-- Tombol tambah + stat -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span id="statPublished" style="background:var(--green-light);color:var(--green);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;">0 Published</span>
+        <span id="statDraft"     style="background:var(--orange-light);color:var(--orange);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;">0 Draft</span>
+      </div>
+      <a href="form-informasi.html" class="btn btn-primary">✏️ Tulis Informasi Baru</a>
+    </div>
+
+    <!-- Tab filter -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tabSemua"     onclick="switchTab('semua')">Semua</button>
+      <button class="tab-btn"        id="tabPublished" onclick="switchTab('published')">Published</button>
+      <button class="tab-btn"        id="tabDraft"     onclick="switchTab('draft')">Draft</button>
+    </div>
+
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">
+      Menampilkan <strong id="jumlahTampil">0</strong> artikel
+    </p>
+
+    <!-- Daftar artikel -->
+    <div id="artikelList">
+      <div style="text-align:center;padding:3rem;"><div class="spinner"></div></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2026
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
+
+    const ikonKat = {
+      'Pelatihan':'🎓','Sertifikasi':'📜','Kegiatan':'📅','Pengumuman':'📢'
+    };
+
+    let semuaArtikel = [];
+    let tabAktif = 'semua';
+
+    function switchTab(tab) {
+      tabAktif = tab;
+      ['Semua','Published','Draft'].forEach(t => {
+        const el = document.getElementById('tab' + t);
+        if (el) el.classList.toggle('active', t.toLowerCase() === tab);
+      });
+      render();
+    }
+
+    function render() {
+      const list = tabAktif === 'semua'
+        ? semuaArtikel
+        : semuaArtikel.filter(a => a.status === tabAktif);
+
+      document.getElementById('jumlahTampil').textContent = list.length;
+      const el = document.getElementById('artikelList');
+
+      if (!list.length) {
+        el.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text2);">
+          <div style="font-size:40px;margin-bottom:1rem;">📭</div>
+          <p>${tabAktif === 'draft' ? 'Tidak ada draft.' : 'Belum ada artikel.'}</p>
+          <a href="form-informasi.html" class="btn btn-primary" style="margin-top:1rem;">✏️ Tulis Informasi Baru</a>
+        </div>`;
+        return;
+      }
+
+      el.innerHTML = list.map(a => {
+        const kat   = a.kategori_informasi;
+        const ikon  = ikonKat[kat?.nama] || '📢';
+        const warna = kat?.warna || '#C8862B';
+        const tgl   = a.published_at
+          ? new Date(a.published_at).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' })
+          : new Date(a.created_at).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+
+        return `
+          <div class="artikel-card" id="acard-${a.id}">
+            <div class="artikel-thumb">
+              ${a.foto_url ? `<img src="${a.foto_url}" alt="${a.judul}">` : ikon}
+            </div>
+            <div class="artikel-body">
+              <div>
+                <div class="artikel-judul">${a.judul}</div>
+                <div class="artikel-meta">
+                  ${kat ? `<span style="background:${warna};color:white;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">${kat.nama}</span>` : ''}
+                  <span class="badge badge-${a.status === 'published' ? 'published' : 'draft'}" style="font-size:10px;padding:2px 8px;border-radius:10px;">
+                    ${a.status === 'published' ? '🟢 Published' : '📝 Draft'}
+                  </span>
+                  <span>📅 ${tgl}</span>
+                </div>
+              </div>
+              <div class="artikel-actions">
+                <a href="form-informasi.html?id=${a.id}" class="btn btn-gold">✏️ Edit</a>
+                ${a.status === 'draft'
+                  ? `<button class="btn btn-primary" onclick="ubahStatus('${a.id}', 'published', '${a.judul.replace(/'/g,"\\'")}')">🚀 Publish</button>`
+                  : `<button class="btn btn-secondary" onclick="ubahStatus('${a.id}', 'draft', '${a.judul.replace(/'/g,"\\'")}')">📝 Jadikan Draft</button>`
+                }
+                <a href="detail-informasi.html?id=${a.id}" class="btn btn-secondary" target="_blank">👁️ Lihat</a>
+                <button class="btn btn-danger" onclick="hapusArtikel('${a.id}', '${a.judul.replace(/'/g,"\\'")}')">🗑️</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function updateStat() {
+      document.getElementById('statPublished').textContent =
+        semuaArtikel.filter(a => a.status === 'published').length + ' Published';
+      document.getElementById('statDraft').textContent =
+        semuaArtikel.filter(a => a.status === 'draft').length + ' Draft';
+    }
+
+    async function ubahStatus(id, statusBaru, judul) {
+      const label = statusBaru === 'published' ? 'Publikasikan' : 'Jadikan Draft';
+      const yakin = await showConfirm({
+        judul: label + ' Artikel?',
+        pesan: `Artikel <strong>"${judul}"</strong> akan ${statusBaru === 'published' ? 'dipublikasikan dan tampil ke publik' : 'dijadikan draft dan disembunyikan dari publik'}.`,
+        tipe: statusBaru === 'published' ? 'info' : 'warning',
+        labelYa: statusBaru === 'published' ? '🚀 Ya, Publish' : '📝 Ya, Draft'
+      });
+      if (!yakin) return;
+
+      const updateData = {
+        status: statusBaru,
+        published_at: statusBaru === 'published' ? new Date().toISOString() : null
+      };
+
+      const { error } = await db.from('informasi').update(updateData).eq('id', id);
+      if (error) { showAlert('Gagal mengubah status: ' + error.message, 'error'); return; }
+
+      const idx = semuaArtikel.findIndex(a => a.id === id);
+      if (idx !== -1) {
+        semuaArtikel[idx].status = statusBaru;
+        semuaArtikel[idx].published_at = updateData.published_at;
+      }
+
+      updateStat();
+      render();
+      showAlert(
+        statusBaru === 'published' ? '✅ Artikel berhasil dipublikasikan!' : '📝 Artikel dijadikan draft.',
+        statusBaru === 'published' ? 'success' : 'info'
+      );
+    }
+
+    async function hapusArtikel(id, judul) {
+      const yakin = await showConfirm({
+        judul: 'Hapus Artikel?',
+        pesan: `Artikel <strong>"${judul}"</strong> akan dihapus permanen dan tidak bisa dikembalikan.`,
+        tipe: 'danger',
+        labelYa: '🗑️ Ya, Hapus'
+      });
+      if (!yakin) return;
+
+      const { error } = await db.from('informasi').delete().eq('id', id);
+      if (error) { showAlert('Gagal menghapus: ' + error.message, 'error'); return; }
+
+      semuaArtikel = semuaArtikel.filter(a => a.id !== id);
+      updateStat();
+      render();
+      showAlert('Artikel berhasil dihapus.', 'success');
+    }
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      if (profil?.peran !== 'admin') {
+        window.location.href = 'dashboard.html'; return;
+      }
+
+      // ✅ Admin bisa lihat SEMUA artikel termasuk draft
+      const { data, error } = await db
+        .from('informasi')
+        .select('*, kategori_informasi(id, nama, warna)')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('artikelList').innerHTML =
+          `<div class="alert alert-error">Gagal memuat data: ${error.message}</div>`;
+        return;
+      }
+
+      semuaArtikel = data || [];
+      updateStat();
+      render();
+    }
+
+    init();
+  </script>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('kelola-informasi');
+    });
+  </script>
+</body>
+</html>
