@@ -82,6 +82,7 @@
       <a href="marketplace.html">Marketplace</a>
       <a href="laporan.html" id="navLaporan" style="display:none;">Laporan</a>
       <a href="manajemen-pengguna.html" id="navPengguna" style="display:none;">Pengguna</a>
+      <a href="dokumen-saya.html" id="navDokumen" style="display:none;">📄 Dokumen Saya</a>
       <a href="profil.html">Profil Saya</a>
       <a href="#" onclick="logout()">Keluar</a>
     </div>
@@ -444,13 +445,17 @@
       } else if (peran === 'ikm') {
         document.getElementById('stat3').style.display = 'block';
         document.getElementById('statLabel3').textContent = '📦 Produk Saya';
+        // Tampilkan link Dokumen Saya di navbar
+        const navDok = document.getElementById('navDokumen');
+        if (navDok) navDok.style.display = 'block';
         try {
           const stats = await getStatistik();
           document.getElementById('statNum3').textContent = stats.totalProduk;
         } catch(e) {}
         document.getElementById('menuGrid').innerHTML += `
-          <a href="form-ikm.html"    class="menu-item"><div class="menu-icon">➕</div><div class="menu-label">Tambah IKM</div></a>
-          <a href="produk-saya.html" class="menu-item"><div class="menu-icon">📦</div><div class="menu-label">Produk Saya</div></a>`;
+          <a href="form-ikm.html"      class="menu-item"><div class="menu-icon">➕</div><div class="menu-label">Tambah IKM</div></a>
+          <a href="produk-saya.html"   class="menu-item"><div class="menu-icon">📦</div><div class="menu-label">Produk Saya</div></a>
+          <a href="dokumen-saya.html"  class="menu-item"><div class="menu-icon">📄</div><div class="menu-label">Dokumen Saya</div></a>`;
       }
     }
 
