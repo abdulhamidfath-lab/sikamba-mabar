@@ -234,6 +234,7 @@ async function initAdminSidebar(pageName) {
         <a href="laporan.html"            class="admin-sidebar-link" data-page="laporan"><span class="si">📊</span>Laporan & Statistik</a>
         <a href="manajemen-pengguna.html" class="admin-sidebar-link" data-page="manajemen-pengguna"><span class="si">👥</span>Manajemen Pengguna</a>
         <a href="form-ikm.html"           class="admin-sidebar-link" data-page="form-ikm"><span class="si">➕</span>Tambah IKM</a>
+        <a href="kelola-dokumen.html"     class="admin-sidebar-link" data-page="kelola-dokumen"><span class="si">📋</span>Kelola Dokumen</a>
         <a href="kelola-informasi.html"  class="admin-sidebar-link" data-page="kelola-informasi"><span class="si">📋</span>Kelola Informasi</a>
         <a href="form-informasi.html"     class="admin-sidebar-link" data-page="form-informasi"><span class="si">✏️</span>Tulis Informasi Baru</a>
       </div>
@@ -301,6 +302,8 @@ async function initAdminSidebar(pageName) {
       'informasi'          : 'Informasi Dinas',
       'detail-informasi'   : 'Detail Informasi',
       'kelola-informasi'   : 'Kelola Informasi',
+      'kelola-dokumen'     : 'Kelola Dokumen',
+      'dokumen-saya'       : 'Dokumen Saya',
       'form-informasi'     : 'Tulis Informasi Baru',
       'cari'               : 'Pencarian',
       'laporan'            : 'Laporan & Statistik',
