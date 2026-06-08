@@ -153,6 +153,15 @@
         </div>
       </div>
 
+      <!-- LEGALITAS & SERTIFIKASI -->
+      <div class="card" id="cardLegalitas" style="margin-bottom:1.2rem;display:none;">
+        <h3 style="margin-bottom:1rem;">🏅 Legalitas & Sertifikasi</h3>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">
+          Dokumen legalitas yang telah diverifikasi oleh Dinas Perdagangan dan Perindustrian Kab. Manggarai Barat.
+        </p>
+        <div id="badgeLegalitas" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+
       <!-- DESKRIPSI -->
       <div class="card" id="cardDeskripsi" style="margin-bottom:1.2rem;display:none;">
         <h3 style="margin-bottom:0.8rem;">📝 Deskripsi Usaha</h3>
@@ -339,6 +348,9 @@
           <div class="info-row"><span class="info-key">Email</span><span class="info-val">${ikm.email || '-'}</span></div>
         `;
 
+        // Legalitas dokumen IKM
+        loadLegalitas(ikm.id);
+
         // Produk IKM
         loadProdukIKM(ikm.id);
 
@@ -384,6 +396,88 @@
       } catch(e) {
         showAlert('Gagal menghapus: ' + e.message, 'error');
       }
+    }
+
+    // ============================================
+    // LEGALITAS & SERTIFIKASI
+    // ============================================
+    async function loadLegalitas(ikmId) {
+      try {
+        const { data } = await db
+          .from('dokumen_ikm')
+          .select('*, jenis_dokumen(nama, ikon)')
+          .eq('ikm_id', ikmId)
+          .eq('status', 'terverifikasi');
+
+        if (!data || !data.length) return;
+
+        document.getElementById('cardLegalitas').style.display = 'block';
+        const container = document.getElementById('badgeLegalitas');
+
+        container.innerHTML = data.map(d => `
+          <div onclick="lihatDetailDokumen('${d.id}')"
+               style="display:inline-flex;align-items:center;gap:6px;
+                      background:var(--green-light);color:var(--green);
+                      padding:8px 14px;border-radius:20px;
+                      font-size:13px;font-weight:600;cursor:pointer;
+                      border:1.5px solid var(--green);transition:all 0.2s;"
+               onmouseover="this.style.background='var(--green)';this.style.color='white';"
+               onmouseout="this.style.background='var(--green-light)';this.style.color='var(--green)';">
+            <span>${d.jenis_dokumen?.ikon || '📄'}</span>
+            <span>${d.jenis_dokumen?.nama || 'Dokumen'}</span>
+            <span style="font-size:11px;opacity:0.8;">✅</span>
+          </div>
+        `).join('');
+
+        window._dokumenLegalitas = data;
+      } catch(e) {}
+    }
+
+    function lihatDetailDokumen(dokId) {
+      const dok = (window._dokumenLegalitas || []).find(d => d.id === dokId);
+      if (!dok) return;
+
+      const jenis = dok.jenis_dokumen;
+
+      function formatTglModal(t) {
+        if (!t) return '-';
+        return new Date(t).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+      }
+
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+      overlay.innerHTML = `
+        <div style="background:white;border-radius:16px;padding:1.8rem;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+          <div style="text-align:center;margin-bottom:1.2rem;">
+            <div style="font-size:48px;margin-bottom:8px;">${jenis?.ikon || '📄'}</div>
+            <h3 style="color:var(--brown);margin-bottom:4px;">${jenis?.nama || 'Dokumen'}</h3>
+            <span style="background:var(--green-light);color:var(--green);padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700;">
+              ✅ Terverifikasi oleh Dinas
+            </span>
+          </div>
+          <div style="background:var(--cream2);border-radius:var(--radius);padding:1rem;margin-bottom:1.2rem;font-size:13px;line-height:1.9;">
+            <div><strong>Nomor:</strong> ${dok.nomor_dokumen}</div>
+            <div><strong>Tanggal Terbit:</strong> ${formatTglModal(dok.tanggal_terbit)}</div>
+            ${dok.tanggal_expired ? `<div><strong>Berlaku s/d:</strong> ${formatTglModal(dok.tanggal_expired)}</div>` : ''}
+          </div>
+          <div style="display:flex;gap:8px;">
+            <a href="${dok.file_url}" target="_blank"
+               style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+                      background:var(--brown);color:white;padding:11px;border-radius:var(--radius);
+                      font-size:13px;font-weight:600;text-decoration:none;">
+              📄 Lihat / Download PDF
+            </a>
+            <button onclick="this.closest('[style*=fixed]').remove()"
+              style="flex:0 0 auto;padding:11px 16px;border-radius:var(--radius);
+                     border:1.5px solid rgba(61,31,13,0.15);background:var(--cream2);
+                     color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+              Tutup
+            </button>
+          </div>
+        </div>
+      `;
+      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+      document.body.appendChild(overlay);
     }
 
     async function loadProdukIKM(ikmId) {
