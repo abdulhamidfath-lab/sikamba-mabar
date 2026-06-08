@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokumen Legalitas — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .dok-hero { background: var(--brown); padding: 1.8rem 0 2.5rem; }
+
+    /* Grid status dokumen */
+    .dok-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Kartu per jenis dokumen */
+    .dok-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 2px solid rgba(61,31,13,0.08);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .dok-card:hover { box-shadow: var(--shadow-md); }
+
+    .dok-card-header {
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--cream2);
+    }
+    .dok-ikon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--cream2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .dok-nama { font-size: 14px; font-weight: 700; color: var(--brown); }
+    .dok-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+    .dok-card-body { padding: 14px 16px; }
+
+    /* Status badge di kartu */
+    .dok-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .dok-status.terverifikasi { background: var(--green-light); color: var(--green); }
+    .dok-status.menunggu      { background: #FFF3CD; color: #856404; }
+    .dok-status.ditolak       { background: var(--red-light); color: var(--red); }
+    .dok-status.belum         { background: var(--cream2); color: var(--text2); }
+
+    .dok-info { font-size: 12px; color: var(--text2); line-height: 1.8; margin-bottom: 10px; }
+    .dok-info strong { color: var(--text); }
+    .dok-catatan-admin {
+      background: var(--red-light);
+      border-left: 3px solid var(--red);
+      padding: 8px 10px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 12px;
+      color: var(--red);
+      margin-bottom: 10px;
+    }
+
+    /* Form upload — tersembunyi, muncul saat klik tombol */
+    .dok-form {
+      display: none;
+      background: var(--cream);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-top: 8px;
+      border: 1.5px solid rgba(61,31,13,0.12);
+    }
+    .dok-form.open { display: block; }
+    .dok-form .form-group { margin-bottom: 0.8rem; }
+    .dok-form .form-label { font-size: 12px; }
+    .dok-form .form-input,
+    .dok-form .form-select { font-size: 14px; padding: 9px 12px; }
+
+    @media (max-width: 640px) {
+      .dok-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">
+      <img src="../images/logo-mabar.png" alt="Logo" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+      <span>SIKAMBA MABAR</span>
+    </a>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="dokumen-saya.html" class="active">Dokumen Saya</a>
+      <a href="profil.html">Profil Saya</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="dok-hero">
+    <div class="container">
+      <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-bottom:3px;">Kelola dokumen legalitas usaha Anda</p>
+      <h2 style="color:white;font-family:'Playfair Display',serif;margin-bottom:0;">📄 Dokumen Legalitas</h2>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:1.5rem;padding-bottom:3rem;">
+
+    <div id="alertBox"></div>
+
+    <!-- Info panduan -->
+    <div class="alert alert-info" style="margin-bottom:1.5rem;">
+      <strong>ℹ️ Panduan:</strong> Upload dokumen legalitas usaha Anda untuk mendapat badge terverifikasi di halaman profil IKM.
+      Dokumen akan diverifikasi oleh admin Dinas sebelum badge ditampilkan.
+    </div>
+
+    <!-- Grid kartu dokumen -->
+    <div class="dok-grid" id="dokGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:3rem;">
+        <div class="spinner"></div>
+        <p style="color:var(--text2);margin-top:1rem;">Memuat dokumen...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2026
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+
+    let ikmId      = null;
+    let jenisList  = [];
+    let dokumenMap = {}; // jenis_id → dokumen
+
+    function formatTgl(tgl) {
+      if (!tgl) return '-';
+      return new Date(tgl).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+    }
+
+    // Toggle form upload per jenis
+    function toggleForm(jenisId) {
+      const formEl = document.getElementById('form-' + jenisId);
+      if (!formEl) return;
+      formEl.classList.toggle('open');
+    }
+
+    // Preview file PDF yang dipilih
+    function previewPDF(jenisId) {
+      const input = document.getElementById('file-' + jenisId);
+      const info  = document.getElementById('fileinfo-' + jenisId);
+      const file  = input?.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showAlert('Ukuran file terlalu besar. Maksimal 5 MB.', 'error');
+        input.value = '';
+        return;
+      }
+      if (file.type !== 'application/pdf') {
+        showAlert('Hanya file PDF yang diizinkan.', 'error');
+        input.value = '';
+        return;
+      }
+      info.textContent = `✅ ${file.name} — ${(file.size/1024).toFixed(0)} KB`;
+    }
+
+    // Upload dokumen
+    async function uploadDokumen(jenisId, namaJenis, adaExpired) {
+      const nomor   = document.getElementById('nomor-' + jenisId)?.value.trim();
+      const terbit  = document.getElementById('terbit-' + jenisId)?.value;
+      const expired = document.getElementById('expired-' + jenisId)?.value || null;
+      const catatan = document.getElementById('catatan-' + jenisId)?.value.trim() || null;
+      const fileEl  = document.getElementById('file-' + jenisId);
+      const file    = fileEl?.files[0];
+      const btn     = document.getElementById('btn-' + jenisId);
+
+      if (!nomor)  { showAlert('Nomor dokumen wajib diisi.', 'error'); return; }
+      if (!terbit) { showAlert('Tanggal terbit wajib diisi.', 'error'); return; }
+      if (adaExpired && !expired) { showAlert('Tanggal expired wajib diisi untuk ' + namaJenis + '.', 'error'); return; }
+      if (!file)   { showAlert('File PDF wajib diupload.', 'error'); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;"></span> Mengirim...';
+
+      try {
+        // Upload file ke storage
+        const ext      = 'pdf';
+        const filePath = `${ikmId}/${jenisId}/dokumen.${ext}`;
+
+        const { error: upErr } = await db.storage
+          .from('dokumen-ikm')
+          .upload(filePath, file, { upsert: true, contentType: 'application/pdf' });
+
+        if (upErr) throw new Error('Gagal upload file: ' + upErr.message);
+
+        const { data: urlData } = db.storage.from('dokumen-ikm').getPublicUrl(filePath);
+
+        // Simpan/update data dokumen
+        const dokData = {
+          ikm_id:          ikmId,
+          jenis_id:        jenisId,
+          nomor_dokumen:   nomor,
+          tanggal_terbit:  terbit,
+          tanggal_expired: expired || null,
+          file_url:        urlData.publicUrl,
+          file_path:       filePath,
+          catatan_ikm:     catatan,
+          status:          'menunggu',
+          catatan_admin:   null,
+          verified_by:     null,
+          verified_at:     null,
+        };
+
+        // Pakai upsert karena ada UNIQUE constraint (ikm_id, jenis_id)
+        const { error: dbErr } = await db
+          .from('dokumen_ikm')
+          .upsert(dokData, { onConflict: 'ikm_id,jenis_id' });
+
+        if (dbErr) throw new Error('Gagal menyimpan data: ' + dbErr.message);
+
+        showAlert('✅ Dokumen berhasil dikirim! Menunggu verifikasi admin.', 'success');
+        setTimeout(() => window.location.reload(), 1500);
+
+      } catch(e) {
+        showAlert('Gagal: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '📤 Kirim untuk Verifikasi';
+      }
+    }
+
+    // Hapus dokumen
+    async function hapusDokumen(dokId, filePath, namaJenis) {
+      const yakin = await showConfirm({
+        judul: 'Hapus Dokumen?',
+        pesan: `Dokumen <strong>${namaJenis}</strong> akan dihapus. Kamu perlu upload ulang jika ingin diverifikasi kembali.`,
+        tipe: 'danger',
+        labelYa: '🗑️ Ya, Hapus'
+      });
+      if (!yakin) return;
+
+      try {
+        // Hapus dari storage
+        if (filePath) {
+          await db.storage.from('dokumen-ikm').remove([filePath]);
+        }
+        // Hapus dari database
+        const { error } = await db.from('dokumen_ikm').delete().eq('id', dokId);
+        if (error) throw error;
+
+        showAlert('Dokumen berhasil dihapus.', 'success');
+        setTimeout(() => window.location.reload(), 1200);
+      } catch(e) {
+        showAlert('Gagal menghapus: ' + e.message, 'error');
+      }
+    }
+
+    // Render semua kartu dokumen
+    function renderKartu() {
+      const grid = document.getElementById('dokGrid');
+
+      if (!jenisList.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text2);">
+          Belum ada jenis dokumen yang dikonfigurasi admin.
+        </div>`;
+        return;
+      }
+
+      grid.innerHTML = jenisList.map(jenis => {
+        const dok = dokumenMap[jenis.id];
+        const status = dok?.status || 'belum';
+
+        const labelStatus = {
+          terverifikasi: '✅ Terverifikasi',
+          menunggu:      '⏳ Menunggu Verifikasi',
+          ditolak:       '❌ Ditolak',
+          belum:         '○ Belum Diupload'
+        };
+
+        // Info dokumen yang sudah ada
+        let infoHTML = '';
+        if (dok) {
+          infoHTML = `
+            <div class="dok-info">
+              <strong>No. Dokumen:</strong> ${dok.nomor_dokumen}<br>
+              <strong>Terbit:</strong> ${formatTgl(dok.tanggal_terbit)}
+              ${dok.tanggal_expired ? `<br><strong>Berlaku s/d:</strong> ${formatTgl(dok.tanggal_expired)}` : ''}
+              ${dok.catatan_ikm ? `<br><strong>Catatan:</strong> ${dok.catatan_ikm}` : ''}
+            </div>`;
+
+          if (dok.status === 'ditolak' && dok.catatan_admin) {
+            infoHTML += `<div class="dok-catatan-admin">
+              ⚠️ <strong>Alasan ditolak:</strong> ${dok.catatan_admin}
+            </div>`;
+          }
+        }
+
+        // Tombol aksi
+        let tombolHTML = '';
+        if (dok?.status === 'terverifikasi') {
+          tombolHTML = `
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <a href="${dok.file_url}" target="_blank" class="btn btn-secondary" style="font-size:12px;padding:7px 12px;">
+                📄 Lihat PDF
+              </a>
+              <button class="btn btn-danger" style="font-size:12px;padding:7px 12px;"
+                onclick="hapusDokumen('${dok.id}','${dok.file_path}','${jenis.nama}')">
+                🗑️ Hapus
+              </button>
+            </div>`;
+        } else if (dok?.status === 'menunggu') {
+          tombolHTML = `
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <a href="${dok.file_url}" target="_blank" class="btn btn-secondary" style="font-size:12px;padding:7px 12px;">
+                📄 Lihat PDF
+              </a>
+              <button class="btn btn-danger" style="font-size:12px;padding:7px 12px;"
+                onclick="hapusDokumen('${dok.id}','${dok.file_path}','${jenis.nama}')">
+                🗑️ Batalkan
+              </button>
+            </div>`;
+        } else {
+          // Belum upload atau ditolak — tampilkan tombol upload
+          const labelBtn = dok?.status === 'ditolak' ? '🔄 Upload Ulang' : '📤 Upload Dokumen';
+          tombolHTML = `
+            <button class="btn btn-primary" style="font-size:12px;padding:7px 14px;width:100%;"
+              onclick="toggleForm('${jenis.id}')">
+              ${labelBtn}
+            </button>
+
+            <!-- Form upload tersembunyi -->
+            <div class="dok-form" id="form-${jenis.id}">
+              <div class="form-group">
+                <label class="form-label">Nomor Dokumen *</label>
+                <input type="text" id="nomor-${jenis.id}" class="form-input"
+                  placeholder="${jenis.nama === 'NIB' ? 'Contoh: 1234567890123' : 'Nomor sertifikat/izin'}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tanggal Terbit *</label>
+                <input type="date" id="terbit-${jenis.id}" class="form-input">
+              </div>
+              ${jenis.ada_expired ? `
+              <div class="form-group">
+                <label class="form-label">Tanggal Berlaku s/d (Expired) *</label>
+                <input type="date" id="expired-${jenis.id}" class="form-input">
+              </div>` : ''}
+              <div class="form-group">
+                <label class="form-label">Catatan (opsional)</label>
+                <input type="text" id="catatan-${jenis.id}" class="form-input"
+                  placeholder="Misal: Sedang proses perpanjangan">
+              </div>
+              <div class="form-group">
+                <label class="form-label">File PDF *</label>
+                <input type="file" id="file-${jenis.id}" class="form-input"
+                  accept="application/pdf" style="padding:8px;"
+                  onchange="previewPDF('${jenis.id}')">
+                <div id="fileinfo-${jenis.id}" style="font-size:12px;color:var(--text2);margin-top:4px;"></div>
+                <div class="form-hint">Format PDF, maksimal 5 MB</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button id="btn-${jenis.id}" class="btn btn-primary" style="flex:1;font-size:13px;"
+                  onclick="uploadDokumen('${jenis.id}','${jenis.nama}',${jenis.ada_expired})">
+                  📤 Kirim untuk Verifikasi
+                </button>
+                <button class="btn btn-secondary" style="font-size:13px;"
+                  onclick="toggleForm('${jenis.id}')">
+                  Batal
+                </button>
+              </div>
+            </div>`;
+        }
+
+        return `
+          <div class="dok-card">
+            <div class="dok-card-header">
+              <div class="dok-ikon">${jenis.ikon}</div>
+              <div>
+                <div class="dok-nama">${jenis.nama}</div>
+                <div class="dok-desc">${jenis.deskripsi || ''}</div>
+              </div>
+            </div>
+            <div class="dok-card-body">
+              <div class="dok-status ${status}">
+                ${labelStatus[status]}
+              </div>
+              ${infoHTML}
+              ${tombolHTML}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+
+      if (!profil?.ikm_id) {
+        document.getElementById('dokGrid').innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:3rem 2rem;">
+            <div style="font-size:48px;margin-bottom:1rem;">🏭</div>
+            <h3>Belum Punya IKM Terdaftar</h3>
+            <p style="color:var(--text2);margin:0.8rem 0 1.5rem;">
+              Daftarkan IKM Anda terlebih dahulu sebelum mengelola dokumen legalitas.
+            </p>
+            <a href="form-ikm.html" class="btn btn-primary">➕ Daftarkan IKM</a>
+          </div>`;
+        return;
+      }
+
+      ikmId = profil.ikm_id;
+
+      // Load jenis dokumen
+      const { data: jenis } = await db
+        .from('jenis_dokumen')
+        .select('*')
+        .eq('aktif', true)
+        .order('urutan');
+      jenisList = jenis || [];
+
+      // Load dokumen yang sudah diupload IKM ini
+      const { data: dokumen } = await db
+        .from('dokumen_ikm')
+        .select('*')
+        .eq('ikm_id', ikmId);
+
+      // Buat map jenis_id → dokumen untuk akses cepat
+      (dokumen || []).forEach(d => { dokumenMap[d.jenis_id] = d; });
+
+      renderKartu();
+    }
+
+    init();
+  </script>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('dokumen-saya');
+    });
+  </script>
+</body>
+</html>

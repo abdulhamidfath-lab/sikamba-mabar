@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Dokumen — SIKAMBA MABAR</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .dok-hero { background: var(--brown); padding: 1.8rem 0 2.5rem; }
+
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--cream2);
+      margin-bottom: 1.2rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text2);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .tab-btn.active { color: var(--brown); border-bottom-color: var(--brown); }
+
+    /* Kartu dokumen untuk admin */
+    .dok-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(61,31,13,0.08);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      transition: box-shadow 0.2s;
+    }
+    .dok-card:hover { box-shadow: var(--shadow-md); }
+
+    .dok-ikon-wrap {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: var(--cream2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+
+    .dok-body { flex: 1; min-width: 0; }
+    .dok-judul {
+      font-size: 14px; font-weight: 700; color: var(--brown);
+      margin-bottom: 4px;
+    }
+    .dok-meta {
+      font-size: 12px; color: var(--text2);
+      line-height: 1.8; margin-bottom: 10px;
+    }
+    .dok-meta strong { color: var(--text); }
+
+    .dok-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .dok-actions .btn { font-size: 12px; padding: 6px 12px; min-height: 34px; }
+
+    .badge-menunggu      { background: #FFF3CD; color: #856404; }
+    .badge-terverifikasi { background: var(--green-light); color: var(--green); }
+    .badge-ditolak       { background: var(--red-light); color: var(--red); }
+
+    /* Stat row */
+    .stat-row-dok {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: -1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-mini { background: white; border-radius: 14px; padding: 12px 14px; text-align: center; box-shadow: var(--shadow); }
+    .stat-mini .num { font-size: 1.8rem; font-weight: 700; }
+    .stat-mini .lbl { font-size: 11px; color: var(--text2); font-weight: 600; }
+
+    /* Modal tolak */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: white; border-radius: 16px;
+      padding: 1.8rem; width: 100%; max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 600px) {
+      .dok-card { gap: 10px; }
+      .dok-ikon-wrap { width: 40px; height: 40px; font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">
+      <img src="../images/logo-mabar.png" alt="Logo" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+      <span>SIKAMBA MABAR</span>
+    </a>
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+    <div class="navbar-menu" id="navMenu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="kelola-dokumen.html" class="active">Kelola Dokumen</a>
+      <a href="data-ikm.html">Data IKM</a>
+      <a href="#" onclick="logout()">Keluar</a>
+    </div>
+  </nav>
+  <div class="batik-strip"></div>
+
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
+  <div class="dok-hero">
+    <div class="container">
+      <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-bottom:3px;">Verifikasi dokumen legalitas IKM</p>
+      <h2 style="color:white;font-family:'Playfair Display',serif;margin-bottom:0;">📋 Kelola Dokumen Legalitas</h2>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:0;padding-bottom:3rem;">
+
+    <!-- Stat row -->
+    <div class="stat-row-dok">
+      <div class="stat-mini"><div class="num" style="color:var(--blue);"    id="sTotal">–</div><div class="lbl">Total</div></div>
+      <div class="stat-mini"><div class="num" style="color:#856404;"        id="sMenunggu">–</div><div class="lbl">Menunggu</div></div>
+      <div class="stat-mini"><div class="num" style="color:var(--green);"   id="sVerif">–</div><div class="lbl">Terverifikasi</div></div>
+      <div class="stat-mini"><div class="num" style="color:var(--red);"     id="sTolak">–</div><div class="lbl">Ditolak</div></div>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <!-- Tab filter -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tabSemua"    onclick="switchTab('semua')">Semua</button>
+      <button class="tab-btn"        id="tabMenunggu" onclick="switchTab('menunggu')">⏳ Menunggu</button>
+      <button class="tab-btn"        id="tabVerif"    onclick="switchTab('terverifikasi')">✅ Terverifikasi</button>
+      <button class="tab-btn"        id="tabTolak"    onclick="switchTab('ditolak')">❌ Ditolak</button>
+    </div>
+
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">
+      Menampilkan <strong id="jumlahTampil">0</strong> dokumen
+    </p>
+
+    <div id="dokList">
+      <div style="text-align:center;padding:3rem;"><div class="spinner"></div></div>
+    </div>
+
+  </div>
+
+  <!-- Modal tolak dengan catatan -->
+  <div class="modal-overlay" id="modalTolak">
+    <div class="modal-box">
+      <h3 style="margin-bottom:0.5rem;color:var(--brown);">❌ Tolak Dokumen</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:1.2rem;" id="modalTolakNama"></p>
+      <div class="form-group">
+        <label class="form-label">Alasan Penolakan *</label>
+        <textarea id="catatanTolak" class="form-textarea" rows="3"
+          placeholder="Jelaskan alasan penolakan agar IKM bisa memperbaiki..."></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:1rem;">
+        <button class="btn btn-danger" style="flex:1;" onclick="konfirmasiTolak()">❌ Tolak Dokumen</button>
+        <button class="btn btn-secondary" style="flex:1;" onclick="tutupModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>SIKAMBA MABAR</strong> — Dinas Perdagangan dan Perindustrian Kabupaten Manggarai Barat © 2026
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
+
+    let semuaDokumen = [];
+    let tabAktif = 'semua';
+    let tolakId  = null;
+
+    function formatTgl(tgl) {
+      if (!tgl) return '-';
+      return new Date(tgl).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+    }
+
+    function switchTab(tab) {
+      tabAktif = tab;
+      ['Semua','Menunggu','Verif','Tolak'].forEach(t => {
+        const btn = document.getElementById('tab' + t);
+        if (btn) btn.classList.remove('active');
+      });
+      const map = { semua:'Semua', menunggu:'Menunggu', terverifikasi:'Verif', ditolak:'Tolak' };
+      const el = document.getElementById('tab' + map[tab]);
+      if (el) el.classList.add('active');
+      render();
+    }
+
+    function render() {
+      const list = tabAktif === 'semua'
+        ? semuaDokumen
+        : semuaDokumen.filter(d => d.status === tabAktif);
+
+      document.getElementById('jumlahTampil').textContent = list.length;
+      const el = document.getElementById('dokList');
+
+      if (!list.length) {
+        el.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text2);">
+          <div style="font-size:40px;margin-bottom:1rem;">📭</div>
+          <p>Tidak ada dokumen ${tabAktif === 'semua' ? '' : tabAktif}.</p>
+        </div>`;
+        return;
+      }
+
+      el.innerHTML = list.map(d => {
+        const jenis   = d.jenis_dokumen;
+        const ikm     = d.ikm;
+        const badgeCls = {
+          menunggu: 'badge-menunggu',
+          terverifikasi: 'badge-terverifikasi',
+          ditolak: 'badge-ditolak'
+        }[d.status] || '';
+        const labelStatus = {
+          menunggu: '⏳ Menunggu',
+          terverifikasi: '✅ Terverifikasi',
+          ditolak: '❌ Ditolak'
+        }[d.status] || d.status;
+
+        return `
+          <div class="dok-card" id="dcard-${d.id}">
+            <div class="dok-ikon-wrap">${jenis?.ikon || '📄'}</div>
+            <div class="dok-body">
+              <div class="dok-judul">${jenis?.nama || 'Dokumen'} — ${ikm?.nama_usaha || '-'}</div>
+              <div class="dok-meta">
+                <span class="badge ${badgeCls}" style="font-size:10px;padding:2px 8px;border-radius:10px;margin-right:6px;">${labelStatus}</span>
+                <br>
+                <strong>No. Dokumen:</strong> ${d.nomor_dokumen}<br>
+                <strong>Terbit:</strong> ${formatTgl(d.tanggal_terbit)}
+                ${d.tanggal_expired ? ` &nbsp;|&nbsp; <strong>Expired:</strong> ${formatTgl(d.tanggal_expired)}` : ''}
+                ${d.catatan_ikm ? `<br><strong>Catatan IKM:</strong> ${d.catatan_ikm}` : ''}
+                ${d.status === 'ditolak' && d.catatan_admin
+                  ? `<br><span style="color:var(--red);"><strong>Alasan ditolak:</strong> ${d.catatan_admin}</span>`
+                  : ''}
+                <br><strong>Upload:</strong> ${formatTgl(d.created_at)}
+                ${d.verified_at ? ` &nbsp;|&nbsp; <strong>Diverifikasi:</strong> ${formatTgl(d.verified_at)}` : ''}
+              </div>
+              <div class="dok-actions">
+                <a href="${d.file_url}" target="_blank" class="btn btn-secondary">
+                  📄 Lihat PDF
+                </a>
+                <a href="detail-ikm.html?id=${d.ikm_id}" target="_blank" class="btn btn-secondary">
+                  🏭 Profil IKM
+                </a>
+                ${d.status === 'menunggu' ? `
+                  <button class="btn btn-primary" onclick="approve('${d.id}','${(ikm?.nama_usaha||'').replace(/'/g,"\\'")}','${(jenis?.nama||'').replace(/'/g,"\\'")}')">
+                    ✅ Approve
+                  </button>
+                  <button class="btn btn-danger" onclick="bukaModalTolak('${d.id}','${(ikm?.nama_usaha||'').replace(/'/g,"\\'")}','${(jenis?.nama||'').replace(/'/g,"\\'")}')">
+                    ❌ Tolak
+                  </button>
+                ` : ''}
+                ${d.status === 'terverifikasi' ? `
+                  <button class="btn btn-secondary" onclick="bukaModalTolak('${d.id}','${(ikm?.nama_usaha||'').replace(/'/g,"\\'")}','${(jenis?.nama||'').replace(/'/g,"\\'")}')">
+                    🔄 Cabut Verifikasi
+                  </button>
+                ` : ''}
+                ${d.status === 'ditolak' ? `
+                  <button class="btn btn-primary" onclick="approve('${d.id}','${(ikm?.nama_usaha||'').replace(/'/g,"\\'")}','${(jenis?.nama||'').replace(/'/g,"\\'")}')">
+                    ✅ Approve Ulang
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function updateStat() {
+      document.getElementById('sTotal').textContent    = semuaDokumen.length;
+      document.getElementById('sMenunggu').textContent = semuaDokumen.filter(d => d.status === 'menunggu').length;
+      document.getElementById('sVerif').textContent    = semuaDokumen.filter(d => d.status === 'terverifikasi').length;
+      document.getElementById('sTolak').textContent    = semuaDokumen.filter(d => d.status === 'ditolak').length;
+
+      // Update label tab
+      const jmlMenunggu = semuaDokumen.filter(d => d.status === 'menunggu').length;
+      const tabM = document.getElementById('tabMenunggu');
+      if (tabM) tabM.textContent = jmlMenunggu > 0 ? `⏳ Menunggu (${jmlMenunggu})` : '⏳ Menunggu';
+    }
+
+    async function approve(id, namaIKM, namaJenis) {
+      const yakin = await showConfirm({
+        judul: 'Approve Dokumen?',
+        pesan: `Dokumen <strong>${namaJenis}</strong> dari IKM <strong>${namaIKM}</strong> akan diverifikasi dan badge akan muncul di profil IKM.`,
+        tipe: 'info',
+        labelYa: '✅ Ya, Approve'
+      });
+      if (!yakin) return;
+
+      const user = await getUser();
+      const { error } = await db.from('dokumen_ikm').update({
+        status:       'terverifikasi',
+        catatan_admin: null,
+        verified_by:  user.id,
+        verified_at:  new Date().toISOString()
+      }).eq('id', id);
+
+      if (error) { showAlert('Gagal approve: ' + error.message, 'error'); return; }
+
+      const idx = semuaDokumen.findIndex(d => d.id === id);
+      if (idx !== -1) {
+        semuaDokumen[idx].status = 'terverifikasi';
+        semuaDokumen[idx].verified_at = new Date().toISOString();
+        semuaDokumen[idx].catatan_admin = null;
+      }
+
+      updateStat();
+      render();
+      showAlert('✅ Dokumen berhasil diverifikasi! Badge akan muncul di profil IKM.', 'success');
+    }
+
+    // Buka modal tolak
+    function bukaModalTolak(id, namaIKM, namaJenis) {
+      tolakId = id;
+      document.getElementById('modalTolakNama').textContent =
+        `Dokumen ${namaJenis} dari IKM "${namaIKM}"`;
+      document.getElementById('catatanTolak').value = '';
+      document.getElementById('modalTolak').classList.add('open');
+    }
+
+    function tutupModal() {
+      document.getElementById('modalTolak').classList.remove('open');
+      tolakId = null;
+    }
+
+    async function konfirmasiTolak() {
+      const catatan = document.getElementById('catatanTolak').value.trim();
+      if (!catatan) {
+        showAlert('Alasan penolakan wajib diisi agar IKM bisa memperbaiki.', 'error');
+        return;
+      }
+
+      const { error } = await db.from('dokumen_ikm').update({
+        status:        'ditolak',
+        catatan_admin: catatan,
+        verified_by:   null,
+        verified_at:   null
+      }).eq('id', tolakId);
+
+      if (error) { showAlert('Gagal menolak: ' + error.message, 'error'); return; }
+
+      const idx = semuaDokumen.findIndex(d => d.id === tolakId);
+      if (idx !== -1) {
+        semuaDokumen[idx].status        = 'ditolak';
+        semuaDokumen[idx].catatan_admin = catatan;
+        semuaDokumen[idx].verified_at   = null;
+      }
+
+      tutupModal();
+      updateStat();
+      render();
+      showAlert('Dokumen ditolak. IKM akan melihat alasan penolakan dan bisa upload ulang.', 'warning');
+    }
+
+    // Tutup modal kalau klik di luar
+    document.getElementById('modalTolak').addEventListener('click', function(e) {
+      if (e.target === this) tutupModal();
+    });
+
+    async function init() {
+      const user = await requireLogin();
+      const profil = await getProfil(user.id);
+      if (profil?.peran !== 'admin') {
+        window.location.href = 'dashboard.html'; return;
+      }
+
+      const { data, error } = await db
+        .from('dokumen_ikm')
+        .select('*, jenis_dokumen(*), ikm:ikm_id(id, nama_usaha)')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('dokList').innerHTML =
+          `<div class="alert alert-error">Gagal memuat data: ${error.message}</div>`;
+        return;
+      }
+
+      semuaDokumen = data || [];
+      updateStat();
+      render();
+    }
+
+    init();
+  </script>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('kelola-dokumen');
+    });
+  </script>
+</body>
+</html>
