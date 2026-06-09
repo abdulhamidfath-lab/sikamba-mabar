@@ -108,6 +108,14 @@
   </nav>
   <div class="batik-strip"></div>
 
+  <!-- Search bar khusus HP -->
+  <div class="mobile-search-bar">
+    <form onsubmit="goMobileSearch(event)">
+      <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
+      <button type="submit">Cari</button>
+    </form>
+  </div>
+
   <div class="dok-hero">
     <div class="container">
       <p style="color:rgba(255,255,255,0.65);font-size:13px;margin-bottom:3px;">Kelola dokumen legalitas usaha Anda</p>
@@ -145,6 +153,11 @@
   <script src="../js/utils.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
+    function goMobileSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('mobileSearchInput').value.trim();
+      if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
+    }
 
     let ikmId      = null;
     let jenisList  = [];
