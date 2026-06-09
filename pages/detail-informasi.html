@@ -261,14 +261,37 @@
       if (!id) { tampilError(); return; }
 
       try {
-        const { data: info, error } = await db
+        // Cek apakah user adalah admin — admin boleh preview draft
+        let isAdmin = false;
+        try {
+          const user = await getUser();
+          if (user) {
+            const profil = await getProfil(user.id);
+            isAdmin = profil?.peran === 'admin';
+          }
+        } catch(e) {}
+
+        // Admin bisa lihat semua status, publik hanya bisa lihat published
+        let query = db
           .from('informasi')
           .select('*, kategori_informasi(id, nama, warna)')
-          .eq('id', id)
-          .eq('status', 'published')
-          .single();
+          .eq('id', id);
+
+        if (!isAdmin) {
+          query = query.eq('status', 'published');
+        }
+
+        const { data: info, error } = await query.single();
 
         if (error || !info) { tampilError(); return; }
+
+        // Tampilkan banner khusus kalau admin preview draft
+        if (isAdmin && info.status === 'draft') {
+          const banner = document.createElement('div');
+          banner.style.cssText = 'background:var(--orange-light);color:var(--orange);padding:10px 16px;font-size:13px;font-weight:600;text-align:center;border-bottom:2px solid var(--orange);';
+          banner.innerHTML = '📝 Anda sedang melihat <strong>DRAFT</strong> — artikel ini belum dipublikasikan ke publik. <a href="kelola-informasi.html" style="color:var(--orange);text-decoration:underline;">Kelola Informasi →</a>';
+          document.body.insertBefore(banner, document.body.firstChild);
+        }
 
         document.getElementById('loadingArea').style.display = 'none';
         document.getElementById('kontenUtama').style.display = 'block';
