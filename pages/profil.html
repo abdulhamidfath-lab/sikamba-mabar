@@ -13,17 +13,14 @@
     .profile-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: white; font-weight: 700; margin-bottom: 4px; }
     .profile-email { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 8px; }
 
-    /* GRID KARTU */
     .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
     @media (max-width: 680px) { .cards-grid { grid-template-columns: 1fr; } }
 
-    /* PASSWORD INPUT WRAPPER */
     .pass-wrap { position: relative; margin-bottom: 1.2rem; }
     .pass-wrap .form-input { padding-right: 44px; margin-bottom: 0; }
     .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text2); font-size: 18px; padding: 4px; display: flex; align-items: center; justify-content: center; }
     .pass-toggle:hover { color: var(--brown); }
 
-    /* GANTI PERAN CARD */
     .peran-card { background: white; border-radius: var(--radius-lg); padding: 1.5rem; border: 1.5px solid var(--gold-light); box-shadow: 0 2px 12px rgba(200,134,43,0.12); margin-bottom: 1.2rem; }
     .peran-option { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius); border: 1.5px solid rgba(61,31,13,0.12); cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
     .peran-option:hover { border-color: var(--gold); background: var(--cream); }
@@ -40,7 +37,10 @@
 <body>
 
   <nav class="navbar">
-    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">🏛️ <span>SIKAMBA MABAR</span></a>
+    <a href="dashboard.html" class="navbar-brand" style="text-decoration:none;">
+      <img src="../images/logo-mabar.png" alt="Logo Mabar" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+      <span>SIKAMBA MABAR</span>
+    </a>
     <form class="navbar-search" onsubmit="goSearch(event)">
       <input type="text" class="navbar-search-input" placeholder="🔍  Cari IKM atau produk..." id="navSearch">
       <button type="submit" class="navbar-search-btn">Cari</button>
@@ -99,17 +99,13 @@
         <label class="form-label">Password Baru</label>
         <div class="pass-wrap">
           <input type="password" id="passBar" class="form-input" placeholder="Min. 6 karakter">
-          <button class="pass-toggle" onclick="togglePass('passBar', this)" type="button" aria-label="Lihat password">
-            👁️
-          </button>
+          <button class="pass-toggle" onclick="togglePass('passBar', this)" type="button">👁️</button>
         </div>
 
         <label class="form-label">Konfirmasi Password</label>
         <div class="pass-wrap">
           <input type="password" id="passKonfirmasi" class="form-input" placeholder="Ulangi password baru">
-          <button class="pass-toggle" onclick="togglePass('passKonfirmasi', this)" type="button" aria-label="Lihat konfirmasi password">
-            👁️
-          </button>
+          <button class="pass-toggle" onclick="togglePass('passKonfirmasi', this)" type="button">👁️</button>
         </div>
 
         <button class="btn btn-secondary" onclick="ubahPassword()" style="margin-top:0.5rem;">Ubah Password</button>
@@ -169,33 +165,31 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/utils.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
-    function showAlert(pesan, tipe = 'success') {
+    function showAlertProfil(pesan, tipe = 'success') {
       const el = document.getElementById('alertBox');
       el.innerHTML = `<div class="alert alert-${tipe}">${pesan}</div>`;
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       setTimeout(() => el.innerHTML = '', 4000);
     }
 
-    // Toggle lihat/sembunyikan password
     function togglePass(inputId, btn) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
         input.type = 'text';
         btn.textContent = '🙈';
-        btn.setAttribute('aria-label', 'Sembunyikan password');
       } else {
         input.type = 'password';
         btn.textContent = '👁️';
-        btn.setAttribute('aria-label', 'Lihat password');
       }
     }
 
-    // Ganti peran
+    // ---- Ganti peran ----
     let peranPilihan = null;
-    let peranAktif = null;
+    let peranAktif   = null;
 
     function pilihPeran(peran) {
       peranPilihan = peran;
@@ -203,87 +197,87 @@
       document.getElementById('opsiIKM').classList.toggle('selected', peran === 'ikm');
 
       const btnSimpan = document.getElementById('btnSimpanPeran');
-      const info = document.getElementById('infoGantiPeran');
+      const info      = document.getElementById('infoGantiPeran');
 
       if (peran !== peranAktif) {
         btnSimpan.style.display = 'inline-flex';
-        if (peran === 'ikm') {
-          info.innerHTML = '⚠️ Setelah berganti ke Pelaku IKM, Anda bisa mendaftarkan usaha dan menambah produk.';
-        } else {
-          info.innerHTML = '';
-        }
+        info.innerHTML = peran === 'ikm'
+          ? '⚠️ Setelah berganti ke Pelaku IKM, Anda bisa mendaftarkan usaha dan menambah produk.'
+          : '';
       } else {
         btnSimpan.style.display = 'none';
         info.innerHTML = '';
       }
     }
 
+    // ✅ DIPERBAIKI: pakai showConfirm() bukan confirm()
     async function simpanPeran() {
       if (!peranPilihan || peranPilihan === peranAktif) return;
 
-      const konfirmasi = confirm(
-        peranPilihan === 'ikm'
-          ? '✅ Ubah peran menjadi Pelaku IKM?\n\nAnda akan bisa mendaftarkan usaha dan menambah produk.'
-          : '⚠️ Ubah peran kembali ke Konsumen?\n\nAnda tidak akan bisa mengelola data IKM.'
-      );
-      if (!konfirmasi) return;
+      const yakin = await showConfirm({
+        judul: peranPilihan === 'ikm' ? 'Ubah ke Pelaku IKM?' : 'Ubah ke Konsumen?',
+        pesan: peranPilihan === 'ikm'
+          ? 'Anda akan bisa mendaftarkan usaha dan menambah produk sebagai Pelaku IKM.'
+          : '⚠️ Anda tidak akan bisa mengelola data IKM setelah berganti ke Konsumen.',
+        tipe: peranPilihan === 'ikm' ? 'info' : 'warning',
+        labelYa: peranPilihan === 'ikm' ? '✅ Ya, Jadi Pelaku IKM' : '⚠️ Ya, Jadi Konsumen'
+      });
+      if (!yakin) return;
 
       const user = await getUser();
       const { error } = await db.from('profiles').update({ peran: peranPilihan }).eq('id', user.id);
 
-      if (error) { showAlert('Gagal mengubah peran: ' + error.message, 'error'); return; }
+      if (error) { showAlertProfil('Gagal mengubah peran: ' + error.message, 'error'); return; }
 
       peranAktif = peranPilihan;
       document.getElementById('btnSimpanPeran').style.display = 'none';
       document.getElementById('infoGantiPeran').innerHTML = '';
 
-      // Update badge di hero
       const warna = { admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu' };
       document.getElementById('peranBadge').innerHTML =
         `<span class="badge ${warna[peranPilihan]||'badge-kategori'}" style="font-size:12px;">${peranPilihan.toUpperCase()}</span>`;
 
-      showAlert(
+      showAlertProfil(
         peranPilihan === 'ikm'
           ? '✅ Peran berhasil diubah menjadi Pelaku IKM! Anda sekarang bisa mendaftarkan usaha.'
           : '✅ Peran berhasil diubah kembali ke Konsumen.'
       );
 
-      // Refresh halaman setelah 2 detik agar menu dashboard terupdate
       setTimeout(() => window.location.reload(), 2000);
     }
 
     async function simpanProfil() {
       const user = await getUser();
       const nama = document.getElementById('editNama').value.trim();
-      if (!nama) { showAlert('Nama tidak boleh kosong.', 'error'); return; }
+      if (!nama) { showAlertProfil('Nama tidak boleh kosong.', 'error'); return; }
       const { error } = await db.from('profiles').update({ nama_lengkap: nama }).eq('id', user.id);
-      if (error) { showAlert('Gagal menyimpan: ' + error.message, 'error'); return; }
-      showAlert('✅ Profil berhasil diperbarui!');
+      if (error) { showAlertProfil('Gagal menyimpan: ' + error.message, 'error'); return; }
+      showAlertProfil('✅ Profil berhasil diperbarui!');
       document.getElementById('namaUser').textContent = nama;
     }
 
     async function ubahPassword() {
-      const pass = document.getElementById('passBar').value;
+      const pass       = document.getElementById('passBar').value;
       const konfirmasi = document.getElementById('passKonfirmasi').value;
-      if (pass.length < 6) { showAlert('Password minimal 6 karakter.', 'error'); return; }
-      if (pass !== konfirmasi) { showAlert('Konfirmasi password tidak cocok.', 'error'); return; }
+      if (pass.length < 6) { showAlertProfil('Password minimal 6 karakter.', 'error'); return; }
+      if (pass !== konfirmasi) { showAlertProfil('Konfirmasi password tidak cocok.', 'error'); return; }
       const { error } = await db.auth.updateUser({ password: pass });
-      if (error) { showAlert('Gagal ubah password: ' + error.message, 'error'); return; }
-      showAlert('✅ Password berhasil diubah!');
+      if (error) { showAlertProfil('Gagal ubah password: ' + error.message, 'error'); return; }
+      showAlertProfil('✅ Password berhasil diubah!');
       document.getElementById('passBar').value = '';
       document.getElementById('passKonfirmasi').value = '';
     }
 
     async function init() {
-      const user = await requireLogin();
+      const user   = await requireLogin();
       const profil = await getProfil(user.id);
-      const peran = profil?.peran || 'konsumen';
-      peranAktif = peran;
+      const peran  = profil?.peran || 'konsumen';
+      peranAktif   = peran;
       peranPilihan = peran;
 
-      document.getElementById('namaUser').textContent = profil?.nama_lengkap || user.email;
+      document.getElementById('namaUser').textContent  = profil?.nama_lengkap || user.email;
       document.getElementById('emailUser').textContent = user.email;
-      document.getElementById('editNama').value = profil?.nama_lengkap || '';
+      document.getElementById('editNama').value        = profil?.nama_lengkap || '';
 
       const warna = { admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu' };
       document.getElementById('peranBadge').innerHTML =
@@ -301,11 +295,8 @@
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('profil');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('profil');
     });
   </script>
 </body>
