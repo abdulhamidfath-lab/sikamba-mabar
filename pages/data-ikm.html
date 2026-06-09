@@ -233,7 +233,17 @@
       }
 
       try {
-        const { data, error } = await db.from('ikm').select('*').order('created_at', { ascending: false });
+        // ✅ FIX: Filter berdasarkan peran
+        // - Admin   → lihat semua IKM (aktif, menunggu, nonaktif)
+        // - IKM     → lihat semua + IKM miliknya sendiri
+        // - Publik/Konsumen → hanya IKM yang statusnya aktif
+        let query = db.from('ikm').select('*').order('created_at', { ascending: false });
+
+        if (peranUser === 'konsumen' || peranUser === '') {
+          query = query.eq('status', 'aktif');
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
         semuaIKM = data || [];
         renderIKM(semuaIKM);
