@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,12 +6,10 @@
   <title>Laporan & Statistik — SIKAMBA MABAR</title>
   <link rel="stylesheet" href="../css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <!-- Library SheetJS untuk ekspor Excel .xlsx -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     .stat-hero { background: var(--brown); padding: 1.8rem 0 2.5rem; }
 
-    /* ✅ BARU: stat cards auto-fit agar 2 kolom di HP */
     .stat-grid-top {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -24,16 +21,49 @@
     .stat-top .num { font-size: 2rem; font-weight: 700; }
     .stat-top .lbl { font-size: 11px; color: var(--text2); font-weight: 600; margin-top: 4px; }
 
-    /* ✅ BARU: charts-grid 1 kolom di HP */
     .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.5rem; }
     .chart-card { background: white; border-radius: 16px; padding: 1.2rem; border: 1px solid rgba(61,31,13,0.07); box-shadow: var(--shadow); }
     .chart-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 1rem; }
     .chart-wrap { position: relative; height: 220px; }
 
+    /* ✅ BARU: Section dokumen legalitas */
+    .dok-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .dok-stat-card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .dok-stat-card:hover { border-color: var(--gold-light); }
+    .dok-stat-ikon  { font-size: 28px; margin-bottom: 8px; }
+    .dok-stat-nama  { font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
+    .dok-stat-num   { font-size: 1.8rem; font-weight: 700; color: var(--green); line-height: 1; }
+    .dok-stat-total { font-size: 11px; color: var(--text2); margin-top: 4px; }
+    .dok-stat-bar {
+      height: 6px;
+      background: var(--cream2);
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .dok-stat-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--green);
+      transition: width 0.8s ease;
+    }
+
     @media (max-width: 640px) {
       .charts-grid { grid-template-columns: 1fr; }
       .stat-top .num { font-size: 1.6rem; }
-      /* tombol ekspor full-width di HP */
       .ekspor-btn-wrap { width: 100%; }
       .ekspor-btn-wrap .btn { width: 100%; }
     }
@@ -55,7 +85,6 @@
   </nav>
   <div class="batik-strip"></div>
 
-  <!-- ✅ BARU: Search bar khusus HP -->
   <div class="mobile-search-bar">
     <form onsubmit="goMobileSearch(event)">
       <input type="text" id="mobileSearchInput" placeholder="🔍 Cari IKM atau produk...">
@@ -72,13 +101,13 @@
 
   <div class="container" style="padding-top:0;padding-bottom:3rem;">
 
-    <!-- STAT CARDS -->
+    <!-- STAT CARDS UTAMA -->
     <div class="stat-grid-top">
-      <div class="stat-top"><div class="num" style="color:var(--blue);" id="sTotal">–</div><div class="lbl">Total IKM</div></div>
-      <div class="stat-top"><div class="num" style="color:var(--green);" id="sAktif">–</div><div class="lbl">IKM Aktif</div></div>
-      <div class="stat-top"><div class="num" style="color:var(--orange);" id="sMenunggu">–</div><div class="lbl">Menunggu</div></div>
-      <div class="stat-top"><div class="num" style="color:#7B5EA7;" id="sProduk">–</div><div class="lbl">Total Produk</div></div>
-      <div class="stat-top"><div class="num" style="color:var(--brown);" id="sKecamatan">–</div><div class="lbl">Kecamatan</div></div>
+      <div class="stat-top"><div class="num" style="color:var(--blue);"    id="sTotal">–</div><div class="lbl">Total IKM</div></div>
+      <div class="stat-top"><div class="num" style="color:var(--green);"   id="sAktif">–</div><div class="lbl">IKM Aktif</div></div>
+      <div class="stat-top"><div class="num" style="color:var(--orange);"  id="sMenunggu">–</div><div class="lbl">Menunggu</div></div>
+      <div class="stat-top"><div class="num" style="color:#7B5EA7;"        id="sProduk">–</div><div class="lbl">Total Produk</div></div>
+      <div class="stat-top"><div class="num" style="color:var(--brown);"   id="sKecamatan">–</div><div class="lbl">Kecamatan</div></div>
     </div>
 
     <!-- GRAFIK -->
@@ -101,16 +130,32 @@
       </div>
     </div>
 
+    <!-- ✅ BARU: STATISTIK DOKUMEN LEGALITAS -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h3 style="margin:0;">🏅 Kepatuhan Legalitas IKM</h3>
+          <p style="font-size:13px;color:var(--text2);margin-top:4px;">
+            Jumlah IKM aktif yang sudah memiliki dokumen legalitas terverifikasi
+          </p>
+        </div>
+        <span id="totalIKMAktifLabel" style="font-size:13px;color:var(--text2);"></span>
+      </div>
+      <div class="dok-stat-grid" id="dokStatGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:2rem;">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- TABEL RINGKASAN PER KECAMATAN -->
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:10px;">
         <h3 style="margin:0;">📋 Ringkasan per Kecamatan</h3>
-        <!-- ✅ BARU: tombol ekspor dibungkus div untuk resize di HP -->
         <div class="ekspor-btn-wrap">
           <button class="btn btn-secondary" onclick="eksporExcel()">⬇️ Ekspor Excel (.xlsx)</button>
         </div>
       </div>
-      <!-- ✅ KUNCI: tabel dibungkus .table-wrap agar bisa scroll horizontal di HP -->
       <div class="table-wrap">
         <table id="tabelKecamatan">
           <thead>
@@ -169,13 +214,14 @@
     }
 
     function analisis(ikm, produk) {
-      const aktif = ikm.filter(i => i.status === 'aktif').length;
+      const aktif    = ikm.filter(i => i.status === 'aktif').length;
       const menunggu = ikm.filter(i => i.status === 'menunggu').length;
-      const kecs = [...new Set(ikm.filter(i => i.kecamatan).map(i => i.kecamatan))];
-      document.getElementById('sTotal').textContent = ikm.length;
-      document.getElementById('sAktif').textContent = aktif;
+      const kecs     = [...new Set(ikm.filter(i => i.kecamatan).map(i => i.kecamatan))];
+
+      document.getElementById('sTotal').textContent    = ikm.length;
+      document.getElementById('sAktif').textContent    = aktif;
       document.getElementById('sMenunggu').textContent = menunggu;
-      document.getElementById('sProduk').textContent = produk.length;
+      document.getElementById('sProduk').textContent   = produk.length;
       document.getElementById('sKecamatan').textContent = kecs.length;
 
       const perKec = {};
@@ -184,7 +230,7 @@
       const kecAktif = Object.entries(perKec).filter(([,v]) => v > 0);
       buatGrafik('chartKecamatan', 'bar',
         kecAktif.map(([k]) => k),
-        [{ label: 'Jumlah IKM', data: kecAktif.map(([,v]) => v), backgroundColor: WARNA.slice(0,kecAktif.length), borderRadius: 6 }]
+        [{ label:'Jumlah IKM', data: kecAktif.map(([,v]) => v), backgroundColor: WARNA.slice(0,kecAktif.length), borderRadius: 6 }]
       );
 
       const perKat = {};
@@ -196,7 +242,7 @@
       );
 
       buatGrafik('chartStatus', 'pie',
-        ['Aktif', 'Menunggu', 'Nonaktif'],
+        ['Aktif','Menunggu','Nonaktif'],
         [{ data: [aktif, menunggu, ikm.filter(i=>i.status==='nonaktif').length], backgroundColor: ['#2ECC71','#F39C12','#E74C3C'], borderWidth: 2 }]
       );
 
@@ -205,15 +251,16 @@
       const prodEntries = Object.entries(perKatProd).sort((a,b) => b[1]-a[1]);
       buatGrafik('chartProdukKat', 'bar',
         prodEntries.map(([k]) => k),
-        [{ label: 'Jumlah Produk', data: prodEntries.map(([,v]) => v), backgroundColor: WARNA.slice(0,prodEntries.length), borderRadius: 6 }]
+        [{ label:'Jumlah Produk', data: prodEntries.map(([,v]) => v), backgroundColor: WARNA.slice(0,prodEntries.length), borderRadius: 6 }]
       );
 
+      // Tabel kecamatan
       const tbody = document.getElementById('bodyKecamatan');
       const rows = KECAMATAN_LIST.map(kec => {
-        const ikmKec = ikm.filter(i => i.kecamatan === kec);
+        const ikmKec  = ikm.filter(i => i.kecamatan === kec);
         const prodKec = produk.filter(p => ikmKec.some(i => i.id === p.ikm_id)).length;
         if (!ikmKec.length) return null;
-        return {kec, total: ikmKec.length, aktif: ikmKec.filter(i=>i.status==='aktif').length, menunggu: ikmKec.filter(i=>i.status==='menunggu').length, produk: prodKec};
+        return { kec, total: ikmKec.length, aktif: ikmKec.filter(i=>i.status==='aktif').length, menunggu: ikmKec.filter(i=>i.status==='menunggu').length, produk: prodKec };
       }).filter(Boolean).sort((a,b) => b.total - a.total);
 
       tbody.innerHTML = rows.length ? rows.map(r => `
@@ -227,124 +274,94 @@
       `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text2);">Belum ada data</td></tr>';
     }
 
+    // ✅ BARU: Statistik dokumen legalitas
+    async function loadStatistikDokumen(totalIKMAktif) {
+      try {
+        document.getElementById('totalIKMAktifLabel').textContent =
+          `Dari ${totalIKMAktif} IKM aktif`;
+
+        // Load semua jenis dokumen
+        const { data: jenisList } = await db
+          .from('jenis_dokumen')
+          .select('*')
+          .eq('aktif', true)
+          .order('urutan');
+
+        if (!jenisList?.length) {
+          document.getElementById('dokStatGrid').innerHTML =
+            '<div style="grid-column:1/-1;text-align:center;color:var(--text2);padding:1rem;">Belum ada jenis dokumen dikonfigurasi.</div>';
+          return;
+        }
+
+        // Hitung dokumen terverifikasi per jenis
+        const { data: dokumen } = await db
+          .from('dokumen_ikm')
+          .select('jenis_id, ikm_id, status')
+          .eq('status', 'terverifikasi');
+
+        const dokMap = {};
+        (dokumen || []).forEach(d => {
+          if (!dokMap[d.jenis_id]) dokMap[d.jenis_id] = new Set();
+          dokMap[d.jenis_id].add(d.ikm_id);
+        });
+
+        document.getElementById('dokStatGrid').innerHTML = jenisList.map(jenis => {
+          const jumlah  = dokMap[jenis.id]?.size || 0;
+          const persen  = totalIKMAktif > 0 ? Math.round((jumlah / totalIKMAktif) * 100) : 0;
+          const warna   = persen >= 70 ? 'var(--green)' : persen >= 40 ? 'var(--orange)' : 'var(--red)';
+
+          return `
+            <div class="dok-stat-card">
+              <div class="dok-stat-ikon">${jenis.ikon}</div>
+              <div class="dok-stat-nama">${jenis.nama}</div>
+              <div class="dok-stat-num" style="color:${warna};">${jumlah}</div>
+              <div class="dok-stat-total">IKM terverifikasi</div>
+              <div class="dok-stat-bar">
+                <div class="dok-stat-bar-fill" style="width:${persen}%;background:${warna};"></div>
+              </div>
+              <div style="font-size:11px;color:var(--text2);margin-top:4px;">${persen}% dari IKM aktif</div>
+            </div>`;
+        }).join('');
+
+      } catch(e) {
+        document.getElementById('dokStatGrid').innerHTML =
+          `<div style="grid-column:1/-1;color:var(--text2);font-size:13px;padding:1rem;">Gagal memuat statistik dokumen.</div>`;
+      }
+    }
+
     function eksporExcel() {
       if (!ikmData.length) { alert('Tidak ada data untuk diekspor.'); return; }
 
-      // =============================================
-      // SHEET 1: Data IKM Lengkap
-      // Setiap baris = 1 IKM, kolom = detail IKM
-      // =============================================
-      const headerIKM = [
-        'No', 'Nama Usaha', 'Nama Pemilik', 'Kategori',
-        'Kecamatan', 'Desa/Kelurahan', 'Alamat Lengkap',
-        'Status', 'Tahun Berdiri', 'Tenaga Kerja',
-        'No. Telp / WhatsApp', 'Email'
-      ];
-
+      const headerIKM = ['No','Nama Usaha','Nama Pemilik','Kategori','Kecamatan','Desa/Kelurahan','Alamat Lengkap','Status','Tahun Berdiri','Tenaga Kerja','No. Telp / WhatsApp','Email'];
       const rowsIKM = ikmData.map((ikm, idx) => [
-        idx + 1,
-        ikm.nama_usaha   || '-',
-        ikm.pemilik      || '-',
-        ikm.kategori     || '-',
-        ikm.kecamatan    || '-',
-        ikm.desa         || '-',
-        ikm.alamat       || '-',
-        ikm.status       || '-',
-        ikm.tahun_berdiri        || '-',
-        ikm.jumlah_tenaga_kerja  || '-',
-        ikm.no_telp      || '-',
-        ikm.email        || '-',
+        idx + 1, ikm.nama_usaha||'-', ikm.pemilik||'-', ikm.kategori||'-',
+        ikm.kecamatan||'-', ikm.desa||'-', ikm.alamat||'-', ikm.status||'-',
+        ikm.tahun_berdiri||'-', ikm.jumlah_tenaga_kerja||'-', ikm.no_telp||'-', ikm.email||'-'
       ]);
 
-      // Gabungkan header + rows jadi array 2 dimensi
-      const dataSheet1 = [headerIKM, ...rowsIKM];
-
-      // =============================================
-      // SHEET 2: Ringkasan per Kecamatan
-      // =============================================
-      const KECAMATAN_LIST = [
-        'Komodo','Boleng','Sano Nggoang','Mbeliling','Lembor',
-        'Lembor Selatan','Welak','Kuwus','Kuwus Barat',
-        'Pacar','Mancang Pacar','Ndoso'
-      ];
-
-      const headerRingkasan = [
-        'Kecamatan', 'Total IKM', 'IKM Aktif',
-        'IKM Menunggu', 'IKM Nonaktif', 'Total Produk'
-      ];
-
+      const headerRingkasan = ['Kecamatan','Total IKM','IKM Aktif','IKM Menunggu','IKM Nonaktif','Total Produk'];
       const rowsRingkasan = KECAMATAN_LIST.map(kec => {
         const ikmKec    = ikmData.filter(i => i.kecamatan === kec);
         const produkKec = produkData.filter(p => ikmKec.some(i => i.id === p.ikm_id));
-        return [
-          kec,
-          ikmKec.length,
-          ikmKec.filter(i => i.status === 'aktif').length,
-          ikmKec.filter(i => i.status === 'menunggu').length,
-          ikmKec.filter(i => i.status === 'nonaktif').length,
-          produkKec.length,
-        ];
-      }).filter(r => r[1] > 0); // Hanya tampilkan kecamatan yang ada IKM-nya
+        return [kec, ikmKec.length, ikmKec.filter(i=>i.status==='aktif').length, ikmKec.filter(i=>i.status==='menunggu').length, ikmKec.filter(i=>i.status==='nonaktif').length, produkKec.length];
+      }).filter(r => r[1] > 0);
+      rowsRingkasan.push(['TOTAL', ikmData.length, ikmData.filter(i=>i.status==='aktif').length, ikmData.filter(i=>i.status==='menunggu').length, ikmData.filter(i=>i.status==='nonaktif').length, produkData.length]);
 
-      // Tambah baris total di akhir
-      rowsRingkasan.push([
-        'TOTAL',
-        ikmData.length,
-        ikmData.filter(i => i.status === 'aktif').length,
-        ikmData.filter(i => i.status === 'menunggu').length,
-        ikmData.filter(i => i.status === 'nonaktif').length,
-        produkData.length,
-      ]);
-
-      const dataSheet2 = [headerRingkasan, ...rowsRingkasan];
-
-      // =============================================
-      // BUAT FILE EXCEL pakai SheetJS
-      // =============================================
-      const wb = XLSX.utils.book_new(); // Buat workbook baru (= file Excel)
-
-      // Sheet 1 — Data IKM
-      const ws1 = XLSX.utils.aoa_to_sheet(dataSheet1);
-
-      // Atur lebar kolom Sheet 1 agar tidak terlalu sempit
+      const wb  = XLSX.utils.book_new();
+      const ws1 = XLSX.utils.aoa_to_sheet([headerIKM, ...rowsIKM]);
       ws1['!cols'] = [
-        { wch: 4  },  // No
-        { wch: 28 },  // Nama Usaha
-        { wch: 20 },  // Nama Pemilik
-        { wch: 22 },  // Kategori
-        { wch: 16 },  // Kecamatan
-        { wch: 20 },  // Desa
-        { wch: 30 },  // Alamat
-        { wch: 12 },  // Status
-        { wch: 13 },  // Tahun Berdiri
-        { wch: 14 },  // Tenaga Kerja
-        { wch: 18 },  // No. Telp
-        { wch: 24 },  // Email
+        {wch:4},{wch:28},{wch:20},{wch:22},{wch:16},{wch:20},{wch:30},{wch:12},{wch:13},{wch:14},{wch:18},{wch:24}
       ];
-
-      // Sheet 2 — Ringkasan
-      const ws2 = XLSX.utils.aoa_to_sheet(dataSheet2);
-
-      ws2['!cols'] = [
-        { wch: 18 },  // Kecamatan
-        { wch: 12 },  // Total IKM
-        { wch: 12 },  // Aktif
-        { wch: 16 },  // Menunggu
-        { wch: 14 },  // Nonaktif
-        { wch: 13 },  // Total Produk
-      ];
-
-      // Tambahkan kedua sheet ke workbook
+      const ws2 = XLSX.utils.aoa_to_sheet([headerRingkasan, ...rowsRingkasan]);
+      ws2['!cols'] = [{wch:18},{wch:12},{wch:12},{wch:16},{wch:14},{wch:13}];
       XLSX.utils.book_append_sheet(wb, ws1, 'Data IKM');
       XLSX.utils.book_append_sheet(wb, ws2, 'Ringkasan Kecamatan');
-
-      // Nama file pakai tanggal hari ini
-      const tgl = new Date().toISOString().slice(0, 10); // format: 2024-06-01
+      const tgl = new Date().toISOString().slice(0,10);
       XLSX.writeFile(wb, `Data_IKM_SIKAMBA_MABAR_${tgl}.xlsx`);
     }
 
     async function init() {
-      const user = await requireLogin();
+      const user   = await requireLogin();
       const profil = await getProfil(user.id);
       if (profil?.peran !== 'admin') {
         window.location.href = 'dashboard.html'; return;
@@ -355,9 +372,13 @@
         db.from('produk').select('*').eq('aktif', true)
       ]);
 
-      ikmData = ikm || [];
+      ikmData    = ikm    || [];
       produkData = produk || [];
       analisis(ikmData, produkData);
+
+      // Load statistik dokumen dengan jumlah IKM aktif
+      const totalAktif = ikmData.filter(i => i.status === 'aktif').length;
+      loadStatistikDokumen(totalAktif);
     }
 
     init();
