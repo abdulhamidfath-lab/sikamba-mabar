@@ -11,11 +11,17 @@
     .search-big { width: 100%; border: none; border-radius: 14px; padding: 16px 56px 16px 20px; font-size: 16px; font-family: inherit; outline: none; box-shadow: 0 4px 24px rgba(0,0,0,0.2); color: var(--text); background: white; }
     .search-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: var(--brown); border: none; border-radius: 10px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 18px; }
     .search-hint { text-align: center; color: rgba(255,255,255,0.55); font-size: 13px; margin-top: 10px; }
-    .tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(61,31,13,0.1); margin-bottom: 1.5rem; }
-    .tab { padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text2); transition: all 0.2s; }
+
+    /* Tab */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(61,31,13,0.1); margin-bottom: 1.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text2); transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
     .tab.active { color: var(--brown); border-bottom-color: var(--brown); }
+
     .result-count { font-size: 13px; color: var(--text2); margin-bottom: 1rem; }
     .result-count strong { color: var(--brown); }
+
+    /* IKM grid */
     .ikm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
     .ikm-card { background: white; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(61,31,13,0.07); box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s; }
     .ikm-card:hover { transform: translateY(-2px); }
@@ -24,6 +30,8 @@
     .ikm-body { padding: 12px 14px; }
     .ikm-nama { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--brown); margin-bottom: 3px; }
     .ikm-meta { font-size: 12px; color: var(--text2); }
+
+    /* Produk list */
     .produk-list { display: flex; flex-direction: column; gap: 10px; }
     .produk-row { background: white; border-radius: var(--radius-lg); padding: 12px 14px; display: flex; gap: 12px; align-items: center; border: 1px solid rgba(61,31,13,0.07); cursor: pointer; transition: box-shadow 0.2s; }
     .produk-row:hover { box-shadow: var(--shadow); }
@@ -32,10 +40,41 @@
     .produk-nama { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
     .produk-ikm  { font-size: 12px; color: var(--text2); }
     .produk-harga { font-size: 14px; font-weight: 700; color: var(--brown); margin-top: 4px; }
+
+    /* ✅ BARU: Informasi list */
+    .info-list { display: flex; flex-direction: column; gap: 10px; }
+    .info-row {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid rgba(61,31,13,0.07);
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    .info-row:hover { box-shadow: var(--shadow); }
+    .info-thumb {
+      width: 64px; height: 64px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--brown), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; flex-shrink: 0; overflow: hidden;
+    }
+    .info-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .info-judul { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .info-meta  { font-size: 12px; color: var(--text2); }
+
     .empty { text-align: center; padding: 3rem 1rem; color: var(--text2); }
     .empty .icon { font-size: 48px; margin-bottom: 1rem; }
     .highlight { background: rgba(200,134,43,0.2); border-radius: 3px; padding: 0 2px; }
     .loading { text-align: center; padding: 3rem; }
+
+    @media (max-width: 768px) {
+      .search-hero { padding: 1.5rem 0 2rem; }
+      .ikm-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -58,6 +97,7 @@
       <a href="data-ikm.html">Data IKM</a>
       <a href="peta.html">Peta Industri</a>
       <a href="marketplace.html">Marketplace</a>
+      <a href="informasi.html">Informasi</a>
       <a href="laporan.html" id="navLaporan" style="display:none;">Laporan</a>
       <a href="manajemen-pengguna.html" id="navPengguna" style="display:none;">Pengguna</a>
       <a href="profil.html">Profil Saya</a>
@@ -69,9 +109,9 @@
   <div class="search-hero">
     <div class="container">
       <h2 style="color:white;text-align:center;margin-bottom:0.3rem;">🔍 Pencarian</h2>
-      <p style="color:rgba(255,255,255,0.65);text-align:center;font-size:13px;margin-bottom:0;">Cari IKM dan produk di seluruh Manggarai Barat</p>
+      <p style="color:rgba(255,255,255,0.65);text-align:center;font-size:13px;margin-bottom:0;">Cari IKM, produk, dan informasi di seluruh SIKAMBA MABAR</p>
       <div class="search-box-wrap">
-        <input type="text" id="searchInput" class="search-big" placeholder="Ketik nama IKM, produk, kecamatan..." autofocus>
+        <input type="text" id="searchInput" class="search-big" placeholder="Ketik nama IKM, produk, informasi..." autofocus>
         <button class="search-btn" onclick="doSearch()">🔍</button>
       </div>
       <p class="search-hint" id="searchHint">Tekan Enter atau klik tombol pencarian</p>
@@ -81,17 +121,20 @@
   <div class="container" style="padding-top:1.5rem;padding-bottom:3rem;" id="hasilWrap" style="display:none;">
 
     <div class="tabs">
-      <div class="tab active" id="tabSemua" onclick="switchTab('semua')">Semua</div>
-      <div class="tab" id="tabIKM" onclick="switchTab('ikm')">IKM <span id="countIKM" style="font-size:11px;color:var(--text2);"></span></div>
-      <div class="tab" id="tabProduk" onclick="switchTab('produk')">Produk <span id="countProduk" style="font-size:11px;color:var(--text2);"></span></div>
+      <div class="tab active" id="tabSemua"    onclick="switchTab('semua')">Semua</div>
+      <div class="tab"        id="tabIKM"      onclick="switchTab('ikm')">IKM <span id="countIKM" style="font-size:11px;color:var(--text2);"></span></div>
+      <div class="tab"        id="tabProduk"   onclick="switchTab('produk')">Produk <span id="countProduk" style="font-size:11px;color:var(--text2);"></span></div>
+      <div class="tab"        id="tabInfo"     onclick="switchTab('info')">Informasi <span id="countInfo" style="font-size:11px;color:var(--text2);"></span></div>
     </div>
 
     <div id="hasilSemua">
       <div id="seksiIKM"></div>
       <div id="seksiProduk" style="margin-top:1.5rem;"></div>
+      <div id="seksiInfo"   style="margin-top:1.5rem;"></div>
     </div>
-    <div id="hasilIKM" style="display:none;"></div>
+    <div id="hasilIKM"    style="display:none;"></div>
     <div id="hasilProduk" style="display:none;"></div>
+    <div id="hasilInfo"   style="display:none;"></div>
 
   </div>
 
@@ -107,7 +150,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
-  <script src="../js/ikm.js"></script>
+  <script src="../js/utils.js"></script>
   <script>
     function toggleMenu() { document.getElementById('navMenu').classList.toggle('open'); }
 
@@ -115,6 +158,9 @@
       'Anyaman & Kerajinan':'🧺','Tenun Tradisional':'🧵','Makanan & Minuman':'🍽️',
       'Kopi & Minuman Herbal':'☕','Fashion & Konveksi':'👗','Furniture & Kayu':'🪵',
       'Perbengkelan':'🔧','Jasa & Lainnya':'🏢'
+    };
+    const ikonKatInfo = {
+      'Pelatihan':'🎓','Sertifikasi':'📜','Kegiatan':'📅','Pengumuman':'📢'
     };
     function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
 
@@ -124,16 +170,24 @@
       return text.replace(re, '<mark class="highlight">$1</mark>');
     }
 
+    function formatTgl(tgl) {
+      if (!tgl) return '';
+      return new Date(tgl).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+    }
+
     let tabAktif = 'semua';
     function switchTab(tab) {
       tabAktif = tab;
-      ['semua','ikm','produk'].forEach(t => {
-        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.toggle('active', t === tab);
-        document.getElementById('hasil' + t.charAt(0).toUpperCase() + t.slice(1))?.style && (document.getElementById('hasil' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === tab ? 'block' : 'none');
+      ['semua','ikm','produk','info'].forEach(t => {
+        const tabEl   = document.getElementById('tab'   + t.charAt(0).toUpperCase() + t.slice(1));
+        const hasilEl = document.getElementById('hasil' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (tabEl)   tabEl.classList.toggle('active', t === tab);
+        if (hasilEl) hasilEl.style.display = t === tab ? 'block' : 'none';
       });
       document.getElementById('hasilSemua').style.display = tab === 'semua' ? 'block' : 'none';
     }
 
+    // ---- Render IKM ----
     function renderIKMGrid(list, query, targetId) {
       const el = document.getElementById(targetId);
       if (!list.length) {
@@ -162,6 +216,7 @@
         </div>`;
     }
 
+    // ---- Render Produk ----
     function renderProdukList(list, query, targetId) {
       const el = document.getElementById(targetId);
       if (!list.length) {
@@ -188,6 +243,39 @@
         </div>`;
     }
 
+    // ---- ✅ BARU: Render Informasi ----
+    function renderInfoList(list, query, targetId) {
+      const el = document.getElementById(targetId);
+      if (!list.length) {
+        el.innerHTML = `<div class="empty"><div class="icon">📢</div><p>Tidak ada informasi ditemukan.</p></div>`;
+        return;
+      }
+      el.innerHTML = `
+        <div class="result-count">Ditemukan <strong>${list.length}</strong> informasi</div>
+        <div class="info-list">
+          ${list.map(info => {
+            const kat   = info.kategori_informasi;
+            const warna = kat?.warna || '#C8862B';
+            const ikon  = ikonKatInfo[kat?.nama] || '📢';
+            const tgl   = info.published_at ? formatTgl(info.published_at) : '';
+            return `
+              <div class="info-row" onclick="window.location.href='detail-informasi.html?id=${info.id}'">
+                <div class="info-thumb">
+                  ${info.foto_url ? `<img src="${info.foto_url}" alt="${info.judul}">` : ikon}
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div class="info-judul">${highlight(info.judul, query)}</div>
+                  <div class="info-meta" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+                    ${kat ? `<span style="background:${warna};color:white;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">${kat.nama}</span>` : ''}
+                    ${tgl ? `<span>📅 ${tgl}</span>` : ''}
+                  </div>
+                  ${info.ringkasan ? `<div style="font-size:12px;color:var(--text2);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${info.ringkasan}</div>` : ''}
+                </div>
+              </div>`;
+          }).join('')}
+        </div>`;
+    }
+
     async function doSearch() {
       const q = document.getElementById('searchInput').value.trim();
       if (!q) return;
@@ -195,12 +283,12 @@
       document.getElementById('searchHint').textContent = `Mencari "${q}"...`;
       document.getElementById('hasilWrap').style.display = 'block';
       document.getElementById('emptyState').style.display = 'none';
-      document.getElementById('seksiIKM').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      document.getElementById('seksiIKM').innerHTML    = '<div class="loading"><div class="spinner"></div></div>';
       document.getElementById('seksiProduk').innerHTML = '';
-      document.getElementById('hasilIKM').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      document.getElementById('seksiInfo').innerHTML   = '';
+      document.getElementById('hasilIKM').innerHTML    = '<div class="loading"><div class="spinner"></div></div>';
       document.getElementById('hasilProduk').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-
-      const ql = q.toLowerCase();
+      document.getElementById('hasilInfo').innerHTML   = '<div class="loading"><div class="spinner"></div></div>';
 
       try {
         // Cari IKM
@@ -208,22 +296,33 @@
           .or(`nama_usaha.ilike.%${q}%,pemilik.ilike.%${q}%,kecamatan.ilike.%${q}%,desa.ilike.%${q}%,kategori.ilike.%${q}%,deskripsi.ilike.%${q}%`)
           .order('status', { ascending: false });
 
-        // Cari produk
+        // Cari Produk
         const { data: produkData } = await db.from('produk')
           .select('*, ikm:ikm_id(nama_usaha, kecamatan)')
           .or(`nama_produk.ilike.%${q}%,kategori.ilike.%${q}%,deskripsi.ilike.%${q}%,bahan_baku.ilike.%${q}%`)
           .eq('aktif', true);
 
-        const ikmList = ikmData || [];
+        // ✅ BARU: Cari Informasi
+        const { data: infoData } = await db.from('informasi')
+          .select('*, kategori_informasi(nama, warna)')
+          .or(`judul.ilike.%${q}%,ringkasan.ilike.%${q}%,isi.ilike.%${q}%`)
+          .eq('status', 'published')
+          .order('published_at', { ascending: false });
+
+        const ikmList   = ikmData   || [];
         const produkList = produkData || [];
+        const infoList  = infoData  || [];
+        const total     = ikmList.length + produkList.length + infoList.length;
 
         // Update counter tab
-        document.getElementById('countIKM').textContent = `(${ikmList.length})`;
+        document.getElementById('countIKM').textContent    = `(${ikmList.length})`;
         document.getElementById('countProduk').textContent = `(${produkList.length})`;
-        document.getElementById('searchHint').textContent = `${ikmList.length + produkList.length} hasil ditemukan untuk "${q}"`;
+        document.getElementById('countInfo').textContent   = `(${infoList.length})`;
+        document.getElementById('searchHint').textContent  =
+          `${total} hasil ditemukan untuk "${q}"`;
 
-        // Render tab semua
-        if (ikmList.length === 0 && produkList.length === 0) {
+        // Tab Semua — tampilkan preview masing-masing
+        if (total === 0) {
           document.getElementById('seksiIKM').innerHTML = `
             <div class="empty">
               <div class="icon">😕</div>
@@ -231,35 +330,56 @@
               <p style="font-size:13px;margin-top:8px;">Coba kata kunci lain seperti nama produk, kecamatan, atau kategori.</p>
             </div>`;
           document.getElementById('seksiProduk').innerHTML = '';
+          document.getElementById('seksiInfo').innerHTML   = '';
         } else {
+          // IKM section
           if (ikmList.length) {
-            document.getElementById('seksiIKM').innerHTML = `<h3 style="margin-bottom:1rem;font-size:1rem;">🏭 IKM (${ikmList.length})</h3>`;
+            document.getElementById('seksiIKM').innerHTML =
+              `<h3 style="margin-bottom:1rem;font-size:1rem;">🏭 IKM (${ikmList.length})</h3>`;
             renderIKMGrid(ikmList.slice(0,4), q, 'seksiIKM');
             if (ikmList.length > 4) {
-              document.getElementById('seksiIKM').innerHTML += `<button class="btn btn-secondary" onclick="switchTab('ikm')" style="margin-top:10px;">Lihat semua ${ikmList.length} IKM →</button>`;
+              document.getElementById('seksiIKM').innerHTML +=
+                `<button class="btn btn-secondary" onclick="switchTab('ikm')" style="margin-top:10px;">Lihat semua ${ikmList.length} IKM →</button>`;
             }
           } else {
             document.getElementById('seksiIKM').innerHTML = '';
           }
+
+          // Produk section
           if (produkList.length) {
             const sec = document.getElementById('seksiProduk');
             sec.innerHTML = `<h3 style="margin-bottom:1rem;font-size:1rem;">📦 Produk (${produkList.length})</h3>`;
             renderProdukList(produkList.slice(0,4), q, 'seksiProduk');
             if (produkList.length > 4) {
-              sec.innerHTML += `<button class="btn btn-secondary" onclick="switchTab('produk')" style="margin-top:10px;">Lihat semua ${produkList.length} produk →</button>`;
+              sec.innerHTML +=
+                `<button class="btn btn-secondary" onclick="switchTab('produk')" style="margin-top:10px;">Lihat semua ${produkList.length} produk →</button>`;
             }
           } else {
             document.getElementById('seksiProduk').innerHTML = '';
           }
+
+          // ✅ BARU: Informasi section
+          if (infoList.length) {
+            const sec = document.getElementById('seksiInfo');
+            sec.innerHTML = `<h3 style="margin-bottom:1rem;font-size:1rem;">📢 Informasi (${infoList.length})</h3>`;
+            renderInfoList(infoList.slice(0,3), q, 'seksiInfo');
+            if (infoList.length > 3) {
+              sec.innerHTML +=
+                `<button class="btn btn-secondary" onclick="switchTab('info')" style="margin-top:10px;">Lihat semua ${infoList.length} informasi →</button>`;
+            }
+          } else {
+            document.getElementById('seksiInfo').innerHTML = '';
+          }
         }
 
-        // Render tab IKM
-        renderIKMGrid(ikmList, q, 'hasilIKM');
-        // Render tab produk
+        // Tab individual
+        renderIKMGrid(ikmList,   q, 'hasilIKM');
         renderProdukList(produkList, q, 'hasilProduk');
+        renderInfoList(infoList,   q, 'hasilInfo');
 
       } catch(e) {
-        document.getElementById('seksiIKM').innerHTML = `<div class="alert alert-error">Gagal mencari: ${e.message}</div>`;
+        document.getElementById('seksiIKM').innerHTML =
+          `<div class="alert alert-error">Gagal mencari: ${e.message}</div>`;
       }
     }
 
@@ -268,17 +388,15 @@
       if (e.key === 'Enter') doSearch();
     });
 
-    // Search real-time setelah 500ms berhenti mengetik
+    // Real-time setelah 500ms
     let timer;
     document.getElementById('searchInput').addEventListener('input', () => {
       clearTimeout(timer);
       const q = document.getElementById('searchInput').value.trim();
-      if (q.length >= 2) {
-        timer = setTimeout(doSearch, 500);
-      }
+      if (q.length >= 2) timer = setTimeout(doSearch, 500);
     });
 
-    // Ambil query dari URL jika ada (?q=...)
+    // Ambil query dari URL
     async function init() {
       const params = new URLSearchParams(window.location.search);
       const q = params.get('q');
@@ -290,21 +408,14 @@
       }
     }
 
+    setupNavAdmin();
     init();
   </script>
 
- <script src="../js/utils.js"></script>
-<script>
-  setupNavAdmin();
-</script>
-
   <script src="../js/sidebar.js"></script>
   <script>
-    // Init sidebar admin — hanya tampil jika peran admin
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initAdminSidebar === 'function') {
-        initAdminSidebar('cari');
-      }
+      if (typeof initAdminSidebar === 'function') initAdminSidebar('cari');
     });
   </script>
 </body>
