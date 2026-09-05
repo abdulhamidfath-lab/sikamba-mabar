@@ -264,7 +264,12 @@
 
         document.getElementById('loadingArea').style.display = 'none';
         document.getElementById('kontenUtama').style.display = 'block';
-
+        const sudahDilihatIKM = sessionStorage.getItem('dilihat_ikm_' + ikm.id);
+if (!sudahDilihatIKM) {
+  db.rpc('increment_views_ikm', { ikm_id_param: ikm.id }).then(() => {
+    sessionStorage.setItem('dilihat_ikm_' + ikm.id, '1');
+  });
+}
         const ikon = ikonKategori[ikm.kategori] || '🏭';
         document.getElementById('heroIcon').textContent = ikon;
         if (ikm.foto_url) {
