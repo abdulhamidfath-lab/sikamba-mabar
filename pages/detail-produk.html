@@ -268,6 +268,7 @@
         document.getElementById('kontenUtama').style.display = 'block';
 
         document.title = p.nama_produk + ' — SIKAMBA MABAR';
+setMetaDescription(`${p.nama_produk} — ${rupiah(p.harga)} dari ${p.ikm?.nama_usaha || 'IKM Manggarai Barat'}, ${p.ikm?.kecamatan || ''}. Produk asli Manggarai Barat, terdaftar di SIKAMBA MABAR.`);
 
         // Share WA
        const shareUrl = `https://sikamba-mabar.vercel.app/bagikan/produk/${p.id}`;
