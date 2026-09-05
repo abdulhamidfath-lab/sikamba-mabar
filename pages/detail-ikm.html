@@ -272,6 +272,7 @@
         }
 
         document.title = ikm.nama_usaha + ' — SIKAMBA MABAR';
+setMetaDescription(`${ikm.nama_usaha} — ${ikm.kategori}. Berlokasi di ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || 'Manggarai Barat'}. Lihat produk dan profil lengkap IKM ini di SIKAMBA MABAR.`);
         document.getElementById('namaUsaha').textContent = ikm.nama_usaha;
         document.getElementById('breadNama').textContent = ikm.nama_usaha;
         document.getElementById('subHeader').innerHTML = `
