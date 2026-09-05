@@ -342,9 +342,9 @@ setMetaDescription(info.ringkasan || `${info.judul} — Informasi dari Dinas Per
         document.getElementById('judulArtikel').textContent = info.judul;
         document.getElementById('breadJudul').textContent   = info.judul;
 
-        if (info.published_at) {
-          document.getElementById('tglPublish').textContent = '📅 ' + formatTanggal(info.published_at);
-        }
+       if (info.published_at) {
+  document.getElementById('tglPublish').textContent = '📅 ' + formatTanggal(info.published_at) + `  ·  👁️ ${(info.views || 0) + 1}x dilihat`;
+}
 
         // Ringkasan
         if (info.ringkasan) {
