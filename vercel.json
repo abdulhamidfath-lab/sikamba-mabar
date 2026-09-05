@@ -1,14 +1,27 @@
 {
   "cleanUrls": false,
   "trailingSlash": false,
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
+      "source": "/pages/detail-produk.html",
+      "has": [
+        { "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
+      ],
+      "destination": "/api/produk-preview"
     },
     {
-      "src": "/(.*)",
-      "dest": "/404.html",
-      "status": 404
+      "source": "/pages/detail-ikm.html",
+      "has": [
+        { "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
+      ],
+      "destination": "/api/ikm-preview"
+    },
+    {
+      "source": "/pages/detail-informasi.html",
+      "has": [
+        { "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
+      ],
+      "destination": "/api/informasi-preview"
     }
   ]
 }
