@@ -297,7 +297,58 @@
         </tr>
       `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text2);">Belum ada data</td></tr>';
     }
+    // ✅ BARU: Statistik tayangan (views)
+async function loadStatistikViews() {
+  try {
+    const [{ data: produkViews }, { data: ikmViews }, { data: infoViews }] = await Promise.all([
+      db.from('produk').select('id, nama_produk, kategori, views, ikm:ikm_id(nama_usaha)').eq('aktif', true),
+      db.from('ikm').select('id, views'),
+      db.from('informasi').select('id, views').eq('status', 'published')
+    ]);
 
+    const totalViewsProduk = (produkViews || []).reduce((sum, p) => sum + (p.views || 0), 0);
+    const totalViewsIKM    = (ikmViews    || []).reduce((sum, i) => sum + (i.views || 0), 0);
+    const totalViewsInfo   = (infoViews   || []).reduce((sum, a) => sum + (a.views || 0), 0);
+
+    document.getElementById('viewsStatGrid').innerHTML = `
+      <div class="dok-stat-card">
+        <div class="dok-stat-ikon">📦</div>
+        <div class="dok-stat-nama">Tayangan Produk</div>
+        <div class="dok-stat-num" style="color:var(--blue);">${totalViewsProduk.toLocaleString('id-ID')}</div>
+      </div>
+      <div class="dok-stat-card">
+        <div class="dok-stat-ikon">🏭</div>
+        <div class="dok-stat-nama">Tayangan IKM</div>
+        <div class="dok-stat-num" style="color:var(--green);">${totalViewsIKM.toLocaleString('id-ID')}</div>
+      </div>
+      <div class="dok-stat-card">
+        <div class="dok-stat-ikon">📢</div>
+        <div class="dok-stat-nama">Tayangan Informasi</div>
+        <div class="dok-stat-num" style="color:var(--orange);">${totalViewsInfo.toLocaleString('id-ID')}</div>
+      </div>
+    `;
+
+    // Top 5 produk paling banyak dilihat
+    const top5 = (produkViews || [])
+      .slice()
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
+      .slice(0, 5);
+
+    const tbody = document.getElementById('bodyTopProduk');
+    tbody.innerHTML = top5.length ? top5.map(p => `
+      <tr>
+        <td><strong>${p.nama_produk}</strong></td>
+        <td>${p.ikm?.nama_usaha || '-'}</td>
+        <td><span class="badge badge-kategori" style="font-size:10px;">${p.kategori}</span></td>
+        <td style="text-align:center;"><strong>👁️ ${(p.views || 0).toLocaleString('id-ID')}</strong></td>
+      </tr>
+    `).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text2);">Belum ada data tayangan</td></tr>';
+
+  } catch(e) {
+    document.getElementById('viewsStatGrid').innerHTML =
+      `<div style="grid-column:1/-1;color:var(--text2);font-size:13px;padding:1rem;">Gagal memuat statistik tayangan.</div>`;
+  }
+}
     // ✅ BARU: Statistik dokumen legalitas
     async function loadStatistikDokumen(totalIKMAktif) {
       try {
