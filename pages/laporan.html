@@ -129,7 +129,31 @@
         <div class="chart-wrap"><canvas id="chartProdukKat"></canvas></div>
       </div>
     </div>
-
+        
+    <!-- ✅ BARU: STATISTIK TAYANGAN (VIEWS) -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <h3 style="margin-bottom:0.3rem;">📈 Statistik Tayangan</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:1.2rem;">
+        Total halaman produk, IKM, dan informasi yang telah dilihat pengunjung
+      </p>
+      <div class="dok-stat-grid" id="viewsStatGrid" style="margin-bottom:1.5rem;">
+        <div style="grid-column:1/-1;text-align:center;padding:2rem;">
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <h4 style="margin-bottom:0.8rem;font-size:14px;">🔥 5 Produk Paling Banyak Dilihat</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Produk</th><th>IKM</th><th>Kategori</th><th>Tayangan</th></tr>
+          </thead>
+          <tbody id="bodyTopProduk">
+            <tr><td colspan="4" style="text-align:center;padding:1.5rem;"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
     <!-- ✅ BARU: STATISTIK DOKUMEN LEGALITAS -->
     <div class="card" style="margin-bottom:1.5rem;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:10px;">
