@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /pages/dashboard.html
+Disallow: /pages/produk-saya.html
+Disallow: /pages/dokumen-saya.html
+Disallow: /pages/kelola-dokumen.html
+Disallow: /pages/kelola-informasi.html
+Disallow: /pages/form-ikm.html
+Disallow: /pages/form-produk.html
+Disallow: /pages/form-informasi.html
+Disallow: /pages/manajemen-pengguna.html
+Disallow: /pages/laporan.html
+Disallow: /pages/profil.html
+Disallow: /pages/reset-password.html
+Disallow: /lupa-password.html
+
+Sitemap: https://sikamba-mabar.vercel.app/sitemap.xml
