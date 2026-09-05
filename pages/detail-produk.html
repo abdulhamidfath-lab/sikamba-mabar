@@ -266,7 +266,13 @@
         // Data berhasil — sembunyikan loading, tampilkan konten
         document.getElementById('loadingArea').style.display = 'none';
         document.getElementById('kontenUtama').style.display = 'block';
-
+        // Catat tayangan — cuma sekali per sesi browser biar tidak terhitung berkali-kali kalau di-refresh
+const sudahDilihat = sessionStorage.getItem('dilihat_produk_' + p.id);
+if (!sudahDilihat) {
+  db.rpc('increment_views_produk', { produk_id: p.id }).then(() => {
+    sessionStorage.setItem('dilihat_produk_' + p.id, '1');
+  });
+}
         document.title = p.nama_produk + ' — SIKAMBA MABAR';
 setMetaDescription(`${p.nama_produk} — ${rupiah(p.harga)} dari ${p.ikm?.nama_usaha || 'IKM Manggarai Barat'}, ${p.ikm?.kecamatan || ''}. Produk asli Manggarai Barat, terdaftar di SIKAMBA MABAR.`);
 
