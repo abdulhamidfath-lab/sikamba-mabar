@@ -304,7 +304,12 @@
 
         document.getElementById('loadingArea').style.display = 'none';
         document.getElementById('kontenUtama').style.display = 'block';
-
+        const sudahDilihatInfo = sessionStorage.getItem('dilihat_info_' + info.id);
+if (!sudahDilihatInfo) {
+  db.rpc('increment_views_informasi', { informasi_id: info.id }).then(() => {
+    sessionStorage.setItem('dilihat_info_' + info.id, '1');
+  });
+}
         // Hero foto
         const ikon = ikonKat[info.kategori_informasi?.nama] || '📢';
         document.getElementById('heroIcon').textContent = ikon;
