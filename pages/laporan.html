@@ -451,9 +451,12 @@ async function loadStatistikViews() {
       produkData = produk || [];
       analisis(ikmData, produkData);
 
-      // Load statistik dokumen dengan jumlah IKM aktif
+            // Load statistik dokumen dengan jumlah IKM aktif
       const totalAktif = ikmData.filter(i => i.status === 'aktif').length;
       loadStatistikDokumen(totalAktif);
+
+      // ✅ BARU: Load statistik tayangan
+      loadStatistikViews();
     }
 
     init();
