@@ -230,7 +230,15 @@
       document.getElementById('errorPesan').textContent = pesan;
       document.getElementById('errorArea').style.display = 'block';
     }
-
+    function setMetaDescription(teks) {
+  let meta = document.querySelector('meta[name="description"]');
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('name', 'description');
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', teks);
+}
     async function init() {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
