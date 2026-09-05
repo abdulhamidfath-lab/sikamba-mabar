@@ -341,12 +341,15 @@
         document.getElementById('isiArtikel').innerHTML = info.isi || '<p style="color:var(--text2);">Konten belum tersedia.</p>';
 
         // Share WA
-        const pesan = encodeURIComponent(
-          `📢 *${info.judul}*\n` +
-          (info.ringkasan ? `\n${info.ringkasan}\n` : '') +
-          `\nBaca selengkapnya: ${window.location.href}\n\n_SIKAMBA MABAR — Dinas Perindag Manggarai Barat_`
-        );
-        document.getElementById('shareWA').href = `https://wa.me/?text=${pesan}`;
+        const shareUrl = `https://sikamba-mabar.vercel.app/bagikan/informasi/${info.id}`;
+const pesan = encodeURIComponent(
+  `📢 *${info.judul}*\n` +
+  (info.ringkasan ? `\n${info.ringkasan}\n` : '') +
+  `\nBaca selengkapnya: ${shareUrl}\n\n_SIKAMBA MABAR — Dinas Perindag Manggarai Barat_`
+);
+document.getElementById('shareWA').href = `https://wa.me/?text=${pesan}`;
+
+window._shareUrl = shareUrl;
 
         // Artikel lainnya
         const { data: lain } = await db
