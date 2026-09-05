@@ -297,6 +297,7 @@ window._shareUrl = shareUrl; // dipakai tombol "Salin Link"
         document.getElementById('breadNama').textContent = p.nama_produk;
         document.getElementById('hargaProduk').textContent = rupiah(p.harga);
         document.getElementById('stokProduk').textContent = `Stok: ${p.stok} unit`;
+document.getElementById('stokProduk').innerHTML += ` &nbsp;·&nbsp; 👁️ ${(p.views || 0) + 1}x dilihat`;
         document.getElementById('subHeader').innerHTML = `<span class="badge badge-kategori">${p.kategori}</span>`;
 
         // Tombol WA hubungi IKM
