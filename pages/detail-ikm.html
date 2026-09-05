@@ -366,7 +366,7 @@ window._shareUrl = shareUrl;
     }
 
     function copyLinkIKM(btn) {
-      navigator.clipboard.writeText(window.location.href).then(() => {
+      navigator.clipboard.writeText(window._shareUrl || window.location.href).then(() => {
         btn.textContent = '✅ Link Disalin!';
         btn.classList.add('copied');
         setTimeout(() => { btn.textContent = '📋 Salin Link'; btn.classList.remove('copied'); }, 2500);
