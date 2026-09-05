@@ -273,17 +273,19 @@
         `;
 
         // Share WA
-        const sharePesan = encodeURIComponent(
-          `🏭 *${ikm.nama_usaha}*\n` +
-          `📦 ${ikm.kategori}\n` +
-          `📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}\n` +
-          (ikm.no_telp ? `📞 ${ikm.no_telp}\n` : '') +
-          `\nLihat selengkapnya: ${window.location.href}\n\n` +
-          `_Produk asli Manggarai Barat — SIKAMBA MABAR_`
-        );
-        const shareEl = document.getElementById('shareIKMWA');
-        if (shareEl) shareEl.href = `https://wa.me/?text=${sharePesan}`;
+        const shareUrl = `https://sikamba-mabar.vercel.app/bagikan/ikm/${ikm.id}`;
+const sharePesan = encodeURIComponent(
+  `🏭 *${ikm.nama_usaha}*\n` +
+  `📦 ${ikm.kategori}\n` +
+  `📍 ${[ikm.desa, ikm.kecamatan].filter(Boolean).join(', ') || '-'}\n` +
+  (ikm.no_telp ? `📞 ${ikm.no_telp}\n` : '') +
+  `\nLihat selengkapnya: ${shareUrl}\n\n` +
+  `_Produk asli Manggarai Barat — SIKAMBA MABAR_`
+);
+const shareEl = document.getElementById('shareIKMWA');
+if (shareEl) shareEl.href = `https://wa.me/?text=${sharePesan}`;
 
+window._shareUrl = shareUrl;
         // Tombol aksi edit/hapus
         try {
           const user = await getUser();
