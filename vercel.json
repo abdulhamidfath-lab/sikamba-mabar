@@ -5,21 +5,21 @@
     {
       "source": "/pages/detail-produk.html",
       "has": [
-        { "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
+        { "type": "header", "key": "user-agent", "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
       ],
       "destination": "/api/produk-preview"
     },
     {
       "source": "/pages/detail-ikm.html",
       "has": [
-        { "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
+        { "type": "header", "key": "user-agent", "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
       ],
       "destination": "/api/ikm-preview"
     },
     {
       "source": "/pages/detail-informasi.html",
       "has": [
-        { "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
+        { "type": "header", "key": "user-agent", "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Pinterest).*" }
       ],
       "destination": "/api/informasi-preview"
     }
