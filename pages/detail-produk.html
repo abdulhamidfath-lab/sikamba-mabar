@@ -194,7 +194,15 @@
       if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
     }
     function rupiah(n) { return 'Rp ' + parseInt(n).toLocaleString('id-ID'); }
-
+    function setMetaDescription(teks) {
+  let meta = document.querySelector('meta[name="description"]');
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('name', 'description');
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', teks);
+}
     // ✅ PERBAIKAN: tampilError — tidak redirect, tampilkan pesan di halaman
     function tampilError(judul, pesan) {
       document.getElementById('loadingArea').style.display = 'none';
