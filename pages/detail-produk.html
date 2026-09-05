@@ -262,11 +262,14 @@
         document.title = p.nama_produk + ' — SIKAMBA MABAR';
 
         // Share WA
-        const sharePesan = encodeURIComponent(
-          `🛍️ *${p.nama_produk}*\n💰 ${rupiah(p.harga)}\n🏭 ${p.ikm?.nama_usaha || ''}\n📍 ${p.ikm?.kecamatan || ''}\n\nLihat: ${window.location.href}\n\n_Produk asli Manggarai Barat — SIKAMBA MABAR_`
-        );
-        const shareWA = document.getElementById('shareProdukWA');
-        if (shareWA) shareWA.href = `https://wa.me/?text=${sharePesan}`;
+       const shareUrl = `https://sikamba-mabar.vercel.app/bagikan/produk/${p.id}`;
+const sharePesan = encodeURIComponent(
+  `🛍️ *${p.nama_produk}*\n💰 ${rupiah(p.harga)}\n🏭 ${p.ikm?.nama_usaha || ''}\n📍 ${p.ikm?.kecamatan || ''}\n\nLihat: ${shareUrl}\n\n_Produk asli Manggarai Barat — SIKAMBA MABAR_`
+);
+const shareWA = document.getElementById('shareProdukWA');
+if (shareWA) shareWA.href = `https://wa.me/?text=${sharePesan}`;
+
+window._shareUrl = shareUrl; // dipakai tombol "Salin Link"
 
         const ikon = ikonKategori[p.kategori] || '📦';
         if (p.foto_url) {
