@@ -281,10 +281,11 @@ setMetaDescription(`${ikm.nama_usaha} — ${ikm.kategori}. Berlokasi di ${[ikm.d
         document.getElementById('namaUsaha').textContent = ikm.nama_usaha;
         document.getElementById('breadNama').textContent = ikm.nama_usaha;
         document.getElementById('subHeader').innerHTML = `
-          👤 ${ikm.pemilik} &nbsp;|&nbsp;
-          <span class="badge badge-${ikm.status === 'aktif' ? 'aktif' : ikm.status === 'menunggu' ? 'menunggu' : 'nonaktif'}">${ikm.status}</span>
-          &nbsp;<span class="badge badge-kategori">${ikm.kategori}</span>
-        `;
+  👤 ${ikm.pemilik} &nbsp;|&nbsp;
+  <span class="badge badge-${ikm.status === 'aktif' ? 'aktif' : ikm.status === 'menunggu' ? 'menunggu' : 'nonaktif'}">${ikm.status}</span>
+  &nbsp;<span class="badge badge-kategori">${ikm.kategori}</span>
+  &nbsp;·&nbsp; 👁️ ${(ikm.views || 0) + 1}x dilihat
+`;
 
         // Share WA
         const shareUrl = `https://sikamba-mabar.vercel.app/bagikan/ikm/${ikm.id}`;
