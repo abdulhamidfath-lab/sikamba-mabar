@@ -79,7 +79,19 @@
       <h3 style="margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:1px solid var(--cream2);">
         📦 Informasi Produk
       </h3>
+            <!-- ✅ BARU: Pilih IKM tujuan — hanya tampil untuk admin -->
+      <div class="form-group" id="groupPilihIKM" style="display:none;">
+        <label class="form-label">Pilih IKM (Pemilik Produk) *</label>
+        <select id="pilih_ikm" class="form-select">
+          <option value="">-- Pilih IKM --</option>
+        </select>
+      </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nama Produk *</label>
+          <input type="text" id="nama_produk" class="form-input" placeholder="Nama produk">
+        </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Nama Produk *</label>
