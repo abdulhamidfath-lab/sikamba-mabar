@@ -360,12 +360,13 @@
       btn.disabled = true;
 
       try {
-        let ikmId = editId;
+                let ikmId = editId;
 
         if (editId) {
           await updateIKM(editId, data);
         } else {
-          const ikm = await simpanIKM(data);
+          const akunPemilikId = isAdmin ? (document.getElementById('pemilik_akun')?.value || null) : null;
+          const ikm = await simpanIKM(data, { isAdmin, akunPemilikId });
           ikmId = ikm.id;
         }
 
