@@ -136,9 +136,25 @@
       if (q) window.location.href = 'cari.html?q=' + encodeURIComponent(q);
     }
 
-    const warnaBadge = { admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu' };
+       const warnaBadge = { admin:'badge-aktif', ikm:'badge-kategori', konsumen:'badge-menunggu' };
     const ikonPeran  = { admin:'👑', ikm:'🏭', konsumen:'🛍️' };
     let semuaUsers = [];
+
+    // ✅ BARU: data IKM untuk fitur "Tautkan ke IKM"
+    let semuaIKMList   = [];
+    let namaIkmMap      = {};
+    let ikmBelumTertaut = [];
+
+    async function loadDataIKM() {
+      const { data: semuaIkm } = await db.from('ikm').select('id, nama_usaha, kecamatan, status').order('nama_usaha');
+      semuaIKMList = semuaIkm || [];
+      namaIkmMap = {};
+      semuaIKMList.forEach(i => { namaIkmMap[i.id] = i.nama_usaha; });
+
+      const { data: profilDenganIkm } = await db.from('profiles').select('ikm_id').not('ikm_id', 'is', null);
+      const idTertaut = new Set((profilDenganIkm || []).map(p => p.ikm_id));
+      ikmBelumTertaut = semuaIKMList.filter(i => !idTertaut.has(i.id));
+    }
 
     function render() {
       const cari        = document.getElementById('searchInput').value.toLowerCase();
