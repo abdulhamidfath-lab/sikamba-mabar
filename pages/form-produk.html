@@ -285,7 +285,7 @@
       }
     }
 
-    async function init() {
+        async function init() {
       const user   = await requireLogin();
       const profil = await getProfil(user.id);
       const peran  = profil?.peran || 'konsumen';
@@ -296,11 +296,30 @@
         return;
       }
 
-      ikmId = profil?.ikm_id;
-      if (!ikmId && peran !== 'admin') {
-        showAlertForm('⛔ Anda belum memiliki IKM terdaftar. Daftarkan IKM Anda terlebih dahulu.');
-        document.getElementById('btnSimpan').style.display = 'none';
-        return;
+      isAdmin = peran === 'admin';
+
+      if (isAdmin) {
+        // ✅ BARU: admin pilih IKM tujuan dari dropdown
+        document.getElementById('groupPilihIKM').style.display = 'block';
+        const { data: daftarIkm } = await db.from('ikm').select('id, nama_usaha, kecamatan').order('nama_usaha');
+        const selIkm = document.getElementById('pilih_ikm');
+        (daftarIkm || []).forEach(i => {
+          const opt = document.createElement('option');
+          opt.value = i.id;
+          opt.textContent = `${i.nama_usaha} (${i.kecamatan || '-'})`;
+          selIkm.appendChild(opt);
+        });
+
+        // Prefill kalau datang dari link dengan ?ikm=ID
+        const paramIkm = new URLSearchParams(window.location.search).get('ikm');
+        if (paramIkm) selIkm.value = paramIkm;
+      } else {
+        ikmId = profil?.ikm_id;
+        if (!ikmId) {
+          showAlertForm('⛔ Anda belum memiliki IKM terdaftar. Daftarkan IKM Anda terlebih dahulu.');
+          document.getElementById('btnSimpan').style.display = 'none';
+          return;
+        }
       }
 
       const params = new URLSearchParams(window.location.search);
@@ -318,6 +337,7 @@
           document.getElementById('stok').value        = p.stok        || '';
           document.getElementById('bahan_baku').value  = p.bahan_baku  || '';
           document.getElementById('aktif').value       = p.aktif ? 'true' : 'false';
+          if (isAdmin) document.getElementById('pilih_ikm').value = p.ikm_id || '';
           if (p.foto_url) {
             document.getElementById('previewImg').src               = p.foto_url;
             document.getElementById('previewImg').style.display     = 'block';
@@ -327,7 +347,6 @@
         }
       }
     }
-
     // ✅ REFACTOR: cukup satu baris ini
     setupNavAdmin();
     init();
