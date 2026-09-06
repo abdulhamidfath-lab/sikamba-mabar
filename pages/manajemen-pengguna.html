@@ -259,7 +259,39 @@
       showAlert(`Peran berhasil diubah menjadi <strong>${peranBaru}</strong>.`, 'success');
       render();
     }
+        // ✅ BARU: hubungkan akun IKM ke data IKM yang belum tertaut
+    async function tautkanIKM(userId) {
+      const sel = document.getElementById('tautsel-' + userId);
+      const ikmIdTerpilih = sel?.value;
+      if (!ikmIdTerpilih) {
+        showAlert('Pilih IKM terlebih dahulu.', 'error');
+        return;
+      }
 
+      const ikmTerpilih = ikmBelumTertaut.find(i => i.id === ikmIdTerpilih);
+
+      const yakin = await showConfirm({
+        judul: 'Tautkan ke IKM?',
+        pesan: `Akun ini akan dijadikan pemilik IKM <strong>"${ikmTerpilih?.nama_usaha}"</strong>. Pemilik akan bisa mengelola data usaha dan produknya.`,
+        tipe: 'info',
+        labelYa: '🔗 Ya, Tautkan'
+      });
+      if (!yakin) return;
+
+      const { error } = await db.from('profiles').update({ ikm_id: ikmIdTerpilih }).eq('id', userId);
+      if (error) {
+        showAlert('Gagal menautkan: ' + error.message, 'error');
+        return;
+      }
+
+      const user = semuaUsers.find(u => u.id === userId);
+      if (user) user.ikm_id = ikmIdTerpilih;
+
+      await loadDataIKM();
+      render();
+      showAlert(`Berhasil ditautkan ke "${ikmTerpilih?.nama_usaha}".`, 'success');
+    }
+    
     function updateStat() {
       document.getElementById('sTotal').textContent    = semuaUsers.length;
       document.getElementById('sAdmin').textContent    = semuaUsers.filter(u=>u.peran==='admin').length;
