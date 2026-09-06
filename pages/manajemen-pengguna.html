@@ -179,7 +179,31 @@
         return;
       }
 
-      el.innerHTML = list.map(u => `
+            el.innerHTML = list.map(u => {
+        // ✅ BARU: bagian tautan IKM, cuma tampil untuk peran 'ikm'
+        let tautanHTML = '';
+        if (u.peran === 'ikm') {
+          if (u.ikm_id) {
+            const namaIkm = namaIkmMap[u.ikm_id] || 'IKM';
+            tautanHTML = `
+              <div style="margin-top:8px;">
+                <span class="badge badge-aktif" style="font-size:10px;" title="${namaIkm}">🔗 Terhubung: ${namaIkm}</span>
+              </div>`;
+          } else if (ikmBelumTertaut.length) {
+            tautanHTML = `
+              <div style="display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+                <select class="peran-select" id="tautsel-${u.id}" style="min-width:160px;">
+                  <option value="">-- Pilih IKM untuk ditautkan --</option>
+                  ${ikmBelumTertaut.map(i => `<option value="${i.id}">${i.nama_usaha}</option>`).join('')}
+                </select>
+                <button class="btn btn-secondary" style="font-size:11px;padding:6px 10px;min-height:36px;" onclick="tautkanIKM('${u.id}')">🔗 Tautkan</button>
+              </div>`;
+          } else {
+            tautanHTML = `<div style="margin-top:8px;font-size:11px;color:var(--text2);">Belum ada IKM yang bisa ditautkan.</div>`;
+          }
+        }
+
+        return `
         <div class="user-card" id="ucard-${u.id}">
           <div class="user-avatar">${ikonPeran[u.peran] || '👤'}</div>
           <div class="user-info">
@@ -189,6 +213,7 @@
               <span class="badge ${warnaBadge[u.peran]||'badge-kategori'}" style="font-size:10px;">${(u.peran||'konsumen').toUpperCase()}</span>
               <span style="margin-left:6px;">· ${new Date(u.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</span>
             </div>
+            ${tautanHTML}
           </div>
           <div class="user-actions">
             <select class="peran-select" id="sel-${u.id}" onchange="ubahPeran('${u.id}', this.value, '${u.peran}')">
@@ -197,8 +222,8 @@
               <option value="konsumen" ${u.peran==='konsumen'?'selected':''}>🛍️ Konsumen</option>
             </select>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
 
     // ✅ DIPERBARUI: pakai showConfirm() dan showAlert()
