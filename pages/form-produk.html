@@ -229,7 +229,10 @@
       if (!nama || !kategori || !harga) {
         showAlertForm('Nama produk, kategori, dan harga wajib diisi.'); return;
       }
-
+            const targetIkmId = isAdmin ? document.getElementById('pilih_ikm').value : ikmId;
+      if (!targetIkmId) {
+        showAlertForm('Pilih IKM tujuan produk ini terlebih dahulu.'); return;
+      }
       btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;"></span> Menyimpan...';
       btn.disabled = true;
 
