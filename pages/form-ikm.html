@@ -417,7 +417,25 @@
         }
       }
 
-      if (isAdmin) document.getElementById('groupStatus').style.display = 'block';
+            if (isAdmin) document.getElementById('groupStatus').style.display = 'block';
+
+      // ✅ BARU: tampilkan dropdown pemilik cuma untuk admin & IKM baru (bukan edit)
+      if (isAdmin && !id) {
+        document.getElementById('groupPemilikAkun').style.display = 'block';
+        const { data: calonPemilik } = await db.from('profiles')
+          .select('id, nama_lengkap, email, peran')
+          .is('ikm_id', null)
+          .neq('peran', 'admin')
+          .order('nama_lengkap');
+
+        const selPemilik = document.getElementById('pemilik_akun');
+        (calonPemilik || []).forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = `${p.nama_lengkap || p.email} (${p.peran})`;
+          selPemilik.appendChild(opt);
+        });
+      }
 
       if (id) {
         editId = id;
