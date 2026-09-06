@@ -198,7 +198,16 @@
         </select>
       </div>
       <input type="hidden" id="statusHidden" value="menunggu">
-
+            <!-- ✅ BARU: Hubungkan ke akun pengguna — hanya admin, saat tambah IKM baru -->
+      <div class="form-group" id="groupPemilikAkun" style="display:none;">
+        <label class="form-label">Hubungkan ke Akun Pengguna (opsional)</label>
+        <select id="pemilik_akun" class="form-select">
+          <option value="">-- Belum dihubungkan, tautkan nanti --</option>
+        </select>
+        <div class="form-hint">
+          Pilih akun pengguna yang menjadi pemilik IKM ini. Kalau belum tahu/belum ada akunnya, biarkan kosong — nanti bisa dihubungkan lewat halaman Manajemen Pengguna.
+        </div>
+      </div>
       <div class="form-group">
         <label class="form-label">Foto Usaha</label>
 
