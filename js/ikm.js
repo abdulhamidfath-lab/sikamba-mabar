@@ -28,12 +28,25 @@ async function getMyIKM(userId) {
 }
 
 // SIMPAN IKM BARU
-async function simpanIKM(data) {
+// opsi.isAdmin: true kalau yang input admin
+// opsi.akunPemilikId: kalau admin memilih akun pemilik dari dropdown, isi ID akun itu di sini
+async function simpanIKM(data, opsi = {}) {
   const { data: ikm, error } = await db.from('ikm').insert(data).select().single();
   if (error) throw error;
-  // Hubungkan IKM ke profil pengguna
+
   const user = await getUser();
-  await db.from('profiles').update({ ikm_id: ikm.id }).eq('id', user.id);
+
+  if (opsi.isAdmin) {
+    // Admin: HANYA hubungkan kalau eksplisit pilih akun pemilik.
+    // Kalau tidak pilih, biarkan IKM "belum tertaut" — bisa dihubungkan nanti.
+    if (opsi.akunPemilikId) {
+      await db.from('profiles').update({ ikm_id: ikm.id }).eq('id', opsi.akunPemilikId);
+    }
+  } else {
+    // Pelaku IKM daftar sendiri: tetap otomatis terhubung ke akunnya (perilaku lama, tidak berubah)
+    await db.from('profiles').update({ ikm_id: ikm.id }).eq('id', user.id);
+  }
+
   return ikm;
 }
 
