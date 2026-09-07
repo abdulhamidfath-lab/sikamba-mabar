@@ -188,6 +188,9 @@
             tautanHTML = `
               <div style="margin-top:8px;">
                 <span class="badge badge-aktif" style="font-size:10px;" title="${namaIkm}">🔗 Terhubung: ${namaIkm}</span>
+                <button class="btn btn-secondary" style="font-size:11px;padding:5px 10px;min-height:32px;" onclick="lepasTautan('${u.id}','${namaIkm.replace(/'/g,"\\'")}')">
+                  ✂️ Lepas Tautan
+                </button>
               </div>`;
           } else if (ikmBelumTertaut.length) {
             tautanHTML = `
