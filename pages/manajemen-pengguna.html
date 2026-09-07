@@ -262,7 +262,8 @@
       showAlert(`Peran berhasil diubah menjadi <strong>${peranBaru}</strong>.`, 'success');
       render();
     }
-        // ✅ BARU: hubungkan akun IKM ke data IKM yang belum tertaut
+        
+    // ✅ BARU: hubungkan akun IKM ke data IKM yang belum tertaut
     async function tautkanIKM(userId) {
       const sel = document.getElementById('tautsel-' + userId);
       const ikmIdTerpilih = sel?.value;
@@ -293,6 +294,30 @@
       await loadDataIKM();
       render();
       showAlert(`Berhasil ditautkan ke "${ikmTerpilih?.nama_usaha}".`, 'success');
+    }
+
+        // ✅ BARU: lepas tautan akun IKM dari data IKM-nya
+    async function lepasTautan(userId, namaIkm) {
+      const yakin = await showConfirm({
+        judul: 'Lepas Tautan IKM?',
+        pesan: `Akun ini akan dilepaskan dari IKM <strong>"${namaIkm}"</strong>. Pemilik tidak akan bisa lagi mengelola usaha dan produknya sampai ditautkan ulang. Data IKM itu sendiri <strong>tidak akan terhapus</strong>.`,
+        tipe: 'warning',
+        labelYa: '✂️ Ya, Lepas Tautan'
+      });
+      if (!yakin) return;
+
+      const { error } = await db.from('profiles').update({ ikm_id: null }).eq('id', userId);
+      if (error) {
+        showAlert('Gagal melepas tautan: ' + error.message, 'error');
+        return;
+      }
+
+      const user = semuaUsers.find(u => u.id === userId);
+      if (user) user.ikm_id = null;
+
+      await loadDataIKM();
+      render();
+      showAlert(`Tautan ke "${namaIkm}" berhasil dilepas. IKM kini tersedia untuk ditautkan ke akun lain.`, 'info');
     }
     
     function updateStat() {
