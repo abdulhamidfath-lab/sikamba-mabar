@@ -120,12 +120,7 @@
       <button type="submit" class="navbar-search-btn">Cari</button>
     </form>
     <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
-    <div class="navbar-menu" id="navMenu">
-      <a href="../index.html">Beranda</a>
-      <a href="data-ikm.html">Data IKM</a>
-      <a href="marketplace.html">Marketplace</a>
-      <a href="informasi.html" class="active">Informasi</a>
-    </div>
+    <div class="navbar-menu" id="navMenu"></div>
   </nav>
   <div class="batik-strip"></div>
 
@@ -405,6 +400,13 @@ window._shareUrl = shareUrl;
     document.addEventListener('DOMContentLoaded', init);
   </script>
 
+  <script src="../js/navbar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderNavbar('data-ikm');
+    });
+  </script>
+  
   <script src="../js/sidebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
