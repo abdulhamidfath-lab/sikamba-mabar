@@ -55,13 +55,7 @@
       <span>SIKAMBA MABAR</span>
     </a>
     <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
-    <div class="navbar-menu" id="navMenu">
-      <a href="../index.html">Beranda</a>
-      <a href="data-ikm.html">Data IKM</a>
-      <a href="peta.html">Peta Industri</a>
-      <a href="marketplace.html">Marketplace</a>
-      <a href="tentang.html" class="active">Tentang</a>
-    </div>
+    <div class="navbar-menu" id="navMenu"></div>
   </nav>
   <div class="batik-strip"></div>
 
@@ -195,6 +189,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase.js"></script>
+  <script src="../js/navbar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderNavbar('data-ikm');
+    });
+  </script>
   <script src="../js/sidebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
