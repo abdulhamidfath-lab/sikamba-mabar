@@ -407,6 +407,16 @@
         return;
       }
 
+       // ✅ BARU: cegah pelaku IKM tambah IKM kedua kalau sudah punya
+      if (!id && peran === 'ikm' && profil?.ikm_id) {
+        document.getElementById('alertBox').innerHTML =
+          `<div class="alert alert-info">ℹ️ Anda sudah memiliki data IKM terdaftar. Setiap akun hanya bisa mengelola satu IKM.<br><a href="form-ikm.html?id=${profil.ikm_id}" style="font-weight:600;">✏️ Edit Data IKM Anda →</a></div>`;
+        document.getElementById('btnSimpan').style.display = 'none';
+        document.querySelector('.card').style.opacity = '0.4';
+        document.querySelector('.card').style.pointerEvents = 'none';
+        return;
+      }
+      
       if (id && peran === 'ikm') {
         if (profil?.ikm_id !== id) {
           document.getElementById('alertBox').innerHTML =
