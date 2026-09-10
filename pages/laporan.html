@@ -442,14 +442,17 @@ async function loadStatistikViews() {
         window.location.href = 'dashboard.html'; return;
       }
 
-      const [{ data: ikm }, { data: produk }] = await Promise.all([
+            const [{ data: ikm }, { data: produk }] = await Promise.all([
         db.from('ikm').select('*'),
-        db.from('produk').select('*').eq('aktif', true)
+        db.from('produk').select('*') // ✅ hapus filter aktif → ambil SEMUA produk (untuk laporan Excel)
       ]);
 
       ikmData    = ikm    || [];
       produkData = produk || [];
-      analisis(ikmData, produkData);
+
+      // Grafik & angka statistik di layar tetap pakai produk aktif saja
+      // (biar tampilan dashboard tidak berubah dari sebelumnya)
+      analisis(ikmData, produkData.filter(p => p.aktif));
 
             // Load statistik dokumen dengan jumlah IKM aktif
       const totalAktif = ikmData.filter(i => i.status === 'aktif').length;
