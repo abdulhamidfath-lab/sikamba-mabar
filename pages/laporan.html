@@ -404,9 +404,10 @@ async function loadStatistikViews() {
       }
     }
 
-    function eksporExcel() {
+        function eksporExcel() {
       if (!ikmData.length) { alert('Tidak ada data untuk diekspor.'); return; }
 
+      // ===== Sheet 1: Data IKM (sama seperti sebelumnya) =====
       const headerIKM = ['No','Nama Usaha','Nama Pemilik','Kategori','Kecamatan','Desa/Kelurahan','Alamat Lengkap','Status','Tahun Berdiri','Tenaga Kerja','No. Telp / WhatsApp','Email'];
       const rowsIKM = ikmData.map((ikm, idx) => [
         idx + 1, ikm.nama_usaha||'-', ikm.pemilik||'-', ikm.kategori||'-',
@@ -414,23 +415,55 @@ async function loadStatistikViews() {
         ikm.tahun_berdiri||'-', ikm.jumlah_tenaga_kerja||'-', ikm.no_telp||'-', ikm.email||'-'
       ]);
 
+      // ===== Sheet 2: Ringkasan per Kecamatan (tetap hitung dari produk AKTIF saja) =====
+      const produkAktif = produkData.filter(p => p.aktif);
       const headerRingkasan = ['Kecamatan','Total IKM','IKM Aktif','IKM Menunggu','IKM Nonaktif','Total Produk'];
       const rowsRingkasan = KECAMATAN_LIST.map(kec => {
         const ikmKec    = ikmData.filter(i => i.kecamatan === kec);
-        const produkKec = produkData.filter(p => ikmKec.some(i => i.id === p.ikm_id));
+        const produkKec = produkAktif.filter(p => ikmKec.some(i => i.id === p.ikm_id));
         return [kec, ikmKec.length, ikmKec.filter(i=>i.status==='aktif').length, ikmKec.filter(i=>i.status==='menunggu').length, ikmKec.filter(i=>i.status==='nonaktif').length, produkKec.length];
       }).filter(r => r[1] > 0);
-      rowsRingkasan.push(['TOTAL', ikmData.length, ikmData.filter(i=>i.status==='aktif').length, ikmData.filter(i=>i.status==='menunggu').length, ikmData.filter(i=>i.status==='nonaktif').length, produkData.length]);
+      rowsRingkasan.push(['TOTAL', ikmData.length, ikmData.filter(i=>i.status==='aktif').length, ikmData.filter(i=>i.status==='menunggu').length, ikmData.filter(i=>i.status==='nonaktif').length, produkAktif.length]);
 
+      // ===== Sheet 3 (BARU): Data Produk =====
+      // Bikin "kamus" ikm_id → nama usaha & kecamatan, biar tidak nampilkan kode acak di Excel
+      const ikmMap = {};
+      ikmData.forEach(i => { ikmMap[i.id] = i; });
+
+      const headerProduk = ['No','Nama Produk','Nama IKM','Kecamatan','Kategori','Harga (Rp)','Stok','Bahan Baku','Status'];
+      const rowsProduk = produkData.map((p, idx) => {
+        const ikmPemilik = ikmMap[p.ikm_id];
+        return [
+          idx + 1,
+          p.nama_produk || '-',
+          ikmPemilik?.nama_usaha || '-',
+          ikmPemilik?.kecamatan || '-',
+          p.kategori || '-',
+          p.harga || 0,
+          p.stok ?? '-',
+          p.bahan_baku || '-',
+          p.aktif ? 'Aktif' : 'Nonaktif'
+        ];
+      });
+
+      // ===== Susun workbook =====
       const wb  = XLSX.utils.book_new();
+
       const ws1 = XLSX.utils.aoa_to_sheet([headerIKM, ...rowsIKM]);
       ws1['!cols'] = [
         {wch:4},{wch:28},{wch:20},{wch:22},{wch:16},{wch:20},{wch:30},{wch:12},{wch:13},{wch:14},{wch:18},{wch:24}
       ];
+
       const ws2 = XLSX.utils.aoa_to_sheet([headerRingkasan, ...rowsRingkasan]);
       ws2['!cols'] = [{wch:18},{wch:12},{wch:12},{wch:16},{wch:14},{wch:13}];
+
+      const ws3 = XLSX.utils.aoa_to_sheet([headerProduk, ...rowsProduk]);
+      ws3['!cols'] = [{wch:4},{wch:28},{wch:26},{wch:16},{wch:22},{wch:14},{wch:8},{wch:22},{wch:12}];
+
       XLSX.utils.book_append_sheet(wb, ws1, 'Data IKM');
       XLSX.utils.book_append_sheet(wb, ws2, 'Ringkasan Kecamatan');
+      XLSX.utils.book_append_sheet(wb, ws3, 'Data Produk'); // ✅ sheet baru
+
       const tgl = new Date().toISOString().slice(0,10);
       XLSX.writeFile(wb, `Data_IKM_SIKAMBA_MABAR_${tgl}.xlsx`);
     }
