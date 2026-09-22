@@ -31,10 +31,9 @@ async function getMyIKM(userId) {
 // opsi.isAdmin: true kalau yang input admin
 // opsi.akunPemilikId: kalau admin memilih akun pemilik dari dropdown, isi ID akun itu di sini
 async function simpanIKM(data, opsi = {}) {
-  const { data: ikm, error } = await db.from('ikm').insert(data).select().single();
-  if (error) throw error;
-
   const user = await getUser();
+  const { data: ikm, error } = await db.from('ikm').insert({ ...data, created_by: user.id }).select().single();
+  if (error) throw error;
 
   if (opsi.isAdmin) {
     // Admin: HANYA hubungkan kalau eksplisit pilih akun pemilik.
