@@ -246,10 +246,16 @@
           produkId = produk.id;
         }
 
-        // Generate QR code
-        const qrUrl  = window.location.origin + `/pages/qr-produk.html?id=${produkId}`;
-        const qrData = await generateQR(qrUrl);
-        await db.from('produk').update({ qr_code: qrData }).eq('id', produkId);
+        // Generate QR code — dibungkus try/catch supaya kalau QR gagal dibuat,
+        // produknya TETAP dianggap berhasil tersimpan (QR bisa nyusul lewat Edit)
+        try {
+          const qrUrl  = window.location.origin + `/pages/qr-produk.html?id=${produkId}`;
+          const qrData = await generateQR(qrUrl);
+          await db.from('produk').update({ qr_code: qrData }).eq('id', produkId);
+        } catch (qrErr) {
+          console.warn('QR code gagal dibuat, tapi produk tetap tersimpan:', qrErr.message);
+          // sengaja tidak throw — biar proses simpan produk tidak dianggap gagal
+        }
 
         // Upload foto jika ada
         const fotoFile = document.getElementById('foto').files[0];
