@@ -427,12 +427,7 @@
         const { data: ikm } = await db.from('ikm').select('*').order('created_at',{ascending:false}).limit(5);
         renderIKMList(ikm||[]);
       } catch(e) {}
-
-      if (peran === 'admin') {
-        document.getElementById('navLaporan').style.display = 'block';
-        document.getElementById('navPengguna').style.display = 'block';
-      }
-
+      
       if (peran === 'admin') {
         document.getElementById('stat3').style.display = 'block';
         document.getElementById('statLabel3').textContent = '⏳ Menunggu';
