@@ -445,8 +445,10 @@
         const navDok = document.getElementById('navDokumen');
         if (navDok) navDok.style.display = 'block';
         try {
-          const stats = await getStatistik();
-          document.getElementById('statNum3').textContent = stats.totalProduk;
+          const { count } = await db.from('produk')
+            .select('id', { count: 'exact', head: true })
+            .eq('ikm_id', profil.ikm_id);
+          document.getElementById('statNum3').textContent = count || 0;
         } catch(e) {}
         // Cek dokumen yang ditolak
         loadDokumenDitolak(profil.ikm_id);
