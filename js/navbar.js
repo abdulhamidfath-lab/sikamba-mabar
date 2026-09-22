@@ -50,6 +50,8 @@ async function renderNavbar(halamanAktif) {
   if (peran === 'ikm') {
     links.push({ key: 'produk-saya',   label: 'Produk Saya',      href: prefix + 'produk-saya.html' });
     links.push({ key: 'dokumen-saya',  label: '📄 Dokumen Saya',  href: prefix + 'dokumen-saya.html' });
+  }  else if (peran === 'admin') {
+    links.push({ key: 'produk-saya', label: 'Kelola Produk', href: prefix + 'produk-saya.html' });
   }
 
   // Menu akun — cuma untuk yang sudah login
