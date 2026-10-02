@@ -257,16 +257,25 @@
           // sengaja tidak throw — biar proses simpan produk tidak dianggap gagal
         }
 
-        // Upload foto jika ada
+         // Upload foto jika ada
         const fotoFile = document.getElementById('foto').files[0];
         if (fotoFile && produkId) {
           const ext  = fotoFile.name.split('.').pop();
           const path = `${produkId}/foto.${ext}`;
           const { error: upErr } = await db.storage.from('foto-produk').upload(path, fotoFile, { upsert: true });
-          if (!upErr) {
-            const { data: urlData } = db.storage.from('foto-produk').getPublicUrl(path);
-            await db.from('produk').update({ foto_url: urlData.publicUrl }).eq('id', produkId);
+
+          if (upErr) {
+            // Jangan diam-diam: beri tahu pengguna kalau foto gagal
+            editId = produkId; // supaya klik "Simpan" lagi tidak membuat produk ganda
+            showAlertForm('⚠️ Produk tersimpan, tetapi foto gagal diupload: ' + upErr.message, 'warning');
+            btn.textContent = '💾 Simpan Perubahan';
+            btn.disabled = false;
+            return;
           }
+
+          const { data: urlData } = db.storage.from('foto-produk').getPublicUrl(path);
+          // ?v=... supaya browser menampilkan foto terbaru
+          await db.from('produk').update({ foto_url: urlData.publicUrl + '?v=' + Date.now() }).eq('id', produkId);
         }
 
         showAlertForm(
