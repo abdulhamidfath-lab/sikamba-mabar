@@ -455,10 +455,9 @@
       try {
         const { data } = await db.from('produk')
           .select('*, ikm:ikm_id(nama_usaha)')
-          .eq('aktif', true)
-          .order('created_at', { ascending: false })
-          .limit(12);
-        renderProdukSlider(data || []);
+          .eq('aktif', true);
+        // acak semua produk aktif, lalu ambil 12 saja untuk slider
+        renderProdukSlider(acak(data || []).slice(0, 12));
       } catch(e) {}
 
       // Load IKM unggulan
