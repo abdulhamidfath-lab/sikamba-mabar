@@ -341,7 +341,7 @@
           const { data: urlData } = db.storage
             .from('foto-informasi')
             .getPublicUrl(path);
-          await db.from('informasi').update({ foto_url: urlData.publicUrl }).eq('id', infoId);
+          await db.from('informasi').update({ foto_url: urlData.publicUrl + '?v=' + Date.now() }).eq('id', infoId);
         }
 
         showAlertForm(
