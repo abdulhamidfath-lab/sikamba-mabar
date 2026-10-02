@@ -62,7 +62,8 @@ async function uploadFotoIKM(file, ikmId) {
   const { error } = await db.storage.from('foto-ikm').upload(path, file, { upsert: true });
   if (error) throw error;
   const { data } = db.storage.from('foto-ikm').getPublicUrl(path);
-  return data.publicUrl;
+  // ?v=... membuat alamat gambar berbeda setiap upload, jadi browser tidak memakai gambar lama
+  return data.publicUrl + '?v=' + Date.now();
 }
 
 // AMBIL SEMUA PRODUK MILIK IKM
