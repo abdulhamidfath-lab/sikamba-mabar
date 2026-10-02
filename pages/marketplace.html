@@ -117,6 +117,7 @@
           <option value="500000-99999999">Di atas Rp 500.000</option>
         </select>
         <select class="form-select" id="sortBy" style="flex:1;min-width:140px;margin-bottom:0;" onchange="render()">
+          <option value="acak">Rekomendasi (acak)</option>
           <option value="terbaru">Terbaru</option>
           <option value="termurah">Harga Termurah</option>
           <option value="termahal">Harga Termahal</option>
@@ -217,7 +218,8 @@
         return cocokKat && cocokKec && cocokCari && cocokHarga;
       });
 
-      if (sort === 'termurah') hasil.sort((a,b) => a.harga - b.harga);
+      if (sort === 'terbaru') hasil.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+      else if (sort === 'termurah') hasil.sort((a,b) => a.harga - b.harga);
       else if (sort === 'termahal') hasil.sort((a,b) => b.harga - a.harga);
       else if (sort === 'nama') hasil.sort((a,b) => a.nama_produk.localeCompare(b.nama_produk));
 
