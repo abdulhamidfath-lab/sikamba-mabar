@@ -92,3 +92,13 @@ async function getStatistik() {
     totalProduk: produk.count || 0
   };
 }
+
+// ACAK URUTAN ARRAY (dipakai agar semua produk punya peluang tampil di depan)
+function acak(daftar) {
+  const hasil = [...daftar]; // salin dulu, supaya data aslinya tidak berubah
+  for (let i = hasil.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [hasil[i], hasil[j]] = [hasil[j], hasil[i]];
+  }
+  return hasil;
+}
