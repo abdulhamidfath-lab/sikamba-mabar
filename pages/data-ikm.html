@@ -244,7 +244,7 @@
 
         const { data, error } = await query;
         if (error) throw error;
-        semuaIKM = data || [];
+        semuaIKM = acak(data || []); // diacak sekali di sini, supaya urutan stabil saat difilter
         renderIKM(semuaIKM);
       } catch(e) {
         document.getElementById('ikmGrid').innerHTML =
