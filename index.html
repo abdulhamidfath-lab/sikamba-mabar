@@ -462,8 +462,8 @@
 
       // Load IKM unggulan
       try {
-        const { data } = await db.from('ikm').select('*').eq('status','aktif')
-          .order('created_at', { ascending: false }).limit(4);
+        const { data: semuaAktif } = await db.from('ikm').select('*').eq('status','aktif');
+        const data = acak(semuaAktif || []).slice(0, 4); // acak semua IKM aktif, ambil 4
         const grid = document.getElementById('ikmGrid');
         if (!data || !data.length) {
           grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text2);padding:2rem;">Belum ada IKM terdaftar.</div>';
