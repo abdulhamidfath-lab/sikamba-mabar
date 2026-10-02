@@ -417,10 +417,8 @@
       try {
         const { data: produk } = await db.from('produk')
           .select('*, ikm:ikm_id(nama_usaha)')
-          .eq('aktif',true)
-          .order('created_at',{ascending:false})
-          .limit(10);
-        renderProdukSlider(produk||[]);
+          .eq('aktif',true);
+        renderProdukSlider(acak(produk||[]).slice(0, 10));
       } catch(e) {}
 
       try {
