@@ -239,7 +239,8 @@
         let produkId = editId;
 
         if (editId) {
-          await db.from('produk').update(data).eq('id', editId);
+          const { error: updErr } = await db.from('produk').update(data).eq('id', editId);
+          if (updErr) throw updErr;
         } else {
           const { data: produk, error } = await db.from('produk').insert(data).select().single();
           if (error) throw error;
