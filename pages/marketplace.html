@@ -271,7 +271,7 @@
         return;
       }
 
-      semuaProduk = data || [];
+      semuaProduk = acak(data || []); // diacak sekali di sini, supaya urutan stabil saat difilter
       render();
     }
 
