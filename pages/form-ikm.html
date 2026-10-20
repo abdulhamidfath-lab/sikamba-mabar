@@ -322,11 +322,7 @@
     async function simpan() {
       const user = await requireLogin();
       const btn  = document.getElementById('btnSimpan');
-
-      const statusVal = isAdmin
-        ? document.getElementById('status').value
-        : 'menunggu';
-
+   
       const data = {
         nama_usaha:          document.getElementById('nama_usaha').value.trim(),
         pemilik:             document.getElementById('pemilik').value.trim(),
@@ -341,13 +337,20 @@
         no_telp:             document.getElementById('no_telp').value.trim(),
         email:               document.getElementById('email_usaha').value.trim(),
         jumlah_tenaga_kerja: parseInt(document.getElementById('jumlah_tenaga_kerja').value) || null,
-        status:              statusVal,
       };
 
-      if (!data.nama_usaha || !data.pemilik || !data.kategori) {
-        showAlertForm('Nama usaha, pemilik, dan kategori wajib diisi.'); return;
-      }
+       // ✅ Blok baru, diletakkan SETELAH data dibuat
+  if (isAdmin) {
+    data.status = document.getElementById('status').value;
+  } else if (!editId) {
+    data.status = 'menunggu';
+  }
 
+  if (!data.nama_usaha || !data.pemilik || !data.kategori) {
+    showAlertForm('Nama usaha, pemilik, dan kategori wajib diisi.'); return;
+  }
+      
+  
       btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;"></span> Menyimpan...';
       btn.disabled = true;
 
