@@ -174,7 +174,7 @@
         <div class="ikm-card">
           <div class="ikm-foto">
             ${ikm.foto_url
-              ? `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">`
+              ? `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}" loading="lazy">`
               : `<span>${ikonKategori[ikm.kategori] || '🏭'}</span>`}
           </div>
           <div class="ikm-body">
