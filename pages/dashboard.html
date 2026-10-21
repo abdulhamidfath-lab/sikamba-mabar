@@ -247,7 +247,7 @@
       track.innerHTML = data.map(p => `
         <div class="produk-slide" onclick="window.location.href='detail-produk.html?id=${p.id}'">
           <div class="produk-foto">
-            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}">` : (ikonKat[p.kategori]||'📦')}
+            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}" loading="lazy">` : (ikonKat[p.kategori]||'📦')}
           </div>
           <div class="produk-body">
             <div class="produk-nama">${p.nama_produk}</div>
