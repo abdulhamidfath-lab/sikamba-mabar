@@ -136,7 +136,7 @@
       grid.innerHTML = data.map(p => `
         <div class="produk-card" id="card-${p.id}">
           <div class="produk-foto">
-            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}">` : `<span>${ikonKategori[p.kategori] || '📦'}</span>`}
+            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}" loading="lazy">` : `<span>${ikonKategori[p.kategori] || '📦'}</span>`}
             <div class="produk-status">
               <span class="badge ${p.aktif ? 'badge-aktif' : 'badge-nonaktif'}">${p.aktif ? 'Aktif' : 'Nonaktif'}</span>
             </div>
