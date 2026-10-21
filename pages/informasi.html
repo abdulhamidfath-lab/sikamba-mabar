@@ -245,7 +245,7 @@
           <div class="info-card" onclick="window.location.href='detail-informasi.html?id=${info.id}'">
             <div class="info-foto">
               ${info.foto_url
-                ? `<img src="${info.foto_url}" alt="${info.judul}">`
+                ? `<img src="${info.foto_url}" alt="${info.judul}" loading="lazy">`
                 : `<span>${ikon}</span>`}
             </div>
             <div class="info-body">
