@@ -316,8 +316,9 @@
         }
 
         // ✅ FIX: Upload foto dengan path dan contentType yang benar
-        const fotoFile = document.getElementById('foto').files[0];
-        if (fotoFile && infoId) {
+        const fotoAsli = document.getElementById('foto').files[0];
+        if (fotoAsli && infoId) {
+          const fotoFile = await kompresFoto(fotoAsli);
           const ext  = fotoFile.name.split('.').pop().toLowerCase();
           const path = `informasi/${infoId}/sampul.${ext}`;
 
