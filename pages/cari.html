@@ -190,7 +190,7 @@
           ${list.map(ikm => `
             <div class="ikm-card" onclick="window.location.href='detail-ikm.html?id=${ikm.id}'">
               <div class="ikm-foto">
-                ${ikm.foto_url ? `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}">` : (ikonKat[ikm.kategori]||'🏭')}
+                ${ikm.foto_url ? `<img src="${ikm.foto_url}" alt="${ikm.nama_usaha}" loading="lazy">` : (ikonKat[ikm.kategori]||'🏭')}
               </div>
               <div class="ikm-body">
                 <div class="ikm-nama">${highlight(ikm.nama_usaha, query)}</div>
@@ -219,7 +219,7 @@
           ${list.map(p => `
             <div class="produk-row" onclick="window.location.href='detail-produk.html?id=${p.id}'">
               <div class="produk-thumb">
-                ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}">` : (ikonKat[p.kategori]||'📦')}
+                ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}" loading="lazy">` : (ikonKat[p.kategori]||'📦')}
               </div>
               <div style="flex:1;min-width:0;">
                 <div class="produk-nama">${highlight(p.nama_produk, query)}</div>
@@ -251,7 +251,7 @@
             return `
               <div class="info-row" onclick="window.location.href='detail-informasi.html?id=${info.id}'">
                 <div class="info-thumb">
-                  ${info.foto_url ? `<img src="${info.foto_url}" alt="${info.judul}">` : ikon}
+                  ${info.foto_url ? `<img src="${info.foto_url}" alt="${info.judul}" loading="lazy">` : ikon}
                 </div>
                 <div style="flex:1;min-width:0;">
                   <div class="info-judul">${highlight(info.judul, query)}</div>
