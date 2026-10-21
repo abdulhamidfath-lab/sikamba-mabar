@@ -260,8 +260,9 @@
         }
 
          // Upload foto jika ada
-        const fotoFile = document.getElementById('foto').files[0];
-        if (fotoFile && produkId) {
+        const fotoAsli = document.getElementById('foto').files[0];
+        if (fotoAsli && produkId) {
+          const fotoFile = await kompresFoto(fotoAsli);
           const ext  = fotoFile.name.split('.').pop();
           const path = `${produkId}/foto.${ext}`;
           const { error: upErr } = await db.storage.from('foto-produk').upload(path, fotoFile, { upsert: true });
