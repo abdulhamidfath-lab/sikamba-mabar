@@ -2,8 +2,21 @@
   "cleanUrls": false,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/bagikan/produk/:id", "destination": "/api/produk-preview?id=:id" },
-    { "source": "/bagikan/ikm/:id", "destination": "/api/ikm-preview?id=:id" },
-    { "source": "/bagikan/informasi/:id", "destination": "/api/informasi-preview?id=:id" }
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/bagikan/produk/:id",
+      "destination": "/api/produk-preview?id=:id"
+    },
+    {
+      "source": "/bagikan/ikm/:id",
+      "destination": "/api/ikm-preview?id=:id"
+    },
+    {
+      "source": "/bagikan/informasi/:id",
+      "destination": "/api/informasi-preview?id=:id"
+    }
   ]
 }
