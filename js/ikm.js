@@ -57,6 +57,7 @@ async function updateIKM(id, data) {
 
 // UPLOAD FOTO IKM
 async function uploadFotoIKM(file, ikmId) {
+  file = await kompresFoto(file);
   const ext = file.name.split('.').pop();
   const path = `${ikmId}/foto.${ext}`;
   const { error } = await db.storage.from('foto-ikm').upload(path, file, { upsert: true });
