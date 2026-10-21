@@ -237,7 +237,7 @@
       grid.innerHTML = hasil.map(p => `
         <div class="produk-card" onclick="window.location.href='detail-produk.html?id=${p.id}'">
           <div class="produk-foto">
-            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}">` : `<span>${ikonKategori[p.kategori] || '📦'}</span>`}
+            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nama_produk}" loading="lazy">` : `<span>${ikonKategori[p.kategori] || '📦'}</span>`}
           </div>
           <div class="produk-body">
             <div class="produk-nama">${p.nama_produk}</div>
